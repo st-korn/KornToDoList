@@ -1,0 +1,215 @@
+<html>
+<head>
+	<title>Список задач 13.01.2018</title>
+	<meta charset="utf-8">
+	<style>
+		body {
+			background: linear-gradient( #bbb, transparent 1px), linear-gradient( 90deg, #bbb, transparent 1px);
+			background-size: 12px 12px;
+			background-position: center center;
+		}
+		table {
+			width: 100%;
+		}
+		td {
+			width: 20%;
+			font-family: Arial, Helvetica, sans-serif;
+			font-size: 9pt;
+			vertical-align: top;
+			text-align: justify-all;
+		}
+		td.vs {
+			background-color:rgba(255, 128, 255, 0.3);
+		}
+		td.vn {
+			background-color:rgba(255, 255, 128, 0.3);
+		}
+		td.ns {
+			background-color:rgba(128, 255, 128, 0.3);
+		}
+		td.nn {
+			background-color:rgba(128, 255, 255, 0.3);
+		}
+		td.vh {
+			background-color:rgba(128,128,255, 0.3);
+		}
+		header {
+			margin: 5px 0px 0px 0px;
+			font-family: "Arial Black", Gadget, sans-serif;
+			color: red;
+			font-weight: bold;
+		}
+		header.title {
+			color: DimGrey;
+		}
+		p {
+			margin: 5px 0px 0px 0px;
+			padding: 0;
+		}
+		p:hover {
+			cursor: pointer;
+		}
+		p.done {
+			text-decoration: line-through;
+			text-decoration-style: double;
+			text-decoration-color: green;
+			-webkit-text-decoration-style: double;
+			-webkit-text-decoration-color: green;
+			opacity: 0.3;
+		}
+		p.moved {
+			text-decoration: line-through;
+			text-decoration-style: wavy;
+			text-decoration-color: gray;
+			-webkit-text-decoration-style: wavy;
+			-webkit-text-decoration-color: gray;
+			opacity: 0.3;
+		}
+		p.canceled {
+			text-decoration: line-through;
+			text-decoration-style: solid;
+			text-decoration-color: red;
+			-webkit-text-decoration-style: solid;
+			-webkit-text-decoration-color: red;
+			opacity: 0.3;
+		}
+		p.done:hover::after {
+    		content: "Выполнено"; /* Выводим текст */
+    	}
+    	p.canceled:hover::after {
+    		content: "Отменено"; /* Выводим текст */
+    	}
+    	p.moved:hover::after {
+    		content: "Перемещено в другой список"; /* Выводим текст */
+    	}
+    	p.done:hover::after, p.canceled:hover::after, p.moved:hover::after {
+    		position: absolute; /* Абсолютное позиционирование */
+    		z-index: 1; /* Отображаем подсказку поверх других элементов */
+    		background: rgba(255,255,230,0.9); /* Полупрозрачный цвет фона */
+    		font-family: Arial, Helvetica, sans-serif; /* Гарнитура шрифта */
+    		font-size: 9px; /* Размер текста подсказки */
+    		padding: 5px; /* Поля */
+    		border: 1px solid #000333; /* Параметры рамки */
+    	}
+		span.name {
+			color: blue;
+		}
+		form {
+			font-family: Arial, Helvetica, sans-serif;
+			font-size: 9pt;
+			margin: 10px 0px 10px 0px;
+		}
+		label.result {
+			font-style: italic;
+		}
+	</style>
+	<script type="text/javascript" src="https://yastatic.net/jquery/3.1.1/jquery.min.js"></script>
+	<script type="text/javascript">
+		$( init );
+		function init() {
+			$('td button').bind('click', addNewTask);
+			$("form button").bind('click', sendTask);
+			$('p').bind('click', editTask);
+			$("td.vh button").click();
+		}
+		function addNewTask() {
+			$("form[name='task'] label.action").text("Добавить задачу: ");
+			$("input[name='id']").val( "" );
+			$("input[name='text']").val( "" );
+			$("select[name='section']").val( $(this).closest('td').attr('class') );
+			$("select[name='status']").val( "created" );
+			$("form[name='task'] button").text("Добавить");
+			$("form[name='task'] label.result").text("");
+			$("input[name='text']").focus();
+		}
+		function editTask() {
+			$("form[name='task'] label.action").text("Редактировать задачу: ");
+			$("input[name='id']").val( $(this).attr('id') );
+			$("input[name='text']").val( $(this).text() );
+			$("select[name='section']").val( $(this).closest('td').attr('class') );
+			$("select[name='status']").val( $(this).attr('class') );
+			$("form[name='task'] button").text("Изменить");
+			$("form[name='task'] label.result").text("");
+			$("input[name='text']").focus();
+		}
+		function sendTask() {
+			$.ajax( {
+				url : "http://127.0.0.1:8080/sendTask",
+				cache: false,
+				type : "post",
+				dataType: "text",
+				data : $("form").serialize(),
+				success: function (response) {
+					//console.log(response);
+					//var json_obj = $.parseJSON(response);
+					//$("form[name='task'] label.result").html(json_obj._id);
+					$("form[name='task'] label.result").html("Готово");
+        		},
+    			error: function (jqXHR, exception) {
+			        var msg = '';
+        			if (jqXHR.status === 0) { msg = 'Not connect.\n Verify Network.'; } 
+        			else if (jqXHR.status == 404) { msg = 'Requested page not found. [404]'; }
+        			else if (jqXHR.status == 500) { msg = 'Internal Server Error [500].'; }
+        			else if (exception === 'parsererror') { msg = 'Requested JSON parse failed.'; } 
+        			else if (exception === 'timeout') { msg = 'Time out error.'; } 
+        			else if (exception === 'abort') { msg = 'Ajax request aborted.'; }
+        			else { msg = 'Uncaught Error.\n' + jqXHR.responseText; }
+        			$("form[name='task'] label.result").html(msg);
+    			},
+			} );
+			return false;
+		}
+	</script>
+</head>
+<body>
+	<header class="title">Список задач 13.01.2018</header>
+	<form name="task">
+		<label class="action">Добавить задачу: </label>
+		<input type="text" name="id" size="4" readonly>
+		<input type="text" name="text" size="100">
+		<select title="Раздел, в который будет добавлена задача" name="section">
+		 	<option value="vs">ВАЖНО И СРОЧНО</option>
+		 	<option value="vn">ВАЖНО, но несрочно</option>
+		 	<option value="ns">неважно, но СРОЧНО</option>
+			<option value="nn">неважно и несрочно</option>
+		 	<option value="vh">входящие задачи</option>
+		</select>
+		<select title="Текущий статус задачи" name="status">
+		 	<option value="created">создана</option>
+		 	<option value="done">завершена</option>
+		 	<option value="canceled">отменена</option>
+		 	<option value="moved">перенесена в другой список</option>
+		</select>
+		<button>Добавить"</button>
+		<label class="result"></label>
+	</form>
+	<table>
+	<tr>
+		<td class="vs">
+			<header>ВАЖНО И СРОЧНО <button>+</button></header>
+			<p id="211" class="created">Составить список кадровых движений</p>
+		</td>
+		<td class="vn">
+			<header>ВАЖНО, но несрочно <button>+</button></header>
+			<p id="212" class="created"><span class="name">Святец</span> - Порешать, что делать с ЛГЭК: предложения по 250 подстанциям + 10 крупным котельным</p>
+			<p id="213" class="created"><span class="name">Святец</span> - Отправить в МРСК служебную записку с предложением о скидке 80% на 2300 опор за VPN к РЭСам</p>
+			<p id="214" class="created"><span class="name">Зайцева, Подкина</span> - подготовить описание бизнес-процессов МУП</p>
+		</td>
+		<td class="ns">
+			<header>неважно, но СРОЧНО <button>+</button></header>
+			<p id="215" class="done"><span class="name">Дашков</span> - Помочь "Донскому лесу" с отображением 24 камер на одном мониторе</p>
+			<p id="216" class="canceled"><span class="name">Евсюков</span> - Получать письма с abuse@rt.ru</p>
+			<p id="217" class="moved"><span class="name">Сараев</span> - Определить и сдать Аверову темы для научных работ на конкурс</p>
+		</td>
+		<td class="nn">
+			<header>неважно и несрочно <button>+</button></header>
+			<p id="218" class="created"><span class="name">Стрельников</span> - Купить стремянки, обжимные машинки, эл.книгу, стол, пульт Лутохину</p>
+			<p id="219" class="created"><span class="name">Стрельников</span> - Поговорить про Blockchain</p>
+		</td>
+		<td class="vh">
+			<header>входящие задачи <button>+</button></header>
+		</td>
+	</tr>
+	</table>
+</body>
+</html>
