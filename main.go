@@ -11,9 +11,12 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-var URI string
-var DB string
+var URI string //URI базы данных MongoDB
+var DB string //имя базы данных MongoDB
 
+// Структура записи о задаче
+// используется в формате JSON для ajax-обмена с клиентскими страницами
+// используется в формате BSON как структура полей коллекции в базе MongoDB
 type Task struct {
 	Id bson.ObjectId `json:"_id" bson:"_id"`
     Text string  `json:"text" bson:"text"`
@@ -21,6 +24,8 @@ type Task struct {
     Status string  `json:"status" bson:"status"`
 }
 
+// Структура, детально описывающая список задач
+// Используется в HTML-шаблоне для вывода основной страницы списка задач
 type Tasks struct {
 	Vs []Task
 	Vn []Task
@@ -29,6 +34,11 @@ type Tasks struct {
 	Vh []Task
 }
 
+// ================================================================================
+// Вспомогательная функция: выделяет в тексте задачи text имена исполнителей
+// (все символы до первого вхождения " - ")
+// и добавляет к ним html-обёртку с тэгами выделения имён исполнителей
+// ================================================================================
 func MarkTask(text string) string {
 	pos := strings.Index(text, " - ")
 	var res string
@@ -64,7 +74,7 @@ func hello(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-type", "text/html")
 	t := template.New("tasks.html")
 	t = t.Funcs(funcMap)
-	t, err = t.ParseFiles("tasks.html")
+	t, err = t.ParseFiles("templates/tasks.html")
 	if err != nil { panic(err) }
 	err = t.Execute(res, tasks)
 	if err != nil { panic(err) }
@@ -121,17 +131,26 @@ func sendTask(res http.ResponseWriter, req *http.Request) {
   	fmt.Println(string(js))
 }
 
+// ================================================================================
+// Основная программа: запуск web-сервера
+// ================================================================================
 func main() {
 
+	// Считываем переменные окружения
 	URI = os.Getenv("MONGODB_ADDON_URI")
 	DB = os.Getenv("MONGODB_ADDON_DB")
+	PORT := os.Getenv("PORT")
 
+	// Назначаем обработчики для пользовательских web-запросов
 	http.HandleFunc("/",hello)
+	
+	// Назначаем обработчики для web-запросов API
 	http.HandleFunc("/sendTask",sendTask)
 
 	// Регистрируем файловый сервер для отдачи статичных файлов из папки static
 	fs := http.FileServer(http.Dir("./static"))
  	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
-	http.ListenAndServe(":8080",nil)
+ 	// Запускаем web-сервер на всех интерфейсах на порту PORT
+	http.ListenAndServe(":"+PORT,nil)
 }

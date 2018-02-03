@@ -1,0 +1,99 @@
+body {
+	background: linear-gradient( #bbb, transparent 1px), linear-gradient( 90deg, #bbb, transparent 1px);
+	background-size: 12px 12px;
+	background-position: center center;
+}
+table {
+	width: 100%;
+}
+td {
+	width: 20%;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 9pt;
+	vertical-align: top;
+	text-align: justify-all;
+}
+td.vs {
+	background-color:rgba(255, 128, 255, 0.3);
+}
+td.vn {
+	background-color:rgba(255, 255, 128, 0.3);
+}
+td.ns {
+	background-color:rgba(128, 255, 128, 0.3);
+}
+td.nn {
+	background-color:rgba(128, 255, 255, 0.3);
+}
+td.vh {
+	background-color:rgba(128,128,255, 0.3);
+}
+header {
+	margin: 5px 0px 0px 0px;
+	font-family: "Arial Black", Gadget, sans-serif;
+	color: red;
+	font-weight: bold;
+}
+header.title {
+	color: DimGrey;
+}
+p {
+	margin: 5px 0px 0px 0px;
+	padding: 0;
+}
+p:hover {
+	cursor: pointer;
+}
+p.done {
+	text-decoration: line-through;
+	text-decoration-style: double;
+	text-decoration-color: green;
+	-webkit-text-decoration-style: double;
+	-webkit-text-decoration-color: green;
+	opacity: 0.3;
+}
+p.moved {
+	text-decoration: line-through;
+	text-decoration-style: wavy;
+	text-decoration-color: gray;
+	-webkit-text-decoration-style: wavy;
+	-webkit-text-decoration-color: gray;
+	opacity: 0.3;
+}
+p.canceled {
+	text-decoration: line-through;
+	text-decoration-style: solid;
+	text-decoration-color: red;
+	-webkit-text-decoration-style: solid;
+	-webkit-text-decoration-color: red;
+	opacity: 0.3;
+}
+p.done:hover::after {
+	content: "Выполнено"; /* Выводим текст */
+}
+p.canceled:hover::after {
+	content: "Отменено"; /* Выводим текст */
+}
+p.moved:hover::after {
+	content: "Перемещено в другой список"; /* Выводим текст */
+}
+p.done:hover::after, p.canceled:hover::after, p.moved:hover::after {
+	position: absolute; /* Абсолютное позиционирование */
+	z-index: 1; /* Отображаем подсказку поверх других элементов */
+	background: rgba(255,255,230,0.9); /* Полупрозрачный цвет фона */
+	font-family: Arial, Helvetica, sans-serif; /* Гарнитура шрифта */
+	font-size: 9px; /* Размер текста подсказки */
+	padding: 5px; /* Поля */
+	border: 1px solid #000333; /* Параметры рамки */
+}
+span.name {
+	color: blue;
+}
+form {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 9pt;
+	margin: 10px 0px 10px 0px;
+}
+label.result {
+	font-style: italic;
+}
