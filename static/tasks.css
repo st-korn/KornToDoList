@@ -1,17 +1,61 @@
+/* ===============================================================
+   Общие стили документа
+   =============================================================== */
+html {
+    -webkit-text-size-adjust: 100%; /* Prevent font scaling in landscape while allowing user zoom */
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 9pt;
+}
 body {
 	background: linear-gradient( #bbb, transparent 1px), linear-gradient( 90deg, #bbb, transparent 1px);
 	background-size: 12px 12px;
 	background-position: center center;
 }
-table {
+
+
+/* ===============================================================
+   Стили заголовков списка и формы редактирования задачи
+   =============================================================== */
+form {
+	margin: 10px 0px 10px 0px;
+}
+label#ListTitle {
+	font-family: "Arial Black", Gadget, sans-serif;
+	font-weight: bold;
+	font-size: 1.25rem;
+	color: rgba(255,0,0,1);
+	margin: 5px 0px 0px 0px;
+}
+select#ListSelect option:nth-child(1) {
+    font-weight:bold;
+}
+span#ListButtons, span#TaskButtons {
+	float: right;
+}
+label#ListHelp {
+	text-decoration: underline;
+}
+label#ListHelp:hover {
+	cursor: pointer;
+}
+label#TaskResult {
+	font-style: italic;
+}
+
+
+/* ===============================================================
+   Стили задач, отображаемых в таблице
+   =============================================================== */
+table#TasksTable {
 	width: 100%;
 }
-td {
-	width: 20%;
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 9pt;
+td.td, td.vs, td.vn, td.ns, td.nn, td.vh {
+	width: 16.6%;
 	vertical-align: top;
 	text-align: justify-all;
+}
+td.td {
+	background-color:rgba(255, 128, 128, 0.3);
 }
 td.vs {
 	background-color:rgba(255, 128, 255, 0.3);
@@ -28,45 +72,53 @@ td.nn {
 td.vh {
 	background-color:rgba(128,128,255, 0.3);
 }
-header {
-	margin: 5px 0px 0px 0px;
+header.ColumnHeader {
 	font-family: "Arial Black", Gadget, sans-serif;
-	color: red;
 	font-weight: bold;
-}
-header.title {
-	color: DimGrey;
+	color: rgb(105,105,105);
+	margin: 5px 0px 0px 0px;
 }
 p {
 	margin: 5px 0px 0px 0px;
 	padding: 0;
 }
-p:hover {
-	cursor: pointer;
+span.name {
+	color: rgba(0,0,255,1.0);
 }
 p.done {
 	text-decoration: line-through;
 	text-decoration-style: double;
-	text-decoration-color: green;
+	text-decoration-color: rgba(0,128,0,0.3);
 	-webkit-text-decoration-style: double;
-	-webkit-text-decoration-color: green;
-	opacity: 0.3;
+	-webkit-text-decoration-color: rgba(0,128,0,0.3);
+	color: rgba(0,0,0,0.3);
 }
 p.moved {
 	text-decoration: line-through;
 	text-decoration-style: wavy;
-	text-decoration-color: gray;
+	text-decoration-color: rgba(128,128,128,0.3);
 	-webkit-text-decoration-style: wavy;
-	-webkit-text-decoration-color: gray;
-	opacity: 0.3;
+	-webkit-text-decoration-color: rgba(128,128,128,0.3);
+	color: rgba(0,0,0,0.3);
 }
 p.canceled {
 	text-decoration: line-through;
 	text-decoration-style: solid;
-	text-decoration-color: red;
+	text-decoration-color: rgba(255,0,0,0.3);
 	-webkit-text-decoration-style: solid;
-	-webkit-text-decoration-color: red;
-	opacity: 0.3;
+	-webkit-text-decoration-color: rgba(255,0,0,0.3);
+	color: rgba(0,0,0,0.3);
+}
+p.done span.name, p.canceled span.name, p.moved span.name {
+	color: rgba(0,0,255,0.3);
+}
+
+
+/* ===============================================================
+   Стили, обеспечивающие интерактивность списка задач
+   =============================================================== */
+p:hover {
+	cursor: pointer;
 }
 p.done:hover::after {
 	content: "Выполнено"; /* Выводим текст */
@@ -80,20 +132,69 @@ p.moved:hover::after {
 p.done:hover::after, p.canceled:hover::after, p.moved:hover::after {
 	position: absolute; /* Абсолютное позиционирование */
 	z-index: 1; /* Отображаем подсказку поверх других элементов */
+	color: rgba(0,0,0,1.0);
 	background: rgba(255,255,230,0.9); /* Полупрозрачный цвет фона */
-	font-family: Arial, Helvetica, sans-serif; /* Гарнитура шрифта */
-	font-size: 9px; /* Размер текста подсказки */
 	padding: 5px; /* Поля */
 	border: 1px solid #000333; /* Параметры рамки */
 }
-span.name {
-	color: blue;
+
+
+/* ===============================================================
+   Стили, обеспечивающие работу со шкалой времени
+   =============================================================== */
+td.TimeLabels, td.TodayTasks {
+	vertical-align: top;
+	text-align: justify-all;
 }
-form {
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 9pt;
-	margin: 10px 0px 10px 0px;
+td.TimeLabels {
+	white-space: nowrap;
 }
-label.result {
-	font-style: italic;
+ul#TimeLabels {
+	list-style-type: none;
+	margin: 0px 0px 0px 0px;
+	padding: 0; 
+}
+li.TimeLabel {
+	margin: 1px 0px 0px 0px;
+	padding: 0;
+	text-decoration: overline;
+	height: 14px;
+}
+td.TodayTasks {
+	width: 100%;
+}
+ul#TodayTasks {
+	list-style-type: none;
+	margin: 0px 0px 0px 0px;; 
+	padding: 0; 
+}
+li.TodayTask {
+	margin: 0px 0px 0px 0px;
+	padding: 0;
+	border: 1px solid rgba(128,128,128,1);
+	border-radius: 3px;
+	box-sizing: border-box;
+	display: block;
+	overflow: hidden;
+}
+li.TodayRelax {
+	margin: 0px 0px 0px 0px;
+	padding: 0;
+	border: 1px solid rgba(128,128,128,0);
+	border-radius: 3px;
+	box-sizing: border-box;
+	display: block;
+	overflow: hidden;
+	height: 15px;
+}
+li.TodayTask:hover {
+	cursor: pointer;
+	border: 1px solid rgba(128,128,255,1);
+	background: rgba(128,128,255,0.1);
+}
+.ui-state-highlight {
+	height: 15px;
+}
+.ui-sortable-helper {
+    cursor: move;
 }

@@ -7,12 +7,20 @@ import (
 	"os"
 	"encoding/json"
 	"text/template"
+	"sort"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"github.com/Shaked/gomobiledetect"
 )
 
 var URI string //URI базы данных MongoDB
 var DB string //имя базы данных MongoDB
+
+// Настройки расписания времени
+const (
+	StartHour = 7
+	EndHour = 24
+)
 
 // Структура записи о задаче
 // используется в формате JSON для ajax-обмена с клиентскими страницами
@@ -22,11 +30,37 @@ type Task struct {
     Text string  `json:"text" bson:"text"`
     Section string  `json:"section" bson:"section"`
     Status string  `json:"status" bson:"status"`
+    List string  `json:"list" bson:"list"`
+}
+
+// Структура записи о задаче, которую планируется выполнить сегодня
+// Использщуется в HTML-шаблоне для вывода шкалы задач на сегодня
+type TodayTask struct {
+	Id bson.ObjectId  `json:"_id" bson:"_id"`
+	IsRelax bool
+	Start int `json:"start" bson:"start"` //номер 15-минутного интервала, в который начинается задача
+	Length int `json:"length" bson:"length"` //количество 15-минутных интервалов
+	Height int //количество пикселей для отображения задачи
+	Text string  `json:"text" bson:"text"` // Текст задачи
+}
+
+type TimeLabel struct {
+	Text string
+	IsRelax bool
 }
 
 // Структура, детально описывающая список задач
 // Используется в HTML-шаблоне для вывода основной страницы списка задач
 type Tasks struct {
+	IsMobile bool
+
+	MyLists []string
+	CurList string
+	ActualListFullName string
+	ActualListShortName string
+
+	TimeLabels []TimeLabel
+	TodayTasks []TodayTask
 	Vs []Task
 	Vn []Task
 	Ns []Task
@@ -48,6 +82,9 @@ func MarkTask(text string) string {
     return res
 }
 
+// ================================================================================
+// Web-страница: Выводит страницу редактирования списка
+// ================================================================================
 func hello(res http.ResponseWriter, req *http.Request) {
 	// Соединяемся с базой
 	session, err := mgo.Dial(URI)
@@ -55,17 +92,91 @@ func hello(res http.ResponseWriter, req *http.Request) {
     defer session.Close()
    	c := session.DB(DB).C("Tasks")
 
-	// Выбираем задачи из базы
+
+   	// Подготавливаем структуру для инициализации шаблона
 	var tasks Tasks
-	err = c.Find(bson.M{"section": "vs"}).Sort("-timestamp").All(&tasks.Vs)
+
+	// Определяем, с какого устройства пришёл запрос
+	detect := mobiledetect.NewMobileDetect(req, nil)
+	tasks.IsMobile = detect.IsMobile()
+
+	// Составляем перечень списов, доступных текущему пользователю
+	err = c.Find(nil).Distinct("list",&tasks.MyLists)
 	if err != nil { panic(err) }
-	err = c.Find(bson.M{"section": "vn"}).Sort("-timestamp").All(&tasks.Vn)
+	sort.Sort(sort.Reverse(sort.StringSlice(tasks.MyLists)))
+
+	// Определяем текущий запрошенный список
+	tasks.CurList = req.URL.Query().Get("list")
+	// Проверяем его корректность:
+	// проверяем, что он не пустой
+	if len(tasks.CurList) == 0 { tasks.CurList=tasks.MyLists[0] }
+	// проверяем, что такой список есть в базе
+	listfound := false;
+	for _, listname := range tasks.MyLists {
+		if listname == tasks.CurList { listfound = true}
+	}
+	// если запросили отсутствующий список
+	if listfound == false { 
+		http.Redirect(res,req,"/",302)
+		return
+	}
+	// Определяем актуальный список
+	tasks.ActualListFullName = tasks.MyLists[0]
+	slices := strings.SplitAfter(tasks.ActualListFullName,":")
+	tasks.ActualListShortName = slices[len(slices)-1]
+	
+	// Заполняем временную шкалу
+	var timelabel TimeLabel
+	for hour:=StartHour; hour<EndHour; hour++ {
+		for min:=0; min<60; min+=15 {
+			timelabel.Text = fmt.Sprintf("%02d:%02d",hour,min)
+			tasks.TimeLabels = append(tasks.TimeLabels, timelabel )
+		}
+	}
+
+	// Выбираем сегодняшние задачи
+	var todaytasks []TodayTask
+	var relaxtask TodayTask
+	err = c.Find(bson.M{"length": bson.M{"$gt": 0}, "list": tasks.CurList}).Sort("start").All(&todaytasks)
 	if err != nil { panic(err) }
-	err = c.Find(bson.M{"section": "ns"}).Sort("-timestamp").All(&tasks.Ns)
+	// Заполняем пустые и недостающие интервалы промежутками отдыха
+	relaxtask.IsRelax = true
+	relaxtask.Length = 1
+	relaxtask.Height = 15
+	curInterval := 0
+	for _, todaytask := range todaytasks {
+		// Добавляем необходимое количество промежутков отдыха перед данной задачей
+		for i:=curInterval; i<todaytask.Start; i++ {
+			relaxtask.Start = i
+			tasks.TodayTasks = append(tasks.TodayTasks, relaxtask)
+			tasks.TimeLabels[i].IsRelax = true
+		}
+		// Добавляем текущую задачу, заполняя недостающие поля в информации о задаче
+		todaytask.IsRelax = false
+		todaytask.Height = todaytask.Length*15
+		if curInterval > todaytask.Start { todaytask.Start = curInterval }
+		tasks.TodayTasks = append(tasks.TodayTasks, todaytask)
+		tasks.TimeLabels[todaytask.Start].IsRelax = false
+		// Переходим на следующий интервал
+		curInterval = todaytask.Start + todaytask.Length
+	}
+	// Добавляем необходимое количество промежутков отдыха после последней задачи
+	for i:=curInterval; i<(EndHour-StartHour)*4; i++ {
+		relaxtask.Start = i
+		tasks.TodayTasks = append(tasks.TodayTasks, relaxtask)
+		tasks.TimeLabels[i].IsRelax = true
+	}
+
+	// Выбираем задачи из базы
+	err = c.Find(bson.M{"section": "vs", "list": tasks.CurList}).Sort("-timestamp").All(&tasks.Vs)
 	if err != nil { panic(err) }
-	err = c.Find(bson.M{"section": "nn"}).Sort("-timestamp").All(&tasks.Nn)
+	err = c.Find(bson.M{"section": "vn", "list": tasks.CurList}).Sort("-timestamp").All(&tasks.Vn)
 	if err != nil { panic(err) }
-	err = c.Find(bson.M{"section": "vh"}).Sort("-timestamp").All(&tasks.Vh)
+	err = c.Find(bson.M{"section": "ns", "list": tasks.CurList}).Sort("-timestamp").All(&tasks.Ns)
+	if err != nil { panic(err) }
+	err = c.Find(bson.M{"section": "nn", "list": tasks.CurList}).Sort("-timestamp").All(&tasks.Nn)
+	if err != nil { panic(err) }
+	err = c.Find(bson.M{"section": "vh", "list": tasks.CurList}).Sort("-timestamp").All(&tasks.Vh)
 	if err != nil { panic(err) }
 
 	funcMap := template.FuncMap{"marktask": MarkTask}
@@ -80,6 +191,9 @@ func hello(res http.ResponseWriter, req *http.Request) {
 	if err != nil { panic(err) }
 }
 
+// ================================================================================
+// Web-API: сохраняет задачу в базе данных
+// ================================================================================
 func sendTask(res http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 	fmt.Println(req.Form)
@@ -92,6 +206,7 @@ func sendTask(res http.ResponseWriter, req *http.Request) {
 
     // Заполняем поля задчи
 	task := &Task {
+		List : strings.Join(req.Form["list"],""),
 		Text : strings.Join(req.Form["text"],""),
 		Section : strings.Join(req.Form["section"],""),
 		Status : strings.Join(req.Form["status"],"") }
@@ -100,6 +215,10 @@ func sendTask(res http.ResponseWriter, req *http.Request) {
 	task.Text = strings.TrimSpace(task.Text)
 	if task.Text == "" { 
 		http.Error(res, "Задача не может быть пустой!", http.StatusInternalServerError)
+		return
+	}
+	if task.List == "" { 
+		http.Error(res, "Задача должна принадлежать списку!", http.StatusInternalServerError)
 		return
 	}
 
@@ -113,6 +232,7 @@ func sendTask(res http.ResponseWriter, req *http.Request) {
 		task.Id = bson.ObjectIdHex(strings.Join(req.Form["id"],""))
 		condition := bson.M{"_id": task.Id}
 		change := bson.M { "$set": bson.M {
+			"list": task.List,
 			"text": task.Text,
 			"section": task.Section,
 			"status": task.Status } }
@@ -126,10 +246,60 @@ func sendTask(res http.ResponseWriter, req *http.Request) {
   		return  }
 
   	res.Header().Set("Content-Type", "application/json; charset=utf-8")
-  	res.Header().Set("Access-Control-Allow-Origin", "*")
+  	//res.Header().Set("Access-Control-Allow-Origin", "*")
   	res.Write(js)
   	fmt.Println(string(js))
 }
+
+// ================================================================================
+// Web-API: сохраняет информацию о расписании сегодняшнего дня, обновляя задачи в базе данных
+// ================================================================================
+func arrangeTodayTasks(res http.ResponseWriter, req *http.Request) {
+	// Определяем структуры данных для входящих аргументов API
+	type jsonTodayTask struct {
+		Id string
+		Start int
+		Length int
+	}
+	type jsonTodayTasks struct {
+		TodayTasks []jsonTodayTask
+	}
+	
+	// Разбираем поступивший JSON
+	decoder := json.NewDecoder(req.Body)
+    var tt jsonTodayTasks
+    err := decoder.Decode(&tt)
+    if err != nil { panic(err) }
+    defer req.Body.Close()
+
+	// Соединяемся с базой
+	session, err := mgo.Dial(URI)
+    if err != nil { panic(err) }
+    defer session.Close()
+   	c := session.DB(DB).C("Tasks")
+
+    // Перебираем задачи и внсим изменения а базу данных
+    for _, t := range tt.TodayTasks {
+		// Исправляем задачу
+		condition := bson.M{"_id": bson.ObjectIdHex(t.Id)}
+		change := bson.M { "$set": bson.M {
+			"start": t.Start,
+			"length": t.Length} }
+		err = c.Update(condition, change)
+		if err != nil { panic(err) }
+    }
+
+    // Возвращаем тот же JSON
+	js, err := json.Marshal(tt)
+  	if err != nil { http.Error(res, err.Error(), http.StatusInternalServerError)
+  		return  }
+
+  	res.Header().Set("Content-Type", "application/json; charset=utf-8")
+  	//res.Header().Set("Access-Control-Allow-Origin", "*")
+  	res.Write(js)
+  	fmt.Println(string(js))
+}
+
 
 // ================================================================================
 // Основная программа: запуск web-сервера
@@ -146,6 +316,7 @@ func main() {
 	
 	// Назначаем обработчики для web-запросов API
 	http.HandleFunc("/sendTask",sendTask)
+	http.HandleFunc("/arrangeTodayTasks",arrangeTodayTasks)
 
 	// Регистрируем файловый сервер для отдачи статичных файлов из папки static
 	fs := http.FileServer(http.Dir("./static"))

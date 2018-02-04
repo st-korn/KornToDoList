@@ -1,33 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Список задач {{.CurList}}</title>
+	<title>Список задач 13.01.2018</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
 	<link rel="stylesheet" type="text/css" href="/static/tasks.css?1">
 	<link rel="stylesheet" type="text/css" href="/static/libs/jquery-ui.min.css">
-	<script src="/static/libs/jquery-3.3.1.min.js"></script>
-	<script src="/static/libs/jquery-ui.min.js"></script>
-	<!--<script src="/static/libs/jquery.ui.touch-punch.min.js"></script>-->
-	<script src="/static/tasks.js?1"></script>
+	<script type="text/javascript" src="/static/libs/jquery-3.3.1.min.js"></script>
+	<script type="text/javascript" src="/static/libs/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="/static/libs/jquery.ui.touch-punch.min.js"></script>
+	<script type="text/javascript" src="/static/tasks.js?1"></script>
 </head>
 <body>
-	<form id="ListForm">
-		<label id="ListTitle">Список задач: </label>
+	<form id=ListForm>
+		<label id="ListSelect">Список задач: </label>
 		<select title="Выберите список задач с которым будете работать" name="list" id="ListSelect">
-			{{- range .MyLists}}
-		 	<option value="{{.}}"{{if eq . $.CurList}} selected="selected"{{end}}>{{.}}</option>
-		 	{{- end}}
+		 	<option value="stkorn@mail.ru:2018-01-31">stkorn@mail.ru:2018-01-31</option>
+		 	<option value="stkorn@mail.ru:2018-01-01">stkorn@mail.ru:2018-01-01</option>
 		</select>
 		<span id="ListButtons">
-			<button id="ListCreate">Создать новый список</button>
-			<label id="ListHelp">Помощь</label>
+			<button id="ListAdd">Создать новый список</button>
+			<label id="ListHelp">Помощь</lbael>
 		</span>
 	</form>
 	<form id="TaskForm">
 		<label id="TaskAction">Задача: </label>
 		<input type="hidden" id="TaskId" name="id">
-		<input type="hidden" id="TaskList" name="list">
 		<input type="text" id="TaskText" name="text" size="55">
 		<select title="Раздел, в который будет добавлена задача" name="section" id="TaskSection">
 		 	<option value="vs">ВАЖНО И СРОЧНО</option>
@@ -43,11 +41,9 @@
 		 	<option value="done">завершена</option>
 		</select>
 		<button id="TaskSubmit">Добавить</button>
+		{{if .ListExpired}}<button id="TaskMove">Перенести в список 2018-01-28</button>{{end}}
+		<button id="TaskToday">Буду делать сегодня</button>
 		<label id="TaskResult"></label>
-		<span id="TaskButtons">
-			<button id="TaskMove" title="{{.ActualListFullName}}">Перенести в список {{.ActualListShortName}}</button>
-			<button id="TaskToday">Буду делать сегодня</button>
-		</span>
 	</form>
 	<table id="TasksTable">
 	<tr>		
@@ -57,27 +53,27 @@
 				<tr>
 					<td class="TimeLabels">
 						<ul id="TimeLabels">
-							{{- range .TimeLabels}}
-							{{- if or (not .IsRelax) (not $.IsMobile)}}
-							<li class="TimeLabel">{{.Text}}</li>
-							{{- end}}
-							{{- end}}
+							<li class="TimeLabel">7:00</li>
+							<li class="TimeLabel">7:15</li>
+							<li class="TimeLabel">7:30</li>
+							<li class="TimeLabel">7:45</li>
+							<li class="TimeLabel">8:00</li>
 						</ul>
 					</td>
 					<td class="TodayTasks">
 						<ul id="TodayTasks">
-							{{- range .TodayTasks}}
-							{{- if and .IsRelax (not $.IsMobile)}}
+							<li class="TodayTask" style="height:30px" title="Задачи длинный текст">Задачи длинный текст</li>
+							<li class="TodayTask" style="height:15px" title="Задачи очень длинный текст номер два">Задачи очень длинный текст номер два</li>
+							<li class="TodayTask" style="height:45px" title="Задачи очень длинный текст номер три">Задачи очень длинный текст номер три</li>
+							<li class="TodayTask" style="height:30px" title="Задачи очень длинный текст номер четыре">Задачи очень длинный текст номер четыре</li>
+							<li class="TodayTask" style="height:15px" title=">Задачи очень длинный текст номер пять">Задачи очень длинный текст номер пять</li>
 							<li class="TodayRelax"></li>
-							{{- end}}
-							{{- if not .IsRelax}}
-							<li id="{{.Id.Hex}}" class="TodayTask" style="height:{{.Height}}px" title="{{.Text}}">{{.Text}}</li>
-							{{- end}}
-							{{- end}}
+							<li class="TodayRelax"></li>
 						</ul>
 					</td>
 				</tr>
 			</table>
+			</ul>
 		</td>
 	{{- if .IsMobile}}</tr>
 	<tr>{{- end}}
