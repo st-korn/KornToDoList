@@ -85,7 +85,7 @@ p {
 span.name {
 	color: rgba(0,0,255,1.0);
 }
-p.done {
+.done {
 	text-decoration: line-through;
 	text-decoration-style: double;
 	text-decoration-color: rgba(0,128,0,0.3);
@@ -93,7 +93,7 @@ p.done {
 	-webkit-text-decoration-color: rgba(0,128,0,0.3);
 	color: rgba(0,0,0,0.3);
 }
-p.moved {
+.moved {
 	text-decoration: line-through;
 	text-decoration-style: wavy;
 	text-decoration-color: rgba(128,128,128,0.3);
@@ -101,7 +101,7 @@ p.moved {
 	-webkit-text-decoration-color: rgba(128,128,128,0.3);
 	color: rgba(0,0,0,0.3);
 }
-p.canceled {
+.canceled {
 	text-decoration: line-through;
 	text-decoration-style: solid;
 	text-decoration-color: rgba(255,0,0,0.3);

@@ -47,12 +47,13 @@
 		<span id="TaskButtons">
 			<button id="TaskMove" title="{{.ActualListFullName}}">Перенести в список {{.ActualListShortName}}</button>
 			<button id="TaskToday">Буду делать сегодня</button>
+			<button id="TaskFromday">Удалить из списка на сегодня</button>
 		</span>
 	</form>
 	<table id="TasksTable">
 	<tr>		
 		<td class="td">
-			<header class="ColumnHeader">СЕГОДНЯ </header>
+			<header class="ColumnHeader">СЕГОДНЯ <button id="ClearDone" title="Удалить выполненные">x</button> <button id="ClearAll" title="Удалить все">X</button></header>
 			<table id="TodayTable">
 				<tr>
 					<td class="TimeLabels">
@@ -71,7 +72,7 @@
 							<li class="TodayRelax"></li>
 							{{- end}}
 							{{- if not .IsRelax}}
-							<li id="{{.Id.Hex}}" class="TodayTask" style="height:{{.Height}}px" title="{{.Text}}">{{.Text}}</li>
+							<li id="{{.Id.Hex}}" class="TodayTask {{.Status}}" style="height:{{.Height}}px" title="{{.Text}}">{{.Text}}</li>
 							{{- end}}
 							{{- end}}
 						</ul>
@@ -82,7 +83,7 @@
 	{{- if .IsMobile}}</tr>
 	<tr>{{- end}}
 		<td class="vs">
-			<header class="ColumnHeader">ВАЖНО И СРОЧНО <button>+</button></header>
+			<header class="ColumnHeader">ВАЖНО И СРОЧНО <button class="add">+</button></header>
 			{{- range .Vs}}
 			<p id="{{.Id.Hex}}" class="{{.Status}}">{{marktask .Text}}</p>
 			{{- end}}
@@ -90,7 +91,7 @@
 	{{- if .IsMobile}}</tr>
 	<tr>{{- end}}
 		<td class="vn">
-			<header class="ColumnHeader">ВАЖНО, но несрочно <button>+</button></header>
+			<header class="ColumnHeader">ВАЖНО, но несрочно <button class="add">+</button></header>
 			{{- range .Vn}}
 			<p id="{{.Id.Hex}}" class="{{.Status}}">{{marktask .Text}}</p>
 			{{- end}}
@@ -98,7 +99,7 @@
 	{{- if .IsMobile}}</tr>
 	<tr>{{- end}}
 		<td class="ns">
-			<header class="ColumnHeader">неважно, но СРОЧНО <button>+</button></header>
+			<header class="ColumnHeader">неважно, но СРОЧНО <button class="add">+</button></header>
 			{{- range .Ns}}
 			<p id="{{.Id.Hex}}" class="{{.Status}}">{{marktask .Text}}</p>
 			{{- end}}
@@ -106,7 +107,7 @@
 	{{- if .IsMobile}}</tr>
 	<tr>{{- end}}
 		<td class="nn">
-			<header class="ColumnHeader">неважно и несрочно <button>+</button></header>
+			<header class="ColumnHeader">неважно и несрочно <button class="add">+</button></header>
 			{{- range .Nn}}
 			<p id="{{.Id.Hex}}" class="{{.Status}}">{{marktask .Text}}</p>
 			{{- end}}
@@ -114,7 +115,7 @@
 	{{- if .IsMobile}}</tr>
 	<tr>{{- end}}
 		<td class="vh">
-			<header class="ColumnHeader">входящие задачи <button>+</button></header>
+			<header class="ColumnHeader">входящие задачи <button class="add">+</button></header>
 			{{- range .Vh}}
 			<p id="{{.Id.Hex}}" class="{{.Status}}">{{marktask .Text}}</p>
 			{{- end}}

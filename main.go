@@ -42,6 +42,7 @@ type TodayTask struct {
 	Length int `json:"length" bson:"length"` //количество 15-минутных интервалов
 	Height int //количество пикселей для отображения задачи
 	Text string  `json:"text" bson:"text"` // Текст задачи
+	Status string `json:"status" bson:"status"` // Статус задачи
 }
 
 type TimeLabel struct {
@@ -263,6 +264,7 @@ func arrangeTodayTasks(res http.ResponseWriter, req *http.Request) {
 	}
 	type jsonTodayTasks struct {
 		TodayTasks []jsonTodayTask
+		List string
 	}
 	
 	// Разбираем поступивший JSON
@@ -278,6 +280,12 @@ func arrangeTodayTasks(res http.ResponseWriter, req *http.Request) {
     defer session.Close()
    	c := session.DB(DB).C("Tasks")
 
+   	// Формируем перечень задач текущего списка, у которых есть длительность 
+   	// (которые должны выполниться сегодня)
+   	var OldTodayTasks []Task
+   	err = c.Find(bson.M{"length": bson.M{"$gt": 0}, "list": tt.List}).All(&OldTodayTasks)
+	if err != nil { panic(err) }
+
     // Перебираем задачи и внсим изменения а базу данных
     for _, t := range tt.TodayTasks {
 		// Исправляем задачу
@@ -287,7 +295,24 @@ func arrangeTodayTasks(res http.ResponseWriter, req *http.Request) {
 			"length": t.Length} }
 		err = c.Update(condition, change)
 		if err != nil { panic(err) }
+		// Удаляем обновлённую задачу из списка всех сегодняшних задач
+		for i := range OldTodayTasks {
+			if OldTodayTasks[i].Id.Hex() == t.Id {
+				OldTodayTasks = append(OldTodayTasks[:i], OldTodayTasks[i+1:]...)
+				break
+			}
+		}
     }
+
+    // Задачи, которые имели длительность, но не попали в параметры API-запроса - 
+    // подлежат исключению из текщуих дел
+	for _, t := range OldTodayTasks {
+		// обнуляем у таких задач длительность
+		condition := bson.M{"_id": t.Id}
+		change := bson.M { "$set": bson.M {"length": 0} }
+		err = c.Update(condition, change)
+		if err != nil { panic(err) }
+	}
 
     // Возвращаем тот же JSON
 	js, err := json.Marshal(tt)

@@ -9,6 +9,9 @@ function init() {
 	$("button#TaskSubmit").bind('click', sendTask);
 	$("button#TaskMove").bind('click', moveTask);
 	$("button#TaskToday").bind('click', todayTask);
+	$("button#TaskFromday").bind('click', fromdayTask);
+	$("button#ClearDone").bind('click', clearDoneTodayTasks);
+	$("button#ClearAll").bind('click', clearAllTodayTasks);
 	afterUpdate();
 	$("td.vh button").click();
 }
@@ -17,7 +20,7 @@ function init() {
 // Инициализация объектов страницы после обновления таблицы задач с сервера
 // ===========================================================================
 function afterUpdate() {
-	$('td button').bind('click', addNewTask);
+	$('button.add').bind('click', addNewTask);
 	$('p').bind('click', editTask);
 	$("ul#TodayTasks").sortable({
 		cursor: "move",
@@ -50,6 +53,7 @@ function addNewTask() {
 	$("button#TaskSubmit").text("Добавить");
 	$("button#TaskMove").hide();
 	$("button#TaskToday").hide();
+	$("button#TaskFromday").hide();
 	$("label#TaskResult").text("");
 	$("input#TaskText").focus();
 }
@@ -70,10 +74,14 @@ function editTask() {
 	else
 		{ $("button#TaskMove").hide() };
 	if( ($("select#TaskStatus").val() == "created") &&
-		($('li[id="'+$(this).attr('id')+'"]').length == 0) ) 
-		{ $("button#TaskToday").show() }
-	else
-		{ $("button#TaskToday").hide() };
+		($('li[id="'+$(this).attr('id')+'"]').length == 0) ) {
+		$("button#TaskToday").show() }
+	else {
+		$("button#TaskToday").hide() };
+	if ($('li[id="'+$(this).attr('id')+'"]').length > 0) {
+		$("button#TaskFromday").show() }
+	else {
+		$("button#TaskFromday").hide() };
 	$("label#TaskResult").text("");
 	$("input#TaskText").focus();
 }
@@ -127,6 +135,26 @@ function todayTask() {
 	return false;
 }
 
+function fromdayTask() {
+	var li = $('li[id="'+$("input#TaskId").val()+'"]') // поиск с # не срабатывает, оказывается на странице нельзя иметь элементы с одинаковым id, пусть даже разных типов
+	console.log(li);
+	li.remove();
+	sendToday();
+	return false;
+}
+
+function clearDoneTodayTasks() {
+	$("li.done").remove();
+	sendToday();
+	return false;
+}
+
+function clearAllTodayTasks() {
+	$("li.TodayTask").remove();
+	sendToday();
+	return false;
+}
+
 function sendToday() {
 	var TodayTasksOffset = $("ul#TodayTasks").offset().top;
 	var TodayTasks = [];
@@ -143,7 +171,7 @@ function sendToday() {
 		cache: false,
 		type : "post",
 		dataType: "json",
-		data : JSON.stringify( { TodayTasks: TodayTasks } ),
+		data : JSON.stringify( { TodayTasks: TodayTasks, List: $("select#ListSelect").val() } ),
 		// В случае успешного получения ответа от сервера
 		success: function (response) {
 			// После того, как задача будет успешно отправлена на сервер
