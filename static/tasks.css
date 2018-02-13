@@ -41,11 +41,15 @@ label#ListHelp {
 label#ListHelp:hover {
 	cursor: pointer;
 }
+input#CheckToday {
+	vertical-align: middle;
+	margin: 0px 0px 0px 0px;
+}
 label#TaskResult {
 	font-style: italic;
 	vertical-align:middle;
 	line-height: 21px;
-	padding: 0px 2px 0px 2px;
+	margin: 0px 0px 0px 4px;
 }
 br.clearBoth {
 	clear: both;
@@ -214,8 +218,8 @@ li.TodayTask:hover {
 li img, p img {
 	display: inline-block;
 	vertical-align: text-top;
-	margin: -1px 0px 0px 0px;
-	padding: 0px 2px 0px 2px;
+	margin: -1px 2px 0px 0px;
+	padding: 0px 0px 0px 2px;
 	height: 16px;
 }
 .done img, .canceled img, .moved img {
@@ -227,8 +231,8 @@ li img, p img {
    Стили, обеспечивающие верчение спиннера
    =============================================================== */
 .sk-fading-circle {
-	margin: 1px 0px 0px 0px;
-	padding: 0px 2px 0px 2px;
+	margin: 1px 0px 0px 4px;
+	padding: 0px 0px 0px 0px;
 	width: 18px;
 	height: 18px;
 	position: relative;

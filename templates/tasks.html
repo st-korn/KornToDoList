@@ -61,11 +61,11 @@
 			 	<option value="canceled">отменена</option>
 			 	<option value="done">завершена</option>
 			</select>
+			<input type="checkbox" id="CheckToday" name="today" value="1">
+    		<label for="CheckToday">Буду делать сегодня</label>
 			<button id="TaskSubmit">Добавить</button>
 		</div>
 		<div class="leftLine">
-			<button id="TaskToday">Буду делать сегодня</button>
-			<button id="TaskFromday">Удалить из списка на сегодня</button>
 			<button id="TaskMove" title="{{.ActualListFullName}}">Перенести в список {{.ActualListShortName}}</button>
 		</div>
 		<div class="leftLine sk-fading-circle" id="spinner">

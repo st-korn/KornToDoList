@@ -32,6 +32,7 @@ type Task struct {
     Status string  `json:"status" bson:"status"`
     List string  `json:"list" bson:"list"`
     Icon string `json:"icon" bson:"icon"`
+    Length int `json:"length" bson:"length"`
 }
 
 // Структура записи о задаче, которую планируется выполнить сегодня
@@ -199,7 +200,7 @@ func hello(res http.ResponseWriter, req *http.Request) {
 // ================================================================================
 func sendTask(res http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
-	fmt.Println(req.Form)
+	//fmt.Println(req.Form)
 
 	// Соединяемся с базой
 	session, err := mgo.Dial(URI)
@@ -214,6 +215,7 @@ func sendTask(res http.ResponseWriter, req *http.Request) {
 		Section : strings.Join(req.Form["section"],""),
 		Status : strings.Join(req.Form["status"],""),
 		Icon : strings.Join(req.Form["icon"],"") }
+	var checkToday = strings.Join(req.Form["today"],"")
 
 	// Проверяем на корректность задачи
 	task.Text = strings.TrimSpace(task.Text)
@@ -245,6 +247,34 @@ func sendTask(res http.ResponseWriter, req *http.Request) {
 		if err != nil { panic(err) }
 	}
 
+	// Проверяем, требуется ли задачу поместить в сегодняшнее расписание / удалить их него
+	err = c.Find(bson.M{"_id": task.Id}).One(&task)
+	if err != nil { panic(err) }
+	if !(task.Length > 0) && (checkToday == "1") {
+		// Выбираем сегодняшние задачи
+		var todaytasks []TodayTask
+		err = c.Find(bson.M{"length": bson.M{"$gt": 0}, "list": task.List}).Sort("start").All(&todaytasks)
+		if err != nil { panic(err) }
+		// Ищем среди сегодняшних задач первый пустой интервал
+		curInterval := 0
+		for _, todaytask := range todaytasks {
+			if curInterval<todaytask.Start { break }
+			curInterval = todaytask.Start + todaytask.Length
+		}
+		// Добавляем задачу в сегодняшнее расписание
+		condition := bson.M{"_id": task.Id}
+		change := bson.M { "$set": bson.M {"length": 1, "start": curInterval} }
+		err = c.Update(condition, change)
+		if err != nil { panic(err) }
+
+	} else if (task.Length > 0) && !(checkToday == "1") {
+		// Удаляем задачу из сегодняшнего расписания
+		condition := bson.M{"_id": task.Id}
+		change := bson.M { "$set": bson.M {"length": 0} }
+		err = c.Update(condition, change)
+		if err != nil { panic(err) }
+	}
+
 	// Возвращаем полную информацию о задаче, включая ID, в формате JSON
 	js, err := json.Marshal(task)
   	if err != nil { http.Error(res, err.Error(), http.StatusInternalServerError)
@@ -253,7 +283,7 @@ func sendTask(res http.ResponseWriter, req *http.Request) {
   	res.Header().Set("Content-Type", "application/json; charset=utf-8")
   	//res.Header().Set("Access-Control-Allow-Origin", "*")
   	res.Write(js)
-  	fmt.Println(string(js))
+  	//fmt.Println(string(js))
 }
 
 // ================================================================================
@@ -326,7 +356,7 @@ func arrangeTodayTasks(res http.ResponseWriter, req *http.Request) {
   	res.Header().Set("Content-Type", "application/json; charset=utf-8")
   	//res.Header().Set("Access-Control-Allow-Origin", "*")
   	res.Write(js)
-  	fmt.Println(string(js))
+  	//fmt.Println(string(js))
 }
 
 

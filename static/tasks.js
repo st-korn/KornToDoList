@@ -1,4 +1,4 @@
-var resetTaskFromAfterUpdate = false;
+var resetTaskFormAfterUpdate = false;
 $( init );
 
 // ===========================================================================
@@ -9,8 +9,6 @@ function init() {
 	$("button#ListCreate").bind('click', createList);
 	$("button#TaskSubmit").bind('click', sendTask);
 	$("button#TaskMove").bind('click', moveTask);
-	$("button#TaskToday").bind('click', todayTask);
-	$("button#TaskFromday").bind('click', fromdayTask);
 	afterUpdate();
 	$("td.vh button").click();
 	$("#spinner").hide();
@@ -47,17 +45,16 @@ function afterUpdate() {
 // Подготавливает форму ввода #TaskForm для добавления новой задачи
 // ===========================================================================
 function addNewTask() {
-	resetTaskFromAfterUpdate = false;
+	resetTaskFormAfterUpdate = false;
 	$("input#TaskId").val( "" );
 	$("input#TaskList").val(  $("select#ListSelect").val() );
 	$("input#TaskText").val( "" );
-	$("select#TaskSection").val( $(this).closest('td').attr('class') );
+	$("select#TaskSection").val( $(this).closest('td').prop('class') );
 	$("select#TaskStatus").val( "created" );
 	$("select#TaskIcon").val( "" );
 	$("button#TaskSubmit").text("Добавить");
 	$("button#TaskMove").hide();
-	$("button#TaskToday").hide();
-	$("button#TaskFromday").hide();
+	$("input#CheckToday").prop('checked',false);
 	$("label#TaskResult").text("");
 	$("input#TaskText").focus();
 }
@@ -66,28 +63,28 @@ function addNewTask() {
 // При щелчке на задаче - загружает её для редактирования в форму #TaskForm
 // ===========================================================================
 function editTask() {
-	resetTaskFromAfterUpdate = false;
-	$("input#TaskId").val( $(this).attr('id') );
+	resetTaskFormAfterUpdate = false;
+	$("input#TaskId").val( $(this).prop('id') );
 	$("input#TaskList").val(  $("select#ListSelect").val() );
 	$("input#TaskText").val( $(this).text() );
-	$("select#TaskSection").val( $(this).closest('td').attr('class') );
-	$("select#TaskStatus").val( $(this).attr('class') );
-	$("select#TaskIcon").val( $(this).find("img").attr('class') );
+	$("select#TaskSection").val( $(this).closest('td').prop('class') );
+	$("select#TaskStatus").val( $(this).prop('class') );
+	$("select#TaskIcon").val( $(this).find("img").prop('class') );
 	$("button#TaskSubmit").text("Изменить");
-	if ( ($("button#TaskMove").attr('title') != $("select#ListSelect").val()) && 
+	if ( ($("button#TaskMove").prop('title') != $("select#ListSelect").val()) && 
 		($("select#TaskStatus").val() == "created") ) 
 		{ $("button#TaskMove").show() }
 	else
 		{ $("button#TaskMove").hide() };
 	if( ($("select#TaskStatus").val() == "created") &&
-		($('li[id="'+$(this).attr('id')+'"]').length == 0) ) {
+		($('li[id="'+$(this).prop('id')+'"]').length == 0) ) {
 		$("button#TaskToday").show() }
 	else {
 		$("button#TaskToday").hide() };
-	if ($('li[id="'+$(this).attr('id')+'"]').length > 0) {
-		$("button#TaskFromday").show() }
+	if ($('li[id="'+$(this).prop('id')+'"]').length > 0) {
+		$("input#CheckToday").prop('checked',true) }
 	else {
-		$("button#TaskFromday").hide() };
+		$("input#CheckToday").prop('checked',false) };
 	$("label#TaskResult").text("");
 	$("input#TaskText").focus();
 }
@@ -97,7 +94,7 @@ function editTask() {
 // так же, как если бы щёлкнули на задаче в одной из колонок таблицы
 // ===========================================================================
 function editTodayTask() {
-	var id = $(this).attr('id')
+	var id = $(this).prop('id')
 	var pp = $('p[id="'+id+'"]') // поиск с # не срабатывает, оказывается на странице нельзя иметь элементы с одинаковым id, пусть даже разных типов
 	editTask.call(pp)
 }
@@ -109,7 +106,7 @@ function editTodayTask() {
 // ===========================================================================
 function sendTask() {
 	$("#spinner").show();
-	resetTaskFromAfterUpdate = true;
+	resetTaskFormAfterUpdate = true;
 	if (!$("input#TaskText").val())
 	{
 		alert('Введите задачу!');
@@ -127,7 +124,6 @@ function sendTask() {
 			// После того, как задача будет успешно отправлена на сервер
 			$("label#TaskResult").html("Готово");
 			reloadTasks();
-			$("#spinner").hide();
 		},
 		// В случае возвращение сервером ошибки, или недоступности сервера
 		error: function(jqXHR,exception) { 
@@ -135,23 +131,6 @@ function sendTask() {
 			$("#spinner").hide();
 		}
 	} );
-	return false;
-}
-
-function todayTask() {
-	var li_html = '<li id="'+$("input#TaskId").val()+'" class="TodayTask" style="height:20px" title="'+$("input#TaskText").val()+'">'+$("input#TaskText").val()+'</li>';
-	if ($("li.TodayTask:last").length>0) { 
-		$("li.TodayTask:last").after(li_html) }
-	else { $("ul#TodayTasks").prepend(li_html) };
-	sendToday();
-	return false;
-}
-
-function fromdayTask() {
-	var li = $('li[id="'+$("input#TaskId").val()+'"]') // поиск с # не срабатывает, оказывается на странице нельзя иметь элементы с одинаковым id, пусть даже разных типов
-	console.log(li);
-	li.remove();
-	sendToday();
 	return false;
 }
 
@@ -169,7 +148,7 @@ function clearAllTodayTasks() {
 
 function sendToday() {
 	$("#spinner").show();
-	resetTaskFromAfterUpdate = true;
+	resetTaskFormAfterUpdate = true;
 	var TodayTasksOffset = $("ul#TodayTasks").offset().top;
 	var TodayTasks = [];
 	$("li.TodayTask").each( function (index, element) {
@@ -190,7 +169,6 @@ function sendToday() {
 			// После того, как задача будет успешно отправлена на сервер
 			$("label#TaskResult").html("Расписание обновлено");
 			reloadTasks();
-			$("#spinner").hide();
 		},
 		// В случае возвращение сервером ошибки, или недоступности сервера
 		error: function(jqXHR,exception) { 
@@ -207,7 +185,9 @@ function reloadTasks() {
 			// Восстанавливаем функциональность кнопок "+" и кликабельность задач
 			afterUpdate();
 			// Подготавливаемся ко вводу новой задачи
-			if (resetTaskFromAfterUpdate) { $("td.vh button").click(); }
+			if (resetTaskFormAfterUpdate) { $("td.vh button").click(); }
+			// Выключаем спиннер
+			$("#spinner").hide();
 		}
 	);
 
@@ -248,10 +228,10 @@ function createList() {
 	var formated_now = now.yyyymmdd();
 	var str = $("select#ListSelect").val();
 	var username = str.substring(0, str.indexOf(":"));
-	$("button#TaskMove").attr('title', username+":"+formated_now);
+	$("button#TaskMove").prop('title', username+":"+formated_now);
 	$("button#TaskMove").text("Перенести в список "+formated_now);
 	if ($("input#TaskId").val() != "") {
-		if ( $("button#TaskMove").attr('title') != $("select#ListSelect").val() ) { $("button#TaskMove").show() };
+		if ( $("button#TaskMove").prop('title') != $("select#ListSelect").val() ) { $("button#TaskMove").show() };
 	}
 	return false;
 }
@@ -259,14 +239,14 @@ function createList() {
 function moveTask() {
 	var old_id = $("input#TaskId").val();
 	$("input#TaskId").val( "" );
-	$("input#TaskList").val(  $("button#TaskMove").attr('title') );	
+	$("input#TaskList").val(  $("button#TaskMove").prop('title') );	
 	sendTask();
 
 	editTask.call($('p[id="'+old_id+'"]'));
 	$("select#TaskStatus").val( "moved" );
 	sendTask();
 	// Проверяем, если список только создаётся - обновляем текущую страницу
-	$('select#ListSelect option[value="'+$("button#TaskMove").attr('title')+'"]').length == 0
+	$('select#ListSelect option[value="'+$("button#TaskMove").prop('title')+'"]').length == 0
 	{
 		location.reload();
 	}
