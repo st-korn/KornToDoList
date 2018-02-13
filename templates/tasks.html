@@ -13,42 +13,79 @@
 </head>
 <body>
 	<form id="ListForm">
-		<label id="ListTitle">Список задач: </label>
-		<select title="Выберите список задач с которым будете работать" name="list" id="ListSelect">
-			{{- range .MyLists}}
-		 	<option value="{{.}}"{{if eq . $.CurList}} selected="selected"{{end}}>{{.}}</option>
-		 	{{- end}}
-		</select>
-		<span id="ListButtons">
+		<div class="leftLine">
+			<label id="ListTitle">Список задач: </label>
+			<select title="Выберите список задач с которым будете работать" name="	list" id="ListSelect">
+				{{- range .MyLists}}
+			 	<option value="{{.}}"{{if eq . $.CurList}} selected="selected"{{end}}>{{.}}</option>
+		 		{{- end}}
+			</select>
+		</div>
+		<div class="rightLine">
 			<button id="ListCreate">Создать новый список</button>
 			<label id="ListHelp">Помощь</label>
-		</span>
+		</div>
+		<br class="clearBoth">
 	</form>
 	<form id="TaskForm">
-		<label id="TaskAction">Задача: </label>
-		<input type="hidden" id="TaskId" name="id">
-		<input type="hidden" id="TaskList" name="list">
-		<input type="text" id="TaskText" name="text" size="55">
-		<select title="Раздел, в который будет добавлена задача" name="section" id="TaskSection">
-		 	<option value="vs">ВАЖНО И СРОЧНО</option>
-		 	<option value="vn">ВАЖНО, но несрочно</option>
-		 	<option value="ns">неважно, но СРОЧНО</option>
-			<option value="nn">неважно и несрочно</option>
-		 	<option value="vh">входящие задачи</option>
-		</select>
-		<select title="Текущий статус задачи" name="status" id="TaskStatus">
-		 	<option value="created">создана</option>
-		 	<option value="moved">перенесена</option>
-		 	<option value="canceled">отменена</option>
-		 	<option value="done">завершена</option>
-		</select>
-		<button id="TaskSubmit">Добавить</button>
-		<label id="TaskResult"></label>
-		<span id="TaskButtons">
-			<button id="TaskMove" title="{{.ActualListFullName}}">Перенести в список {{.ActualListShortName}}</button>
+		<div class="leftLine">
+			<label id="TaskAction">Задача: </label>
+			<input type="hidden" id="TaskId" name="id">
+			<input type="hidden" id="TaskList" name="list">
+			<input type="text" id="TaskText" name="text" size="55">
+			<select title="Раздел, в который будет добавлена задача" name="section" id="TaskSection">
+			 	<option value="vs">ВАЖНО И СРОЧНО</option>
+			 	<option value="vn">ВАЖНО, но несрочно</option>
+			 	<option value="ns">неважно, но СРОЧНО</option>
+				<option value="nn">неважно и несрочно</option>
+			 	<option value="vh">входящие задачи</option>
+			</select>
+			<select title="Классифицируйте необходимое действие" name="icon" id="TaskIcon">
+				<option value=""></option>
+				<option value="wait">ждать</option>
+				<option value="remind">контролировать</option>
+				<option value="call">позвонить</option>
+				<option value="force">заставить</option>
+				<option value="mail">написать</option>
+				<option value="prepare">подготовить</option>
+				<option value="manage">организовать</option>
+				<option value="meet">встретиться</option>
+				<option value="visit">посетить</option>
+				<option value="make">сделать</option>
+				<option value="journey">отправиться</option>
+				<option value="think">придумать</option>
+			</select>
+			<select title="Текущий статус задачи" name="status" id="TaskStatus">
+			 	<option value="created">создана</option>
+			 	<option value="moved">перенесена</option>
+			 	<option value="canceled">отменена</option>
+			 	<option value="done">завершена</option>
+			</select>
+			<button id="TaskSubmit">Добавить</button>
+		</div>
+		<div class="leftLine">
 			<button id="TaskToday">Буду делать сегодня</button>
 			<button id="TaskFromday">Удалить из списка на сегодня</button>
-		</span>
+			<button id="TaskMove" title="{{.ActualListFullName}}">Перенести в список {{.ActualListShortName}}</button>
+		</div>
+		<div class="leftLine sk-fading-circle" id="spinner">
+			<div class="sk-circle1 sk-circle"></div>
+  			<div class="sk-circle2 sk-circle"></div>
+			<div class="sk-circle3 sk-circle"></div>
+			<div class="sk-circle4 sk-circle"></div>
+			<div class="sk-circle5 sk-circle"></div>
+			<div class="sk-circle6 sk-circle"></div>
+			<div class="sk-circle7 sk-circle"></div>
+			<div class="sk-circle8 sk-circle"></div>
+			<div class="sk-circle9 sk-circle"></div>
+			<div class="sk-circle10 sk-circle"></div>
+			<div class="sk-circle11 sk-circle"></div>
+			<div class="sk-circle12 sk-circle"></div>
+		</div>
+		<div class="leftLine">
+			<label id="TaskResult"></label>
+		</div>
+		<br class="clearBoth">
 	</form>
 	<table id="TasksTable">
 	<tr>		
@@ -72,7 +109,7 @@
 							<li class="TodayRelax"></li>
 							{{- end}}
 							{{- if not .IsRelax}}
-							<li id="{{.Id.Hex}}" class="TodayTask {{.Status}}" style="height:{{.Height}}px" title="{{.Text}}">{{.Text}}</li>
+							<li id="{{.Id.Hex}}" class="TodayTask {{.Status}}" style="height:{{.Height}}px" title="{{.Text}}">{{if .Icon}}<img class="{{.Icon}}" src="\static\icons\{{.Icon}}.svg">{{end}}{{.Text}}</li>
 							{{- end}}
 							{{- end}}
 						</ul>
@@ -85,7 +122,7 @@
 		<td class="vs">
 			<header class="ColumnHeader">ВАЖНО И СРОЧНО <button class="add">+</button></header>
 			{{- range .Vs}}
-			<p id="{{.Id.Hex}}" class="{{.Status}}">{{marktask .Text}}</p>
+			<p id="{{.Id.Hex}}" class="{{.Status}}">{{if .Icon}}<img class="{{.Icon}}" src="\static\icons\{{.Icon}}.svg">{{end}}{{marktask .Text}}</p>
 			{{- end}}
 		</td>
 	{{- if .IsMobile}}</tr>
@@ -93,7 +130,7 @@
 		<td class="vn">
 			<header class="ColumnHeader">ВАЖНО, но несрочно <button class="add">+</button></header>
 			{{- range .Vn}}
-			<p id="{{.Id.Hex}}" class="{{.Status}}">{{marktask .Text}}</p>
+			<p id="{{.Id.Hex}}" class="{{.Status}}">{{if .Icon}}<img class="{{.Icon}}" src="\static\icons\{{.Icon}}.svg">{{end}}{{marktask .Text}}</p>
 			{{- end}}
 		</td>
 	{{- if .IsMobile}}</tr>
@@ -101,7 +138,7 @@
 		<td class="ns">
 			<header class="ColumnHeader">неважно, но СРОЧНО <button class="add">+</button></header>
 			{{- range .Ns}}
-			<p id="{{.Id.Hex}}" class="{{.Status}}">{{marktask .Text}}</p>
+			<p id="{{.Id.Hex}}" class="{{.Status}}">{{if .Icon}}<img class="{{.Icon}}" src="\static\icons\{{.Icon}}.svg">{{end}}{{marktask .Text}}</p>
 			{{- end}}
 		</td>
 	{{- if .IsMobile}}</tr>
@@ -109,7 +146,7 @@
 		<td class="nn">
 			<header class="ColumnHeader">неважно и несрочно <button class="add">+</button></header>
 			{{- range .Nn}}
-			<p id="{{.Id.Hex}}" class="{{.Status}}">{{marktask .Text}}</p>
+			<p id="{{.Id.Hex}}" class="{{.Status}}">{{if .Icon}}<img class="{{.Icon}}" src="\static\icons\{{.Icon}}.svg">{{end}}{{marktask .Text}}</p>
 			{{- end}}
 		</td>
 	{{- if .IsMobile}}</tr>
@@ -117,7 +154,7 @@
 		<td class="vh">
 			<header class="ColumnHeader">входящие задачи <button class="add">+</button></header>
 			{{- range .Vh}}
-			<p id="{{.Id.Hex}}" class="{{.Status}}">{{marktask .Text}}</p>
+			<p id="{{.Id.Hex}}" class="{{.Status}}">{{if .Icon}}<img class="{{.Icon}}" src="\static\icons\{{.Icon}}.svg">{{end}}{{marktask .Text}}</p>
 			{{- end}}
 		</td>
 	</tr>

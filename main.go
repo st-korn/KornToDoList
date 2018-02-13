@@ -31,6 +31,7 @@ type Task struct {
     Section string  `json:"section" bson:"section"`
     Status string  `json:"status" bson:"status"`
     List string  `json:"list" bson:"list"`
+    Icon string `json:"icon" bson:"icon"`
 }
 
 // Структура записи о задаче, которую планируется выполнить сегодня
@@ -43,6 +44,7 @@ type TodayTask struct {
 	Height int //количество пикселей для отображения задачи
 	Text string  `json:"text" bson:"text"` // Текст задачи
 	Status string `json:"status" bson:"status"` // Статус задачи
+	Icon string `json:"icon" bson:"icon"` // Пиктограмма задачи
 }
 
 type TimeLabel struct {
@@ -143,7 +145,7 @@ func hello(res http.ResponseWriter, req *http.Request) {
 	// Заполняем пустые и недостающие интервалы промежутками отдыха
 	relaxtask.IsRelax = true
 	relaxtask.Length = 1
-	relaxtask.Height = 15
+	relaxtask.Height = 20
 	curInterval := 0
 	for _, todaytask := range todaytasks {
 		// Добавляем необходимое количество промежутков отдыха перед данной задачей
@@ -154,7 +156,7 @@ func hello(res http.ResponseWriter, req *http.Request) {
 		}
 		// Добавляем текущую задачу, заполняя недостающие поля в информации о задаче
 		todaytask.IsRelax = false
-		todaytask.Height = todaytask.Length*15
+		todaytask.Height = todaytask.Length*20
 		if curInterval > todaytask.Start { todaytask.Start = curInterval }
 		tasks.TodayTasks = append(tasks.TodayTasks, todaytask)
 		tasks.TimeLabels[todaytask.Start].IsRelax = false
@@ -210,7 +212,8 @@ func sendTask(res http.ResponseWriter, req *http.Request) {
 		List : strings.Join(req.Form["list"],""),
 		Text : strings.Join(req.Form["text"],""),
 		Section : strings.Join(req.Form["section"],""),
-		Status : strings.Join(req.Form["status"],"") }
+		Status : strings.Join(req.Form["status"],""),
+		Icon : strings.Join(req.Form["icon"],"") }
 
 	// Проверяем на корректность задачи
 	task.Text = strings.TrimSpace(task.Text)
@@ -236,7 +239,8 @@ func sendTask(res http.ResponseWriter, req *http.Request) {
 			"list": task.List,
 			"text": task.Text,
 			"section": task.Section,
-			"status": task.Status } }
+			"status": task.Status,
+			"icon": task.Icon } }
 		err = c.Update(condition, change)
 		if err != nil { panic(err) }
 	}

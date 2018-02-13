@@ -19,7 +19,13 @@ body {
 form {
 	margin: 10px 0px 10px 0px;
 }
-label#ListTitle {
+div.leftLine {
+	float: left;
+}
+div.rightLine {
+	float: right;
+}
+slabel#ListTitle {
 	font-family: "Arial Black", Gadget, sans-serif;
 	font-weight: bold;
 	font-size: 1.25rem;
@@ -29,9 +35,6 @@ label#ListTitle {
 select#ListSelect option:nth-child(1) {
     font-weight:bold;
 }
-span#ListButtons, span#TaskButtons {
-	float: right;
-}
 label#ListHelp {
 	text-decoration: underline;
 }
@@ -40,8 +43,13 @@ label#ListHelp:hover {
 }
 label#TaskResult {
 	font-style: italic;
+	vertical-align:middle;
+	line-height: 21px;
+	padding: 0px 2px 0px 2px;
 }
-
+br.clearBoth {
+	clear: both;
+}
 
 /* ===============================================================
    Стили задач, отображаемых в таблице
@@ -80,7 +88,7 @@ header.ColumnHeader {
 }
 p {
 	margin: 5px 0px 0px 0px;
-	padding: 0;
+	padding: 0px 0px 0px 0px;
 }
 span.name {
 	color: rgba(0,0,255,1.0);
@@ -155,10 +163,10 @@ ul#TimeLabels {
 	padding: 0; 
 }
 li.TimeLabel {
-	margin: 1px 0px 0px 0px;
+	margin: 0px 0px 0px 0px;
 	padding: 0;
 	text-decoration: overline;
-	height: 14px;
+	height: 20px;
 }
 td.TodayTasks {
 	width: 100%;
@@ -170,7 +178,7 @@ ul#TodayTasks {
 }
 li.TodayTask {
 	margin: 0px 0px 0px 0px;
-	padding: 0;
+	padding: 2px 0px 0px 0px;
 	border: 1px solid rgba(128,128,128,1);
 	border-radius: 3px;
 	box-sizing: border-box;
@@ -179,13 +187,13 @@ li.TodayTask {
 }
 li.TodayRelax {
 	margin: 0px 0px 0px 0px;
-	padding: 0;
+	padding: 0px 0px 0px 0px;
 	border: 1px solid rgba(128,128,128,0);
 	border-radius: 3px;
 	box-sizing: border-box;
 	display: block;
 	overflow: hidden;
-	height: 15px;
+	height: 20px;
 }
 li.TodayTask:hover {
 	cursor: pointer;
@@ -193,8 +201,160 @@ li.TodayTask:hover {
 	background: rgba(128,128,255,0.1);
 }
 .ui-state-highlight {
-	height: 15px;
+	height: 20px;
 }
 .ui-sortable-helper {
     cursor: move;
+}
+
+
+/* ===============================================================
+   Стили, обеспечивающие работу с пиктограммами
+   =============================================================== */
+li img, p img {
+	display: inline-block;
+	vertical-align: text-top;
+	margin: -1px 0px 0px 0px;
+	padding: 0px 2px 0px 2px;
+	height: 16px;
+}
+.done img, .canceled img, .moved img {
+	opacity: 0.3;
+}
+
+
+/* ===============================================================
+   Стили, обеспечивающие верчение спиннера
+   =============================================================== */
+.sk-fading-circle {
+	margin: 1px 0px 0px 0px;
+	padding: 0px 2px 0px 2px;
+	width: 18px;
+	height: 18px;
+	position: relative;
+}
+.sk-fading-circle .sk-circle {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.sk-fading-circle .sk-circle:before {
+  content: '';
+  display: block;
+  margin: 0 auto;
+  width: 15%;
+  height: 15%;
+  background-color: #333;
+  border-radius: 100%;
+  -webkit-animation: sk-circleFadeDelay 1.2s infinite ease-in-out both;
+          animation: sk-circleFadeDelay 1.2s infinite ease-in-out both;
+}
+.sk-fading-circle .sk-circle2 {
+  -webkit-transform: rotate(30deg);
+      -ms-transform: rotate(30deg);
+          transform: rotate(30deg);
+}
+.sk-fading-circle .sk-circle3 {
+  -webkit-transform: rotate(60deg);
+      -ms-transform: rotate(60deg);
+          transform: rotate(60deg);
+}
+.sk-fading-circle .sk-circle4 {
+  -webkit-transform: rotate(90deg);
+      -ms-transform: rotate(90deg);
+          transform: rotate(90deg);
+}
+.sk-fading-circle .sk-circle5 {
+  -webkit-transform: rotate(120deg);
+      -ms-transform: rotate(120deg);
+          transform: rotate(120deg);
+}
+.sk-fading-circle .sk-circle6 {
+  -webkit-transform: rotate(150deg);
+      -ms-transform: rotate(150deg);
+          transform: rotate(150deg);
+}
+.sk-fading-circle .sk-circle7 {
+  -webkit-transform: rotate(180deg);
+      -ms-transform: rotate(180deg);
+          transform: rotate(180deg);
+}
+.sk-fading-circle .sk-circle8 {
+  -webkit-transform: rotate(210deg);
+      -ms-transform: rotate(210deg);
+          transform: rotate(210deg);
+}
+.sk-fading-circle .sk-circle9 {
+  -webkit-transform: rotate(240deg);
+      -ms-transform: rotate(240deg);
+          transform: rotate(240deg);
+}
+.sk-fading-circle .sk-circle10 {
+  -webkit-transform: rotate(270deg);
+      -ms-transform: rotate(270deg);
+          transform: rotate(270deg);
+}
+.sk-fading-circle .sk-circle11 {
+  -webkit-transform: rotate(300deg);
+      -ms-transform: rotate(300deg);
+          transform: rotate(300deg); 
+}
+.sk-fading-circle .sk-circle12 {
+  -webkit-transform: rotate(330deg);
+      -ms-transform: rotate(330deg);
+          transform: rotate(330deg); 
+}
+.sk-fading-circle .sk-circle2:before {
+  -webkit-animation-delay: -1.1s;
+          animation-delay: -1.1s; 
+}
+.sk-fading-circle .sk-circle3:before {
+  -webkit-animation-delay: -1s;
+          animation-delay: -1s; 
+}
+.sk-fading-circle .sk-circle4:before {
+  -webkit-animation-delay: -0.9s;
+          animation-delay: -0.9s; 
+}
+.sk-fading-circle .sk-circle5:before {
+  -webkit-animation-delay: -0.8s;
+          animation-delay: -0.8s; 
+}
+.sk-fading-circle .sk-circle6:before {
+  -webkit-animation-delay: -0.7s;
+          animation-delay: -0.7s; 
+}
+.sk-fading-circle .sk-circle7:before {
+  -webkit-animation-delay: -0.6s;
+          animation-delay: -0.6s; 
+}
+.sk-fading-circle .sk-circle8:before {
+  -webkit-animation-delay: -0.5s;
+          animation-delay: -0.5s; 
+}
+.sk-fading-circle .sk-circle9:before {
+  -webkit-animation-delay: -0.4s;
+          animation-delay: -0.4s;
+}
+.sk-fading-circle .sk-circle10:before {
+  -webkit-animation-delay: -0.3s;
+          animation-delay: -0.3s;
+}
+.sk-fading-circle .sk-circle11:before {
+  -webkit-animation-delay: -0.2s;
+          animation-delay: -0.2s;
+}
+.sk-fading-circle .sk-circle12:before {
+  -webkit-animation-delay: -0.1s;
+          animation-delay: -0.1s;
+}
+@-webkit-keyframes sk-circleFadeDelay {
+  0%, 39%, 100% { opacity: 0; }
+  40% { opacity: 1; }
+}
+@keyframes sk-circleFadeDelay {
+  0%, 39%, 100% { opacity: 0; }
+  40% { opacity: 1; } 
 }

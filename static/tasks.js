@@ -1,3 +1,4 @@
+var resetTaskFromAfterUpdate = false;
 $( init );
 
 // ===========================================================================
@@ -10,10 +11,9 @@ function init() {
 	$("button#TaskMove").bind('click', moveTask);
 	$("button#TaskToday").bind('click', todayTask);
 	$("button#TaskFromday").bind('click', fromdayTask);
-	$("button#ClearDone").bind('click', clearDoneTodayTasks);
-	$("button#ClearAll").bind('click', clearAllTodayTasks);
 	afterUpdate();
 	$("td.vh button").click();
+	$("#spinner").hide();
 }
 
 // ===========================================================================
@@ -21,6 +21,8 @@ function init() {
 // ===========================================================================
 function afterUpdate() {
 	$('button.add').bind('click', addNewTask);
+	$("button#ClearDone").bind('click', clearDoneTodayTasks);
+	$("button#ClearAll").bind('click', clearAllTodayTasks);
 	$('p').bind('click', editTask);
 	$("ul#TodayTasks").sortable({
 		cursor: "move",
@@ -31,7 +33,7 @@ function afterUpdate() {
     });
     $("ul#TodayTasks").disableSelection();
     $("li.TodayTask").resizable({
-    	grid: 15,
+    	grid: 20,
     	handles: 's',
     	distance: 3,
     	start: function(event,ui) { $("li.TodayTask").css("cursor", "s-resize") }, 
@@ -45,11 +47,13 @@ function afterUpdate() {
 // Подготавливает форму ввода #TaskForm для добавления новой задачи
 // ===========================================================================
 function addNewTask() {
+	resetTaskFromAfterUpdate = false;
 	$("input#TaskId").val( "" );
 	$("input#TaskList").val(  $("select#ListSelect").val() );
 	$("input#TaskText").val( "" );
 	$("select#TaskSection").val( $(this).closest('td').attr('class') );
 	$("select#TaskStatus").val( "created" );
+	$("select#TaskIcon").val( "" );
 	$("button#TaskSubmit").text("Добавить");
 	$("button#TaskMove").hide();
 	$("button#TaskToday").hide();
@@ -62,11 +66,13 @@ function addNewTask() {
 // При щелчке на задаче - загружает её для редактирования в форму #TaskForm
 // ===========================================================================
 function editTask() {
+	resetTaskFromAfterUpdate = false;
 	$("input#TaskId").val( $(this).attr('id') );
 	$("input#TaskList").val(  $("select#ListSelect").val() );
 	$("input#TaskText").val( $(this).text() );
 	$("select#TaskSection").val( $(this).closest('td').attr('class') );
 	$("select#TaskStatus").val( $(this).attr('class') );
+	$("select#TaskIcon").val( $(this).find("img").attr('class') );
 	$("button#TaskSubmit").text("Изменить");
 	if ( ($("button#TaskMove").attr('title') != $("select#ListSelect").val()) && 
 		($("select#TaskStatus").val() == "created") ) 
@@ -102,6 +108,8 @@ function editTodayTask() {
 // или создающую новую задачу (если id пустой)
 // ===========================================================================
 function sendTask() {
+	$("#spinner").show();
+	resetTaskFromAfterUpdate = true;
 	if (!$("input#TaskText").val())
 	{
 		alert('Введите задачу!');
@@ -119,15 +127,19 @@ function sendTask() {
 			// После того, как задача будет успешно отправлена на сервер
 			$("label#TaskResult").html("Готово");
 			reloadTasks();
+			$("#spinner").hide();
 		},
 		// В случае возвращение сервером ошибки, или недоступности сервера
-		error: showAjaxError
+		error: function(jqXHR,exception) { 
+			showAjaxError(jqXHR,exception);
+			$("#spinner").hide();
+		}
 	} );
 	return false;
 }
 
 function todayTask() {
-	var li_html = '<li id="'+$("input#TaskId").val()+'" class="TodayTask" style="height:15px" title="'+$("input#TaskText").val()+'">'+$("input#TaskText").val()+'</li>';
+	var li_html = '<li id="'+$("input#TaskId").val()+'" class="TodayTask" style="height:20px" title="'+$("input#TaskText").val()+'">'+$("input#TaskText").val()+'</li>';
 	if ($("li.TodayTask:last").length>0) { 
 		$("li.TodayTask:last").after(li_html) }
 	else { $("ul#TodayTasks").prepend(li_html) };
@@ -156,15 +168,16 @@ function clearAllTodayTasks() {
 }
 
 function sendToday() {
+	$("#spinner").show();
+	resetTaskFromAfterUpdate = true;
 	var TodayTasksOffset = $("ul#TodayTasks").offset().top;
 	var TodayTasks = [];
 	$("li.TodayTask").each( function (index, element) {
 		var TodayTask = {};
 		TodayTask.id = element.id;
-		TodayTask.start = Math.round(($(this).offset().top-TodayTasksOffset)/15);
-		TodayTask.length = Math.round($(this).outerHeight()/15);
+		TodayTask.start = Math.round(($(this).offset().top-TodayTasksOffset)/20);
+		TodayTask.length = Math.round($(this).outerHeight()/20);
 		TodayTasks.push( TodayTask );
-		//console.log(TodayTask);
 	} )
 	$.ajax( {
 		url : "/arrangeTodayTasks",
@@ -177,28 +190,24 @@ function sendToday() {
 			// После того, как задача будет успешно отправлена на сервер
 			$("label#TaskResult").html("Расписание обновлено");
 			reloadTasks();
+			$("#spinner").hide();
 		},
 		// В случае возвращение сервером ошибки, или недоступности сервера
-		error: showAjaxError
+		error: function(jqXHR,exception) { 
+			showAjaxError(jqXHR,exception);
+			$("#spinner").hide();
+		}
 	} );
 }
 
 function reloadTasks() {
 	// Обновляем таблицу задач
-	/*$.get(location.href, function(data) {
-    	var $response = $(data);
-    	$response.children().each( function() {
-    		console.log(this.id)
-        	//if ((this.id == "TasksTable") || (this.id == "ListSelect")) { $('#'+this.id).replaceWith(this); }
-    	} );
-	} )*/
-	//$(".refreshed").load(location.href+" .refreshed",
 	$("#TasksTable").load(location.href+" #TasksTable",
 		"", function() { 
 			// Восстанавливаем функциональность кнопок "+" и кликабельность задач
 			afterUpdate();
 			// Подготавливаемся ко вводу новой задачи
-			$("td.vh button").click();
+			if (resetTaskFromAfterUpdate) { $("td.vh button").click(); }
 		}
 	);
 
