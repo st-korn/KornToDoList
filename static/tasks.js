@@ -237,18 +237,54 @@ function createList() {
 }
 
 function moveTask() {
+	$("#spinner").show();
+	resetTaskFormAfterUpdate = true;
 	var old_id = $("input#TaskId").val();
+
 	$("input#TaskId").val( "" );
 	$("input#TaskList").val(  $("button#TaskMove").prop('title') );	
-	sendTask();
-
-	editTask.call($('p[id="'+old_id+'"]'));
-	$("select#TaskStatus").val( "moved" );
-	sendTask();
-	// Проверяем, если список только создаётся - обновляем текущую страницу
-	$('select#ListSelect option[value="'+$("button#TaskMove").prop('title')+'"]').length == 0
-	{
-		location.reload();
-	}
+	$.ajax( {
+		url : "/sendTask",
+		cache: false,
+		type : "post",
+		dataType: "text",
+		data : $("#TaskForm").serialize(),
+		// В случае успешного получения ответа от сервера
+		success: function (response) {
+			editTask.call($('p[id="'+old_id+'"]'));
+			$("select#TaskStatus").val( "moved" );
+			resetTaskFormAfterUpdate = true;
+			$.ajax( {
+				url : "/sendTask",
+				cache: false,
+				type : "post",
+				dataType: "text",
+				data : $("#TaskForm").serialize(),
+				// В случае успешного получения ответа от сервера
+				success: function (response) {
+					// Проверяем, если список только создаётся - обновляем текущую страницу
+					if ($('select#ListSelect option[value="'+$("button#TaskMove").prop('title')+'"]').length == 0)
+					{
+						location.reload();
+					}
+					else 
+					{
+						$("label#TaskResult").html("Задача перенесена");
+						reloadTasks();
+					}
+				},
+				// В случае возвращение сервером ошибки, или недоступности сервера
+				error: function(jqXHR,exception) { 
+					showAjaxError(jqXHR,exception);
+					$("#spinner").hide();
+				}
+			} );
+		},
+		// В случае возвращение сервером ошибки, или недоступности сервера
+		error: function(jqXHR,exception) { 
+			showAjaxError(jqXHR,exception);
+			$("#spinner").hide();
+		}
+	} );
 	return false;
 }
