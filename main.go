@@ -102,7 +102,7 @@ func hello(res http.ResponseWriter, req *http.Request) {
 
 	// Определяем, с какого устройства пришёл запрос
 	detect := mobiledetect.NewMobileDetect(req, nil)
-	tasks.IsMobile = detect.IsMobile()
+	tasks.IsMobile = detect.IsMobile() && !detect.IsTablet()
 
 	// Составляем перечень списов, доступных текущему пользователю
 	err = c.Find(nil).Distinct("list",&tasks.MyLists)
