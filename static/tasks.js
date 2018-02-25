@@ -22,7 +22,6 @@ function init() {
 function startTour() {
 	// Скрываем таблицу
 	$(".workplace").css("position", "fixed");
-	$(".workplace").width($(".TasksTable").width())
 	$(".tourplace").show();
 	$(".tourplace-background").show();
 	oldBackgroundTop = $(".tourplace-background").offset().top;
