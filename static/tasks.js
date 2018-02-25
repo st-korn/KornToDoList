@@ -1,4 +1,5 @@
 var resetTaskFormAfterUpdate = false;
+var oldBackgroundTop = 0;
 $( init );
 
 // ===========================================================================
@@ -9,9 +10,70 @@ function init() {
 	$("button#ListCreate").bind('click', createList);
 	$("button#TaskSubmit").bind('click', sendTask);
 	$("button#TaskMove").bind('click', moveTask);
+	$("label#ListHelp").bind('click', startTour);
 	afterUpdate();
 	$("td.vh button").click();
 	$("#spinner").hide();
+	$(".tourplace").hide();
+	$(".tourplace-background").hide();
+}
+
+
+function startTour() {
+	// Скрываем таблицу
+	$(".workplace").css("position", "fixed");
+	$(".workplace").width($(".TasksTable").width())
+	$(".tourplace").show();
+	$(".tourplace-background").show();
+	oldBackgroundTop = $(".tourplace-background").offset().top;
+
+	$("div#tour5-cat").offset({ top: $("section#tour5").offset().top+$("select#TaskSection").offset().top-7, left: $("select#TaskSection").offset().left-7 });
+	$("div#tour5-cat").height( $("select#TaskSection").height() );
+	$("div#tour5-cat").width( $("select#TaskSection").width() );
+	$("div#tour5-vh").offset({ top: $("section#tour5").offset().top+$("td.vh .ColumnHeader").offset().top+$("td.vh .ColumnHeader").height()+5, left: $("td.vh").offset().left });
+
+	/*// init controller
+	var controller = new ScrollMagic.Controller();
+
+	// build scenes
+	new ScrollMagic.Scene({triggerElement: "#tour1", duration: window.innerHeight})
+					.setClassToggle("#high1", "active") // add class toggle
+					.addIndicators() // add indicators (requires plugin)
+					.addTo(controller);
+	new ScrollMagic.Scene({triggerElement: "#tour2"})
+					.setClassToggle("#high2", "active") // add class toggle
+					.addIndicators() // add indicators (requires plugin)
+					.addTo(controller);*/
+
+	/*		$('.tour').fullpage({
+				anchors: ['firstPage', 'secondPage', '3rdPage'],
+				sectionsColor: ['#C63D0F', '#1BBC9B', '#7E8F7C'],
+				scrollBar: true});*/
+
+	$("div.tour-background").each( function (index, element) {
+		var backgroundID = element.id;
+		$(this).height( $("section#tour"+backgroundID[backgroundID.length-1]).height()*1.25 );
+	} );
+
+	$.scrollify({
+            section : ".tour",
+            updateHash: false,
+    		touchScroll: true
+          });
+
+$(window).bind('scroll',function(e){
+    parallaxScroll();
+});
+ 
+
+}
+
+function parallaxScroll(){
+    var scrolled = $(window).scrollTop();
+    //console.log("s=",scrolled);
+	//$(".tourplace-background").offset({ top: scrolled*1.25 });
+	//console.log("o=", oldBackgroundTop);
+	 $('.tourplace-background').css('top',(0-(scrolled*1.25))+'px');
 }
 
 // ===========================================================================

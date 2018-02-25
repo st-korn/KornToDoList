@@ -11,7 +11,9 @@ body {
 	background-size: 12px 12px;
 	background-position: center center;
 }
-
+div.workplace {
+	width: 100%;
+}
 
 /* ===============================================================
    Стили заголовков списка и формы редактирования задачи
@@ -65,6 +67,8 @@ td.td, td.vs, td.vn, td.ns, td.nn, td.vh {
 	width: 16.6%;
 	vertical-align: top;
 	text-align: justify-all;
+	padding: 5px 5px 5px 5px;
+	position:relative;
 }
 td.td {
 	background-color:rgba(255, 128, 128, 0.3);
@@ -88,7 +92,7 @@ header.ColumnHeader {
 	font-family: "Arial Black", Gadget, sans-serif;
 	font-weight: bold;
 	color: rgb(105,105,105);
-	margin: 5px 0px 0px 0px;
+	margin: 0px 0px 0px 0px;
 }
 p {
 	margin: 5px 0px 0px 0px;
@@ -361,4 +365,155 @@ li img, p img {
 @keyframes sk-circleFadeDelay {
   0%, 39%, 100% { opacity: 0; }
   40% { opacity: 1; } 
+}
+
+/* ===============================================================
+   Стили тура по системе
+   =============================================================== */
+div.tourplace {
+	top:0px;
+    left:0px;
+    width:100%;
+    z-index:1000;
+}
+section.tour {
+	height:100vh;
+	width: 100%;
+	vertical-align: middle;
+	text-align: center;
+	display: table;
+}
+div.tour-outer {  
+	display: table-cell; 
+	vertical-align: middle;
+	text-align: center;
+	padding: 20px 20px 20px 20px;
+}
+div.tour-inner {
+	max-width: 800px;
+	border: 1px solid rgba(128,128,128,1);
+	border-radius: 10px;
+	box-sizing: border-box;
+	padding: 20px 20px 20px 20px;
+	vertical-align: middle;
+	text-align: justify;
+	display: inline-block;
+	opacity:0.99;
+    background-color: rgba(255,255,255,1);	
+	background: linear-gradient( rgba(187,187,187,0.5),  rgba(255,255,255,0.7) 1px), linear-gradient( 90deg, rgba(187,187,187,0.5),  rgba(255,255,255,0.7) 1px);
+	background-size: 12px 12px;
+	background-position: center center;
+}
+div.tour-label {
+	position: absolute;
+	border: 3px solid rgba(255,128,128,1);
+	color: rgba(255,0,0,1);
+	padding: 5px 5px 5px 5px;
+	font-weight: bold;
+}
+div.tour-border {
+	position: absolute;
+	border: 3px solid rgba(255,128,128,1);
+	color: rgba(255,0,0,1);
+	padding: 5px 5px 5px 5px;
+	font-weight: bold;
+	background: transparent;
+}
+div.tour-inner h3 {
+	font-weight: bold;
+	font-size: 1.5rem;	
+	color: rgba(0,0,0,1);
+}
+div.tour-inner h4 {
+	font-weight: bold;
+	font-size: 1.25rem;	
+	color: rgba(0,0,0,1);
+}
+div.tour-inner h5 {
+	font-weight: normal;
+	font-size: 1rem;	
+	color: rgba(0,0,0,1);
+}
+div.tour-inner a:link, div.tour-inner a:visited {
+	font-weight: normal;
+	font-size: 1rem;	
+	color: rgba(0,0,255,1);
+}
+div.tour-inner span.sample {
+	font-style: italic;
+	font-size: 1rem;	
+	color: rgba(0,0,0,1);
+}
+div.tour-inner span.arrow {
+	font-size: 2rem;
+	font-weight: bold;
+}
+
+
+/* ===============================================================
+   Стили фоновых изображений в туре по системе
+   =============================================================== */
+div.tourplace-background {
+	width: 100%;
+	position: fixed;
+	background-size: cover;
+	background-position: center center;
+ 	opacity:0.99;
+    background-color: rgba(255,255,255,1);
+}
+div.tour-background {
+	width: 100%;
+	height: 125vh;
+ 	opacity:0.99;
+    background-color: rgba(255,255,255,1);
+}
+div#background1 {
+	background:url("/static/tour/tour1.jpg");
+	background-size: cover;
+	background-position: center center;
+}
+div#background2 {
+	background:url("/static/tour/tour2.jpg");
+	background-size: cover;
+	background-position: center center;
+}
+div#background3 {
+	background:url("/static/tour/tour3.jpg");
+	background-size: cover;
+	background-position: center center;
+}
+div#background4 {
+	background:url("/static/tour/tour4.jpg");
+	background-size: cover;
+	background-position: center center;
+}
+
+
+/* ===============================================================
+   Стили, обеспечивающие прыгание стрелки
+   =============================================================== */
+div.arrow {
+	position: relative;
+	left: 48%;
+	top: 10px;
+	width: 40px;
+	height: 40px;
+	font-size: 40px;
+	font-weight: bold;
+}
+div.bounce {
+  -moz-animation: bounce 2s infinite;
+  -webkit-animation: bounce 2s infinite;
+  animation: bounce 2s infinite;
+}
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-30px);
+  }
+  60% {
+    transform: translateY(-15px);
+  }
 }

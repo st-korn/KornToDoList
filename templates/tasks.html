@@ -6,158 +6,237 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
 	<link rel="stylesheet" type="text/css" href="/static/tasks.css?1">
 	<link rel="stylesheet" type="text/css" href="/static/libs/jquery-ui.min.css">
+	<!--<link rel="stylesheet" type="text/css" href="/static/libs/jquery.fullpage.min.css">-->
 	<script src="/static/libs/jquery-3.3.1.min.js"></script>
 	<script src="/static/libs/jquery-ui.min.js"></script>
+	<!--<script src="/static/libs/jquery.snapscroll.min.js"></script>-->
+	<!--<script src="/static/libs/jquery.fullpage.min.js"></script>-->
+	<!--<script src="/static/libs/ScrollMagic.min.js"></script>-->
+	<script src="/static/libs/jquery.scrollify.js"></script>
+	<!--<script src="/static/libs/debug.addIndicators.min.js"></script>-->
 	<!--<script src="/static/libs/jquery.ui.touch-punch.min.js"></script>-->
 	<script src="/static/tasks.js?1"></script>
 </head>
 <body>
-	<form id="ListForm">
-		<div class="leftLine">
-			<label id="ListTitle">Список задач: </label>
-			<select title="Выберите список задач с которым будете работать" name="	list" id="ListSelect">
-				{{- range .MyLists}}
-			 	<option value="{{.}}"{{if eq . $.CurList}} selected="selected"{{end}}>{{.}}</option>
-		 		{{- end}}
-			</select>
-		</div>
-		<div class="rightLine">
-			<button id="ListCreate">Создать новый список</button>
-			<label id="ListHelp">Помощь</label>
-		</div>
-		<br class="clearBoth">
-	</form>
-	<form id="TaskForm">
-		<div class="leftLine">
-			<label id="TaskAction">Задача: </label>
-			<input type="hidden" id="TaskId" name="id">
-			<input type="hidden" id="TaskList" name="list">
-			<input type="text" id="TaskText" name="text" size="55">
-			<select title="Раздел, в который будет добавлена задача" name="section" id="TaskSection">
-			 	<option value="vs">ВАЖНО И СРОЧНО</option>
-			 	<option value="vn">ВАЖНО, но несрочно</option>
-			 	<option value="ns">неважно, но СРОЧНО</option>
-				<option value="nn">неважно и несрочно</option>
-			 	<option value="vh">входящие задачи</option>
-			</select>
-			<select title="Классифицируйте необходимое действие" name="icon" id="TaskIcon">
-				<option value=""></option>
-				<option value="wait">дождаться</option>
-				<option value="remind">дожать</option>
-				<option value="call">позвонить</option>
-				<option value="force">заставить</option>
-				<option value="mail">написать</option>
-				<option value="prepare">разработать</option>
-				<option value="manage">организовать</option>
-				<option value="meet">встретиться</option>
-				<option value="visit">съездить</option>
-				<option value="make">сделать</option>
-				<option value="journey">слетать</option>
-				<option value="think">придумать</option>
-			</select>
-			<select title="Текущий статус задачи" name="status" id="TaskStatus">
-			 	<option value="created">создана</option>
-			 	<option value="moved">перенесена</option>
-			 	<option value="canceled">отменена</option>
-			 	<option value="done">завершена</option>
-			</select>
-			<input type="checkbox" id="CheckToday" name="today" value="1">
-    		<label for="CheckToday">Буду делать сегодня</label>
-			<button id="TaskSubmit">Добавить</button>
-		</div>
-		<div class="leftLine">
-			<button id="TaskMove" title="{{.ActualListFullName}}">Перенести в список {{.ActualListShortName}}</button>
-		</div>
-		<div class="leftLine sk-fading-circle" id="spinner">
-			<div class="sk-circle1 sk-circle"></div>
-  			<div class="sk-circle2 sk-circle"></div>
-			<div class="sk-circle3 sk-circle"></div>
-			<div class="sk-circle4 sk-circle"></div>
-			<div class="sk-circle5 sk-circle"></div>
-			<div class="sk-circle6 sk-circle"></div>
-			<div class="sk-circle7 sk-circle"></div>
-			<div class="sk-circle8 sk-circle"></div>
-			<div class="sk-circle9 sk-circle"></div>
-			<div class="sk-circle10 sk-circle"></div>
-			<div class="sk-circle11 sk-circle"></div>
-			<div class="sk-circle12 sk-circle"></div>
-		</div>
-		<div class="leftLine">
-			<label id="TaskResult"></label>
-		</div>
-		<br class="clearBoth">
-	</form>
-	<table id="TasksTable">
-	<tr>		
-		<td class="td">
-			<header class="ColumnHeader">СЕГОДНЯ <button id="ClearDone" title="Удалить выполненные">x</button> <button id="ClearAll" title="Удалить все">X</button></header>
-			<table id="TodayTable">
-				<tr>
-					<td class="TimeLabels">
-						<ul id="TimeLabels">
-							{{- range .TimeLabels}}
-							{{- if or (not .IsRelax) (not $.IsMobile)}}
-							<li class="TimeLabel">{{.Text}}</li>
-							{{- end}}
-							{{- end}}
-						</ul>
-					</td>
-					<td class="TodayTasks">
-						<ul id="TodayTasks">
-							{{- range .TodayTasks}}
-							{{- if and .IsRelax (not $.IsMobile)}}
-							<li class="TodayRelax"></li>
-							{{- end}}
-							{{- if not .IsRelax}}
-							<li id="{{.Id.Hex}}" class="TodayTask {{.Status}}" style="height:{{.Height}}px" title="{{.Text}}">{{if .Icon}}<img class="{{.Icon}}" src="\static\icons\{{.Icon}}.svg">{{end}}{{.Text}}</li>
-							{{- end}}
-							{{- end}}
-						</ul>
-					</td>
-				</tr>
-			</table>
-		</td>
-	{{- if .IsMobile}}</tr>
-	<tr>{{- end}}
-		<td class="vs">
-			<header class="ColumnHeader">ВАЖНО И СРОЧНО <button class="add">+</button></header>
-			{{- range .Vs}}
-			<p id="{{.Id.Hex}}" class="{{.Status}}">{{if .Icon}}<img class="{{.Icon}}" src="\static\icons\{{.Icon}}.svg">{{end}}{{marktask .Text}}</p>
-			{{- end}}
-		</td>
-	{{- if .IsMobile}}</tr>
-	<tr>{{- end}}
-		<td class="vn">
-			<header class="ColumnHeader">ВАЖНО, но несрочно <button class="add">+</button></header>
-			{{- range .Vn}}
-			<p id="{{.Id.Hex}}" class="{{.Status}}">{{if .Icon}}<img class="{{.Icon}}" src="\static\icons\{{.Icon}}.svg">{{end}}{{marktask .Text}}</p>
-			{{- end}}
-		</td>
-	{{- if .IsMobile}}</tr>
-	<tr>{{- end}}
-		<td class="ns">
-			<header class="ColumnHeader">неважно, но СРОЧНО <button class="add">+</button></header>
-			{{- range .Ns}}
-			<p id="{{.Id.Hex}}" class="{{.Status}}">{{if .Icon}}<img class="{{.Icon}}" src="\static\icons\{{.Icon}}.svg">{{end}}{{marktask .Text}}</p>
-			{{- end}}
-		</td>
-	{{- if .IsMobile}}</tr>
-	<tr>{{- end}}
-		<td class="nn">
-			<header class="ColumnHeader">неважно и несрочно <button class="add">+</button></header>
-			{{- range .Nn}}
-			<p id="{{.Id.Hex}}" class="{{.Status}}">{{if .Icon}}<img class="{{.Icon}}" src="\static\icons\{{.Icon}}.svg">{{end}}{{marktask .Text}}</p>
-			{{- end}}
-		</td>
-	{{- if .IsMobile}}</tr>
-	<tr>{{- end}}
-		<td class="vh">
-			<header class="ColumnHeader">входящие задачи <button class="add">+</button></header>
-			{{- range .Vh}}
-			<p id="{{.Id.Hex}}" class="{{.Status}}">{{if .Icon}}<img class="{{.Icon}}" src="\static\icons\{{.Icon}}.svg">{{end}}{{marktask .Text}}</p>
-			{{- end}}
-		</td>
-	</tr>
-	</table>
+	<div class="workplace">
+		<form id="ListForm">
+			<div class="leftLine">
+				<label id="ListTitle">Список задач: </label>
+				<select title="Выберите список задач с которым будете работать" name="	list" id="ListSelect">
+					{{- range .MyLists}}
+				 	<option value="{{.}}"{{if eq . $.CurList}} selected="selected"{{end}}>{{.}}</option>
+			 		{{- end}}
+				</select>
+			</div>
+			<div class="rightLine">
+				<button id="ListCreate">Создать новый список</button>
+				<label id="ListHelp">Помощь</label>
+			</div>
+			<br class="clearBoth">
+		</form>
+		<form id="TaskForm">
+			<div class="leftLine">
+				<label id="TaskAction">Задача: </label>
+				<input type="hidden" id="TaskId" name="id">
+				<input type="hidden" id="TaskList" name="list">
+				<input type="text" id="TaskText" name="text" size="55">
+				<select title="Раздел, в который будет добавлена задача" name="section" id="TaskSection">
+				 	<option value="vs">ВАЖНО И СРОЧНО</option>
+				 	<option value="vn">ВАЖНО, но несрочно</option>
+				 	<option value="ns">неважно, но СРОЧНО</option>
+					<option value="nn">неважно и несрочно</option>
+				 	<option value="vh">входящие задачи</option>
+				</select>
+				<select title="Классифицируйте необходимое действие" name="icon" id="TaskIcon">
+					<option value=""></option>
+					<option value="wait">дождаться</option>
+					<option value="remind">дожать</option>
+					<option value="call">позвонить</option>
+					<option value="force">заставить</option>
+					<option value="mail">написать</option>
+					<option value="prepare">разработать</option>
+					<option value="manage">организовать</option>
+					<option value="meet">встретиться</option>
+					<option value="visit">съездить</option>
+					<option value="make">сделать</option>
+					<option value="journey">слетать</option>
+					<option value="think">придумать</option>
+				</select>
+				<select title="Текущий статус задачи" name="status" id="TaskStatus">
+				 	<option value="created">создана</option>
+				 	<option value="moved">перенесена</option>
+				 	<option value="canceled">отменена</option>
+				 	<option value="done">завершена</option>
+				</select>
+				<input type="checkbox" id="CheckToday" name="today" value="1">
+	    		<label for="CheckToday">Буду делать сегодня</label>
+				<button id="TaskSubmit">Добавить</button>
+			</div>
+			<div class="leftLine">
+				<button id="TaskMove" title="{{.ActualListFullName}}">Перенести в список {{.ActualListShortName}}</button>
+			</div>
+			<div class="leftLine sk-fading-circle" id="spinner">
+				<div class="sk-circle1 sk-circle"></div>
+	  			<div class="sk-circle2 sk-circle"></div>
+				<div class="sk-circle3 sk-circle"></div>
+				<div class="sk-circle4 sk-circle"></div>
+				<div class="sk-circle5 sk-circle"></div>
+				<div class="sk-circle6 sk-circle"></div>
+				<div class="sk-circle7 sk-circle"></div>
+				<div class="sk-circle8 sk-circle"></div>
+				<div class="sk-circle9 sk-circle"></div>
+				<div class="sk-circle10 sk-circle"></div>
+				<div class="sk-circle11 sk-circle"></div>
+				<div class="sk-circle12 sk-circle"></div>
+			</div>
+			<div class="leftLine">
+				<label id="TaskResult"></label>
+			</div>
+			<br class="clearBoth">
+		</form>
+		<table id="TasksTable">
+		<tr>		
+			<td class="td">
+				<header class="ColumnHeader">СЕГОДНЯ <button id="ClearDone" title="Удалить выполненные">x</button> <button id="ClearAll" title="Удалить все">X</button></header>
+				<table id="TodayTable">
+					<tr>
+						<td class="TimeLabels">
+							<ul id="TimeLabels">
+								{{- range .TimeLabels}}
+								{{- if or (not .IsRelax) (not $.IsMobile)}}
+								<li class="TimeLabel">{{.Text}}</li>
+								{{- end}}
+								{{- end}}
+							</ul>
+						</td>
+						<td class="TodayTasks">
+							<ul id="TodayTasks">
+								{{- range .TodayTasks}}
+								{{- if and .IsRelax (not $.IsMobile)}}
+								<li class="TodayRelax"></li>
+								{{- end}}
+								{{- if not .IsRelax}}
+								<li id="{{.Id.Hex}}" class="TodayTask {{.Status}}" style="height:{{.Height}}px" title="{{.Text}}">{{if .Icon}}<img class="{{.Icon}}" src="\static\icons\{{.Icon}}.svg">{{end}}{{.Text}}</li>
+								{{- end}}
+								{{- end}}
+							</ul>
+						</td>
+					</tr>
+				</table>
+			</td>
+		{{- if .IsMobile}}</tr>
+		<tr>{{- end}}
+			<td class="vs">
+				<header class="ColumnHeader">ВАЖНО И СРОЧНО <button class="add">+</button></header>
+				{{- range .Vs}}
+				<p id="{{.Id.Hex}}" class="{{.Status}}">{{if .Icon}}<img class="{{.Icon}}" src="\static\icons\{{.Icon}}.svg">{{end}}{{marktask .Text}}</p>
+				{{- end}}
+			</td>
+		{{- if .IsMobile}}</tr>
+		<tr>{{- end}}
+			<td class="vn">
+				<header class="ColumnHeader">ВАЖНО, но несрочно <button class="add">+</button></header>
+				{{- range .Vn}}
+				<p id="{{.Id.Hex}}" class="{{.Status}}">{{if .Icon}}<img class="{{.Icon}}" src="\static\icons\{{.Icon}}.svg">{{end}}{{marktask .Text}}</p>
+				{{- end}}
+			</td>
+		{{- if .IsMobile}}</tr>
+		<tr>{{- end}}
+			<td class="ns">
+				<header class="ColumnHeader">неважно, но СРОЧНО <button class="add">+</button></header>
+				{{- range .Ns}}
+				<p id="{{.Id.Hex}}" class="{{.Status}}">{{if .Icon}}<img class="{{.Icon}}" src="\static\icons\{{.Icon}}.svg">{{end}}{{marktask .Text}}</p>
+				{{- end}}
+			</td>
+		{{- if .IsMobile}}</tr>
+		<tr>{{- end}}
+			<td class="nn">
+				<header class="ColumnHeader">неважно и несрочно <button class="add">+</button></header>
+				{{- range .Nn}}
+				<p id="{{.Id.Hex}}" class="{{.Status}}">{{if .Icon}}<img class="{{.Icon}}" src="\static\icons\{{.Icon}}.svg">{{end}}{{marktask .Text}}</p>
+				{{- end}}
+			</td>
+		{{- if .IsMobile}}</tr>
+		<tr>{{- end}}
+			<td class="vh">
+				<header class="ColumnHeader">входящие задачи <button class="add">+</button></header>
+				{{- range .Vh}}
+				<p id="{{.Id.Hex}}" class="{{.Status}}">{{if .Icon}}<img class="{{.Icon}}" src="\static\icons\{{.Icon}}.svg">{{end}}{{marktask .Text}}</p>
+				{{- end}}
+			</td>
+		</tr>
+		</table>
+	</div>
+	<div class="tourplace-background">
+		<div class="tour-background" id="background1"></div>
+		<div class="tour-background" id="background2"></div>
+		<div class="tour-background" id="background3"></div>
+		<div class="tour-background" id="background4"></div>
+	</div>
+	<div class="tourplace">
+		<section class="tour" id="tour1">
+			<div class="tour-outer">
+				<div class="tour-inner">
+					<h3>Много раз пробовали вести электронные списки дел, но каждый раз забрасывали? <br>От обилия накопившихся задач страшно заходить в приложение? <br>Приходится регулярно переписывать списки задач на бумаге?</h3>
+					<h4>Почему в XXI веке бумажные списки дел по-прежднему удобнее гаджетов?</h4>
+					<h5>Во-первых, потому что бумажные списки позволяют охватить взглядом сразу все задачи. Это создаёт в нашем сознании комфортное ощущение конечности списка. Обычно вы используете для списков дел листы формата A4 или даже разворот из двух листов A4 - столько информации никогда не уместится на одном экране вашего смартфона. Поэтому при работе с многостраничным спиком дел на смартфоне нет того ощущения психологического комфорта, как со списком дел на бумаге.</h5>
+					<h5>Во-вторых раз в неделю вам приходится садиться и переписывать бумажный список на новый чистый лист. Этот ритуал "перерождения списка" очень важен с точки зрения психологии: он позволяет отбросить дела, которые потеряли актуальность и больше не нужны;
+					позволяет переформулировать задачи, которые трансформировавшиеся в течении времени. Современным электронным органайзерам очень нехватало этого механизма "перерождения". Если вы решите перебирать задачи, изменяя их наименования и перемещая их между категориями, то вы очень быстро запутаетесь: какую задачу уже обработали, а какую нет.</h5>
+					<h4>Но почему нам всё-таки хочется иметь список дел в электронном виде?</h4>
+					<h5>Смарфон всегда с тобой, чего не скажешь о ежедневнике и шариковой ручке. Удобно иметь доступ к своему списку задач из любой точки мира, не заботясь о  перевозке ежедневника и письменных принадлежностей.</h5>
+					<h5>В электронном виде проще добавлять пиктограммы задач, позволяющие вашему мозгу мгновенно выхватывать нужные задачи из общего списка. Конечно, вы можете рисовать эти пиктограммы и на бумаге, но это займёт реально много времени. Кроме того, в электронном виде проще использовать различные цвета для выделения исполнителей или отметки выполненных задач. На бумаге для этого можно использовать разноцветные ручки - но это утяжеляет работу.
+					</h5>
+				</div>
+			</div>
+		</section>
+		<section class="tour" id="tour2">
+			<div class="tour-outer">
+				<div class="tour-inner">
+					<h3>Что мы предлагаем?</h3>
+					<h4>Мы предлагаем не просто очередную облачную платформу для ведения списков задач. <br>Мы предлагаем концептуально новый подход к планированию вашего времени.</h4>
+					<h5>Мы реализовали в электронном виде все достоинства бумажных списков. Это и охват всех дел одновременно на экране компьютера или горизонтально расположенного планшета. Это и механизм "перероджения" старых списков в новые, позволяющий навести порядок, убрать мусор и разложить всё по полочкам.</h5>
+					<h5>При создании системы важно было соблюсти баланс между желанием максимально всё учесть и категоризировать с одной строны, и простотой использования системы, быстротой ввода данных - с другой. Мы сами используем нашу систему для ежедневной работы, и нам кажется, нам это удалось.</h5>
+					<h4>Узнать новый подход к планированию задач (займёт всего 10 минут, листайте вниз)</h4>
+					<div class="arrow bounce">&#x2b07;</div>
+				</div>
+			</div>
+		</section>
+		<section class="tour" id="tour3">
+			<div class="tour-outer">
+				<div class="tour-inner">
+					<h3>0. Почему важно записывать задачи, а не хранить их в уме</h3>
+					<h4>На сознательное хранение информации в уме расходуется ваша энергия и отвлекается внимание.</h4>
+	 				<h5>Это происходит из-за страха забыть: ответственный руководитель, полагающийся на свою память, ощущает себя аналогично студенту перед экзаменами. Задача должна быть записана, причём не на случайном подвернувшимся под руку листочке, а в том месте, где её всегда можно будет найти вместе с другими задачами. Негативные последствия забывания даже самой мелкой и незначительной задачи вводят перфекциониста в панику, так как он уже не помнит: вдруг он забыл что-то важное? Поэтому задачи, которые вам нужно выполнить или проконтролировать их выполнение, нужно держать в энергонезависимой памяти: на специальном листе бумаги или в информационной системе.</h5>
+ 				</div>
+			</div>
+ 		</section>
+		<section class="tour" id="tour4">
+			<div class="tour-outer">
+				<div class="tour-inner">
+					<h3>1. Чтобы перестать плыть по течению, определите ваши цели</h3>
+					<h4>Цель - это то, чего вы хотите достичь в ближайшие несколько лет. То, что вам действительно нужно. То, ради чего вы работаете.</h4>
+					<h5>Для того чтобы ежедневная работа не закрутила Вас в своей рутине и приближала Вас к Вашим целям важно эти цели сформулировать. Для этого удобно применять инструментарий "ментальных карт" <a href="https://en.wikipedia.org/wiki/Mind_map">Mind maps</a>. В основе каждой карты должна лежать конкретная цель, сформулированная в виде глагола-действия, например: "<span class="sample">Стать директором предприятия</span>" или "<span class="sample">Заработать миллион долларов</span>".</h5> 
+					<h5>Адепты smart рекомендуют в целях указывать чёткие сроки. Мы согласны с этим, но не рекомендуем злоупотреблять, ставя заведомо нереальные сроки. Если вы чётко понимаете, что в этом году стать директором не получится - не ставьте себе такой срок, лучше не ограничивайте себя сроком, но сделайте все что от Вас зависит, что в этом году максимально приблизиться к заветной цели.</h5>
+					<h5>В дочерних ветвях ментальных карт обычно пишут ключевые верхнеуровневые действия, которые нужно совершить для достижения цели, например: "<span class="sample">заключить договор с <партнёром> на <сумму></span>" или "<span class="sample">реализовать <проект> до <срок></span>". Не увлекайтесь, расписывая в ментальных картах мелкие задачи - для этого есть другие более удобные инструменты. </h5>
+					<h5>Ментальные карты с Вашими целями рекомендуется пересматривать и обновлять хотя бы раз в месяц. А заглядывать в них желательно хотя бы еженедельно, чтобы свериться: движетесь ли Вы в направлении ваших целей, не захватили ли Вас бестолковая рутина? В ходе такого анализа Вы можете с удивлением можете обнаружить, что большую часть своего рабочего дня (да чего там, большую часть своей жизни) Вы заняты тем, что не имеет никакого отношения к Вашим целям. Это очень полезный опыт. Это может означать, что Вам нужно научится делегировать рутинные задачи. А может означать, что Вам нужно меня привычный образ жизни, а заодно и привычную работу и отправляться в свободное плавание к Вашим целям. Не готовы? Тогда составляйте ещё одну ментальную карту: "<span class="sample">Создать стабилизационный фонд и начать своё дело</span>".</h5>
+					<h5>В мире уже существует несколько хороших продуктов, позволяющих рисовать ментальные карты. Поэтому мы не видим необходимости создавать ещё один. Лично мы используем рекомендуем облачный продукт <a href="https://www.mindmeister.com/?r=132475">MindMeister</a>. Бесплатная подписка позволит хранить и работать с трёмя картами одновременно. Профессиональная однопользовательская подписка с неограничеснным количеством карт будет стоить $5/мес.</h5>
+				</div>
+			</div>
+		</section>
+		<section class="tour" id="tour5">
+			<div class="tour-outer">
+				<div class="tour-inner">
+					<h3>2. Почему важно иметь возможность быстро записать новую задачу.</h3>
+					<h5>Менеджеру нужно иметь возможность быстро записать всплывшую в памяти или сформировавшуюся в сознании задачу. Смартфон - идеальный инструмент для этого. Очень важно, чтобы это можно было сделать быстро, не тратя время на классификацию задачи, назначение ответственных и сроков исполнения. Всё вышеперечисленное важно с точки зрения SMART, но совершенно вредно для быстрого инструмента накидывания задач. Задачи кристаллизуются обычно в самое неподходящее время: например, во время разговора с собеседником или во время умственного процесса. В этот момент важно сбросить задачу во внешнюю память и выкинуть её из головы, чтобы максимально сосредоточиться на текущей деятельности. Раздумье же по поводу классификации задачи, назначение сроков и ответственных однозначно собьёт Вас с текущей деятельности, что недопустимо. Поэтому в информационной системе предпочтительнее иметь два варианта создания задачи: быстрый и полный.</h5>
+					<h4>Нужно ли сразу выполнять новую задачу?</h4>
+					<h5>Большинство задач не требуют немедленного реагирования, если только вы не работаете в экстренной службе спасения, да и то на оперативных должностях. Желание кинуться и по-быстрому решить возникшую задачу естественно: нам кажется, что тем самым мы избавим себя от груза ещё одной задачи в нашей копилке, которая будет то бывать периодически к ней возвращаться, про неё вспоминать, и обратно или поздно выполнить. Но когда мы так думаем, мы забываем о том, что значительная доля задач, формируемая ответственным руководителем бывает либо избыточная (когда вы выдаёте лишние ценные указания перестраховываясь), либо в итоге успешно решается подчинёнными без его вмешательства. </h5>
+					<h5>Бросившись выполнять новую задачу вы рискуете не выполнить что-то из задач, запланированных на сегодня. Также вполне возможно через 5 минут у Вас появится более важная задача, реально требующая вашего вмешательства, которую вам  придётся отложить, чтобы доделать начатое. В большинстве случаев, появившуюся задачу достаточно внести в энергонезависимую память, а затем вернуться к ней вечером, формируя список дел на завтрашний день. Во-первых, к тому времени задача может стать неактуальной, потому что решиться без вашего участия. А во-вторых, у Вас перед глазами тогда будет полный список задач, накопившихся по результатам прошедшего дня из которого Вы сможете выбрать себе на завтра дела, исходя из их реальной важности.</h5>
+					<h5>Конечно, есть дела, которые требуют немедленной реакции: например, Вашему руководителю через час понадобился отчёт, или Вы увидели, что Ваши сотрудники прямо сейчас некачественно обслуживают клиента - эти задачи требуют реакции здесь и сейчас. Но большинство возникающих дел можно отложить как минимум на завтра.</h5>
+				</div>
+			</div>
+			<div class="tour-inner tour-border" id="tour5-cat"></div>
+			<div class="tour-inner tour-label" id="tour5-vh"><span class="arrow">&#x2B06;</span> По-умолчанию новые задачи добавляются в раздел "Входящие задачи"</div>
+		</section>
+	</div>
 </body>
 </html>
