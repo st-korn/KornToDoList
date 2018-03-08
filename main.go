@@ -251,16 +251,19 @@ func sendTask(res http.ResponseWriter, req *http.Request) {
 	err = c.Find(bson.M{"_id": task.Id}).One(&task)
 	if err != nil { panic(err) }
 	if !(task.Length > 0) && (checkToday == "1") {
+
 		// Выбираем сегодняшние задачи
 		var todaytasks []TodayTask
 		err = c.Find(bson.M{"length": bson.M{"$gt": 0}, "list": task.List}).Sort("start").All(&todaytasks)
 		if err != nil { panic(err) }
-		// Ищем среди сегодняшних задач первый пустой интервал
+		// Ищем среди сегодняшних задач последнюю задачу
 		curInterval := 0
 		for _, todaytask := range todaytasks {
-			if curInterval<todaytask.Start { break }
+			//if curInterval<todaytask.Start { break }
 			curInterval = todaytask.Start + todaytask.Length
 		}
+		
+
 		// Добавляем задачу в сегодняшнее расписание
 		condition := bson.M{"_id": task.Id}
 		change := bson.M { "$set": bson.M {"length": 1, "start": curInterval} }
