@@ -197,6 +197,8 @@ function sendTask() {
 
 function clearDoneTodayTasks() {
 	$("li.done").remove();
+	$("li.moved").remove();
+	$("li.canceled").remove();
 	sendToday();
 	return false;
 }
