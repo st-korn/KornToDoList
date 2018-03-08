@@ -99,6 +99,8 @@ function afterUpdate() {
     	stop: function(event,ui) { $("li.TodayTask").css("cursor", ""); sendToday() }
     });
 	$("li.TodayTask").bind('click', editTodayTask);
+	// Подсчитываем статистику
+	$("label#TaskStats").text("Задач "+$("p").length+": выполнено "+$("p.done").length+" ("+Math.round($("p.done").length*100/$("p").length)+"%), отменено "+$("p.canceled").length+" ("+Math.round($("p.canceled").length*100/$("p").length)+"%)");
 }
 
 // ===========================================================================
