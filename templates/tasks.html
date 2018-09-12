@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Список задач</title>
+	<title>{{.Labels["webPageTitle"]}}</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
 	<link rel="stylesheet" type="text/css" href="/static/tasks.css?1">
@@ -12,10 +12,16 @@
 		<form id="ListForm">
 			<div class="leftLine">
 				<label id="ListTitle">Список задач: </label>
-				<select title="Выберите список задач с которым будете работать" name="	list" id="ListSelect">
+				<select title="Выберите список задач с которым будете работать" name="list" id="ListSelect">
 				</select>
 			</div>
 			<div class="rightLine">
+				<label id="LangTitle">Язык: </label>
+				<select title="Выберите язык" name="lang" id="LangSelect">
+					{{- range .Langs}}
+				 	<option value="{{.EnglishName}}"{{if eq .EnglishName $.UserLang}} selected="selected"{{end}}>{{.NationalName}}</option>
+			 		{{- end}}
+				</select>
 				<button id="ListCreate">Создать новый список</button>
 				<label id="ListHelp">Помощь</label>
 			</div>

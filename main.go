@@ -1,30 +1,41 @@
 package main
 
 import (
-	"net/http"
-	"os"
-	"text/template"
-	"golang.org/x/text/language"
-	"github.com/Shaked/gomobiledetect"
+	"net/http" // для создания http-сервера
+	"os" // для получения переменных среды
+	"text/template" // для использования шаблона html-страницы
+	"encoding/json" // для чтения
+	"golang.org/x/text/language" // для определения предпочтительного языка пользователя
+	"golang.org/x/text/language/display" // для вывода национальных наименования различных языков
+	"github.com/Shaked/gomobiledetect" // для определения мобильных браузеров
 )
 
 var URI string //URI базы данных MongoDB
 var DB string //имя базы данных MongoDB
 
 // Все известные языки системы
-var matcher = language.NewMatcher([]language.Tag{
+var SupportedLangs = []language.Tag{
     language.English,   // The first language is used as fallback.
-    language.Russian})
+    language.German,
+    language.Russian}
+
+// Структура, описывающая язык: английское_название_языка и национальное_название_языка
+type typeLang struct {
+	EnglishName string
+	NationalName string
+}
 
 // Структура, детально описывающая список задач
 // Используется в HTML-шаблоне для вывода основной страницы списка задач
 type typeWebFormData struct {
-	IsMobile bool
-	UserLanguage string
+	IsMobile bool // признак того, что страница открыта из мобильного браузера
+	UserLang string // английское_названия_языка, на котором следует показывать страницу
+	Langs []typeLang // общий перечень языков, на которые переведена система
+	Labels [string]string // текстовки текущего выбранного языка
 }
 
 // ================================================================================
-// Web-страница: Выводит страницу редактирования списка
+// Web-страница: Выводит основную страницу web-приложения
 // ================================================================================
 func webFormShow(res http.ResponseWriter, req *http.Request) {
 
@@ -35,11 +46,22 @@ func webFormShow(res http.ResponseWriter, req *http.Request) {
 	detect := mobiledetect.NewMobileDetect(req, nil)
 	webFormData.IsMobile = detect.IsMobile() && !detect.IsTablet()
 
+    // Загружаем полный список поддерживаемых языков
+    webFormData.Langs = make([]typeLang,len(SupportedLangs))
+	for i, tag := range SupportedLangs {
+		webFormData.Langs[i].EnglishName = display.English.Tags().Name(tag)
+		webFormData.Langs[i].NationalName = display.Self.Name(tag)
+	}
+
 	// Определяем язык, который следует использовать
 	lang, _ := req.Cookie("User-Language")
     accept := req.Header.Get("Accept-Language")
+    matcher := language.NewMatcher(SupportedLangs)
     tag, _ := language.MatchStrings(matcher, lang.String(), accept)
-    webFormData.UserLanguage = tag.String();
+    webFormData.UserLang = display.English.Tags().Name(tag);
+
+	// Загружаем текстовки выбранного языка
+	webFormData.
 
 	// Применяем HTML-шаблон
 	res.Header().Set("Content-type", "text/html")
