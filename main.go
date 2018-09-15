@@ -3,8 +3,9 @@ package main
 import (
 	"net/http" // для создания http-сервера
 	"os" // для получения переменных среды
-	"text/template" // для использования шаблона html-страницы
-	"encoding/json" // для чтения
+	"text/template" // для использования шаблонов html-страницы
+	"io/ioutil" // для чтения текстовых файлов с сервера
+	"encoding/json" // для парсинга json (языковые текстовки)
 	"golang.org/x/text/language" // для определения предпочтительного языка пользователя
 	"golang.org/x/text/language/display" // для вывода национальных наименования различных языков
 	"github.com/Shaked/gomobiledetect" // для определения мобильных браузеров
@@ -31,7 +32,7 @@ type typeWebFormData struct {
 	IsMobile bool // признак того, что страница открыта из мобильного браузера
 	UserLang string // английское_названия_языка, на котором следует показывать страницу
 	Langs []typeLang // общий перечень языков, на которые переведена система
-	Labels [string]string // текстовки текущего выбранного языка
+	Labels map[string]string // текстовки текущего выбранного языка
 }
 
 // ================================================================================
@@ -61,12 +62,17 @@ func webFormShow(res http.ResponseWriter, req *http.Request) {
     webFormData.UserLang = display.English.Tags().Name(tag);
 
 	// Загружаем текстовки выбранного языка
-	webFormData.
+	jsonFile, err := os.Open("templates/"+webFormData.UserLang+".json")
+	if err != nil { panic(err) }
+	defer jsonFile.Close()
+	jsonText, err := ioutil.ReadAll(jsonFile)
+	if err != nil { panic(err) }
+	json.Unmarshal(jsonText, &webFormData.Labels)
 
 	// Применяем HTML-шаблон
 	res.Header().Set("Content-type", "text/html")
 	t := template.New("tasks.html")
-	t, err := t.ParseFiles("templates/tasks.html")
+	t, err = t.ParseFiles("templates/tasks.html")
 	if err != nil { panic(err) }
 	err = t.Execute(res, webFormData)
 	if err != nil { panic(err) }
