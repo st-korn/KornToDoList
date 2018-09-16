@@ -14,100 +14,85 @@ body {
 div#workplace-div {
 	width: 100%;
 }
-br {
-	clear: both;
-}
 
 /* ===============================================================
-   Styles of top forms
+   Styles of header control lines
    =============================================================== */
+div.header-controls-line {
+	margin: 4px 0px 4px 0px;
+}
 form {
-	margin: 10px 0px 10px 0px;
+	display: inline-block;
 }
-div#task-lists-div {
-	float: left;
+input, select, button {
+	margin: 1px 3px 2px 3px;
 }
-div#filter-div {
+input#checkbox-today-input {
+	margin-right: 0px;
+	vertical-align: middle;
+}
+div#spinner {
+	display: inline-block;
+	vertical-align: middle;
+}
+form#languages-and-help-form {
 	float: right;
 }
-div#select-language-div {
+form#filter-form {
 	float: right;
 }
-
-
-
-
-
-div.aligned-left {
-	float: left;
-}
-div.rightLine {
-	float: right;
-}
-slabel#ListTitle {
-	font-family: "Arial Black", Gadget, sans-serif;
-	font-weight: bold;
-	font-size: 1.25rem;
-	color: rgba(255,0,0,1);
-	margin: 5px 0px 0px 0px;
-}
-select#ListSelect option:nth-child(1) {
+select#task-lists-select option:nth-child(1) {
     font-weight:bold;
 }
-label#ListHelp {
+label#help-label {
 	text-decoration: underline;
 }
-label#ListHelp:hover {
+label#help-label:hover {
 	cursor: pointer;
 }
-input#CheckToday {
-	vertical-align: middle;
-	margin: 0px 0px 0px 0px;
-}
-label#TaskResult {
+label#operation-status-label {
 	font-style: italic;
-	vertical-align:middle;
 	line-height: 21px;
-	margin: 0px 0px 0px 4px;
+	margin-left: 4px;
 }
 
 
 /* ===============================================================
-   Стили задач, отображаемых в таблице
+   Styles of tasks table
    =============================================================== */
-table#TasksTable {
+table#tasks-table {
 	width: 100%;
 }
-td.td, td.vs, td.vn, td.ns, td.nn, td.vh {
+table#tasks-table td {
 	width: 16.6%;
 	vertical-align: top;
 	text-align: justify-all;
 	padding: 5px 5px 5px 5px;
 	position:relative;
 }
+table#tasks-table header {
+	font-family: "Arial Black", Gadget, sans-serif;
+	font-weight: bold;
+	color: rgb(105,105,105);
+	margin: 0px 0px 0px 0px;
+}
 td.td {
 	background-color:rgba(251,180,174, 0.5);
 }
-td.vs {
+td.iu {
 	background-color:rgba(254,217,166, 0.5);
 }
-td.vn {
+td.in {
 	background-color:rgba(255,255,204, 0.5);
 }
-td.ns {
+td.nu {
 	background-color:rgba(204,235,197, 0.5);
 }
 td.nn {
 	background-color:rgba(179,205,227, 0.5);
 }
-td.vh {
+td.ib {
 	background-color:rgba(222,203,228, 0.5);
-}
-header.ColumnHeader {
-	font-family: "Arial Black", Gadget, sans-serif;
-	font-weight: bold;
-	color: rgb(105,105,105);
-	margin: 0px 0px 0px 0px;
 }
 p {
 	margin: 5px 0px 0px 0px;
@@ -143,6 +128,15 @@ span.name {
 p.done span.name, p.canceled span.name, p.moved span.name {
 	color: rgba(0,0,255,0.3);
 }
+
+
+
+
+
+
+
+
+
 
 
 /* ===============================================================

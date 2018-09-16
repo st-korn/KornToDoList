@@ -1,133 +1,127 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>{{.Labels.webPageTitle}}</title>
+	<title>{{.Labels.titleWebPage}}</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
-	<link rel="stylesheet" type="text/css" href="/static/tasks.css?2">
+	<link rel="stylesheet" type="text/css" href="/static/tasks.css?3">
 	<link rel="icon" type="image/png" href="/static/favicon.png">
 	<link rel="apple-touch-icon" type="image/png" href="/static/faviphone.png">
 	<script src="/static/tasks.js?1"></script>
 </head>
 <body>
 	<div id="workplace-div">
-		<form id="control-form">
-			<div id="task-lists-div">
-				<label>{{.Labels.taskListsLabel}}</label>
-				<select title="{{.Labels.taskListsSelectorHint}}" name="list" id="task-lists-select"></select>
-				<button id="new-list-create-button">{{.Labels.newListCreate}}</button>
-			</div>
-			<div id="select-language-div">
-				<label>Язык: </label>
-				<select title="Выберите язык" name="lang" id="LangSelect">
+		<div class="header-controls-line">
+			<form id="select-list-form">
+				<label>{{.Labels.labelTaskLists}}</label>
+				<select title="{{.Labels.hintTaskListsSelector}}" name="list" id="task-lists-select"></select>
+				<label id="tasks-statistic-label"></label>
+				<button id="new-list-create-button">{{.Labels.buttonNewListCreate}}</button>
+			</form>
+			<form id="languages-and-help-form">
+				<label>{{.Labels.labelLanguages}}</label>
+				<select title="{{.Labels.hintLanguagesSelector}}" name="lang" id="language-select">
 					{{- range .Langs}}
 				 	<option value="{{.EnglishName}}"{{if eq .EnglishName $.UserLang}} selected="selected"{{end}}>{{.NationalName}}</option>
-			 		{{- end}}
+					{{- end}}
 				</select>
-				<label id="ListHelp">Помощь</label>
-			</div>
-			<br>
-		</form>
-		<form id="task-form">
-			<div class="leftLine">
-				<label id="TaskAction">Задача: </label>
-				<input type="hidden" id="TaskId" name="id">
-				<input type="hidden" id="TaskList" name="list">
-				<input type="text" id="TaskText" name="text" size="55">
-				<select title="Раздел, в который будет добавлена задача" name="section" id="TaskSection">
-				 	<option value="vs">ВАЖНО И СРОЧНО</option>
-				 	<option value="vn">ВАЖНО, но несрочно</option>
-				 	<option value="ns">неважно, но СРОЧНО</option>
-					<option value="nn">неважно и несрочно</option>
-				 	<option value="vh">входящие задачи</option>
+				<label id="help-label">{{.Labels.labelHelp}}</label>
+			</form>
+		</div>
+		<div class="header-controls-line">
+			<form id="edit-task-form">
+				<label>{{.Labels.labelTask}}</label>
+				<input type="hidden" id="task-id-input" name="id">
+				<input type="hidden" id="task-list-input" name="list">
+				<input type="text" id="task-text-input" name="text" size="55">
+				<select title="{{.Labels.hintTaskSectionSelector}}" name="section" id="task-section-select">
+				 	<option value="iu">{{.Labels.sectionIU}}</option>
+				 	<option value="in">{{.Labels.sectionIN}}</option>
+				 	<option value="nu">{{.Labels.sectionNU}}</option>
+					<option value="nn">{{.Labels.sectionNN}}</option>
+				 	<option value="ib">{{.Labels.sectionIB}}</option>
 				</select>
-				<select title="Классифицируйте необходимое действие" name="icon" id="TaskIcon">
+				<select title="{{.Labels.hintTaskIconSelector}}" name="icon" id="task-icon-select">
 					<option value=""></option>
-					<option value="wait">дождаться</option>
-					<option value="remind">дожать</option>
-					<option value="call">позвонить</option>
-					<option value="force">заставить</option>
-					<option value="mail">написать</toption>
-					<option value="prepare">разработать</option>
-					<option value="manage">организовать</option>
-					<option value="meet">встретиться</option>
-					<option value="visit">съездить</option>
-					<option value="make">сделать</option>
-					<option value="journey">слетать</option>
-					<option value="think">придумать</option>
+					<option value="wait">{{.Labels.iconWait}}</option>
+					<option value="remind">{{.Labels.iconRemind}}</option>
+					<option value="call">{{.Labels.iconCall}}</option>
+					<option value="force">{{.Labels.iconForce}}</option>
+					<option value="mail">{{.Labels.iconMail}}</toption>
+					<option value="prepare">{{.Labels.iconPrepare}}</option>
+					<option value="manage">{{.Labels.iconManage}}</option>
+					<option value="meet">{{.Labels.iconMeet}}</option>
+					<option value="visit">{{.Labels.iconVisit}}</option>
+					<option value="make">{{.Labels.iconMake}}</option>
+					<option value="journey">{{.Labels.iconJourney}}</option>
+					<option value="think">{{.Labels.iconThink}}</option>
 				</select>
-				<select title="Текущий статус задачи" name="status" id="TaskStatus">
-				 	<option value="created">создана</option>
-				 	<option value="moved">перенесена</option>
-				 	<option value="canceled">отменена</option>
-				 	<option value="done">завершена</option>
+				<select title="{{.Labels.hintTaskStatusSelector}}" name="status" id="task-status-select">
+				 	<option value="created">{{.Labels.statusCreated}}</option>
+				 	<option value="moved">{{.Labels.statusMoved}}</option>
+				 	<option value="canceled">{{.Labels.statusCanceled}}</option>
+				 	<option value="done">{{.Labels.statusDone}}</option>
 				</select>
-				<input type="checkbox" id="CheckToday" name="today" value="1">
-	    		<label for="CheckToday">Буду делать сегодня</label>
-				<button id="TaskSubmit">Добавить</button>
-			</div>
-			<div class="leftLine">
-				<button id="TaskMove">Перенести в список</button>
-			</div>
-			<div class="leftLine sk-fading-circle" id="spinner">
-				<div class="sk-circle1 sk-circle"></div>
-	  			<div class="sk-circle2 sk-circle"></div>
-				<div class="sk-circle3 sk-circle"></div>
-				<div class="sk-circle4 sk-circle"></div>
-				<div class="sk-circle5 sk-circle"></div>
-				<div class="sk-circle6 sk-circle"></div>
-				<div class="sk-circle7 sk-circle"></div>
-				<div class="sk-circle8 sk-circle"></div>
-				<div class="sk-circle9 sk-circle"></div>
-				<div class="sk-circle10 sk-circle"></div>
-				<div class="sk-circle11 sk-circle"></div>
-				<div class="sk-circle12 sk-circle"></div>
-			</div>
-			<div class="leftLine">
-				<label id="TaskResult"></label>
-			</div>
-			<div class="rightLine">
-				<label id="TaskStats"></label>
-			</div>
-			<br class="clearBoth">
-		</form>
-		<table id="TasksTable">
+				<input type="checkbox" id="checkbox-today-input" name="today" value="1">
+		    	<label for="checkbox-today-input">{{.Labels.labelTodayCheckbox}}</label>
+				<button id="task-submit-button">{{.Labels.buttonAddTask}}</button>
+				<button id="task-move-button">{{.Labels.bottonMoveTask}}</button>
+				<div class="sk-fading-circle" id="spinner">
+					<div class="sk-circle1 sk-circle"></div>
+		  			<div class="sk-circle2 sk-circle"></div>
+					<div class="sk-circle3 sk-circle"></div>
+					<div class="sk-circle4 sk-circle"></div>
+					<div class="sk-circle5 sk-circle"></div>
+					<div class="sk-circle6 sk-circle"></div>
+					<div class="sk-circle7 sk-circle"></div>
+					<div class="sk-circle8 sk-circle"></div>
+					<div class="sk-circle9 sk-circle"></div>
+					<div class="sk-circle10 sk-circle"></div>
+					<div class="sk-circle11 sk-circle"></div>
+					<div class="sk-circle12 sk-circle"></div>
+				</div>
+				<label id="operation-status-label"></label>
+			</form>
+			<form id="filter-form">
+				<label>{{.Labels.labelFilter}}</label>
+				<input type="text" id="filter-input" name="filter" size="20">
+			</form>
+		</div>
+		<table id="tasks-table">
 		<tr>		
 			<td class="td">
-				<header class="ColumnHeader">СЕГОДНЯ <button id="ClearDone" title="Удалить выполненные">x</button> <button id="ClearAll" title="Удалить все">X</button></header>
-				<table id="TodayTable">
-					<tr>
-						<td class="TodayTasks">
-							<ul id="TodayTasks">
-							</ul>
-						</td>
-					</tr>
-				</table>
+				<header>
+					{{.Labels.labelToday}}
+					<button id="clear-done-button" title="{{.Labels.hintClearDone}}">x</button>
+					<button id="clear-all-button" title="{{.Labels.hintClearAll}}">X</button>
+				</header>
+				<ul id="today-tasks-ul">
+				</ul>
 			</td>
 		{{- if .IsMobile}}</tr>
 		<tr>{{- end}}
-			<td class="vs">
-				<header class="ColumnHeader">ВАЖНО И СРОЧНО <button class="add">+</button></header>
+			<td class="iu">
+				<header>{{.Labels.sectionIU}}<button class="add">+</button></header>
+				</td>
+		{{- if .IsMobile}}</tr>
+		<tr>{{- end}}
+			<td class="in">
+				<header>{{.Labels.sectionIN}}<button class="add">+</button></header>
 			</td>
 		{{- if .IsMobile}}</tr>
 		<tr>{{- end}}
-			<td class="vn">
-				<header class="ColumnHeader">ВАЖНО, но несрочно <button class="add">+</button></header>
-			</td>
-		{{- if .IsMobile}}</tr>
-		<tr>{{- end}}
-			<td class="ns">
-				<header class="ColumnHeader">неважно, но СРОЧНО <button class="add">+</button></header>
+			<td class="nu">
+				<header>{{.Labels.sectionNU}}<button class="add">+</button></header>
 			</td>
 		{{- if .IsMobile}}</tr>
 		<tr>{{- end}}
 			<td class="nn">
-				<header class="ColumnHeader">неважно и несрочно <button class="add">+</button></header>
+				<header>{{.Labels.sectionNN}}<button class="add">+</button></header>
 			</td>
 		{{- if .IsMobile}}</tr>
 		<tr>{{- end}}
-			<td class="vh">
-				<header class="ColumnHeader">входящие задачи <button class="add">+</button></header>
+			<td class="ib">
+				<header>{{.Labels.sectionIB}}<button class="add">+</button></header>
 			</td>
 		</tr>
 		</table>

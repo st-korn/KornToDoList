@@ -27,10 +27,10 @@ We use both: lowerCamelCase or UpperCamelCase:
 
 # How we name classes and id's in HTML DOM?
 
-We use **lower-case-with-dash-delimeter** style. If there are several elements with these characteristics on the page, give them a common **class** name. If this element is unique - specify its **id**. For some elements there are both: class and id defined.
+We use **lower-case-with-dash-delimeter** style. If there are several elements with these characteristics on the page, give them a common **class** name. If this element is unique - specify its **id**. Elements with interactivity and with which the javascript interacts, must necessarily have defined id's. For some elements there are both: class and id defined.
 
 This is not good, if the **class-name** contains the tag-name to which this class applies. A class with the same name can have different CSS-implementations for different elements of the HTML DOM. Good idea for class name is `task` or `icon`. Bad idea is `task-div` or `icon-img`. 
-Opposite the **id** should contain the name of the element's tag, for example: `task-form` or `operation-status-label`.
+Opposite the **id** should contain the name of the element's tag, for example: `edit-task-form` or `operation-status-label`.
 
 If the class name contains its distinctive qualities (modifiers), then they should be written via a double dash: `<p class="task--done">`. If the modifier is global and can be applied not only to this class, it should be allocated to a separate stand-alone class: `<p class="task done">`...`<img class="done">`.
 

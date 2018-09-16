@@ -1,6 +1,54 @@
 {
-"webPageTitle" : "Список задач",
-"taskListsLabel" : "Список задач: ",
-"taskListsSelectorHint" : "Выберите список задач, с которым будете работать",
-"newListCreate" : "Создать новый список"
+"titleWebPage" : "Список задач",
+
+"labelTaskLists" : "Список задач: ",
+"hintTaskListsSelector" : "Выберите список задач, с которым будете работать",
+"buttonNewListCreate" : "Создать новый список",
+
+"labelFilter" : "Фильтр: ",
+
+"labelLanguages" : "Язык: ",
+"hintLanguagesSelector" : "Выберите язык",
+
+"labelHelp" : "Помощь",
+
+"labelTask" : "Задача: ",
+
+"hintTaskSectionSelector" : "Раздел, в который будет добавлена задача",
+"sectionIU" : "ВАЖНО И СРОЧНО",
+"sectionIN" : "ВАЖНО, но несрочно",
+"sectionNU" : "неважно, но СРОЧНО",
+"sectionNN" : "неважно и несрочно",
+"sectionIB" : "входящие задачи",
+
+"hintTaskIconSelector" : "Классифицируйте необходимое действие",
+"iconWait" : "дождаться",
+"iconRemind" : "дожать",
+"iconCall" : "позвонить",
+"iconForce" : "заставить",
+"iconMail" : "написать",
+"iconPrepare" : "разработать",
+"iconManage" : "организовать",
+"iconMeet" : "встретиться",
+"iconVisit" : "съездить",
+"iconMake" : "сделать",
+"iconJourney" : "слетать",
+"iconThink" : "придумать",
+
+"hintTaskStatusSelector" : "Текущий статус задачи",
+"statusCreated" : "создана",
+"statusMoved" : "перенесена",
+"statusCanceled" : "отменена",
+"statusDone" : "завершена",
+
+"labelTodayCheckbox" : "Буду делать сегодня",
+"buttonAddTask" : "Добавить",
+"buttonSaveTask" : "Изменить",
+"bottonMoveTask" : "Перенести в список",
+
+"labelToday" : "СЕГОДНЯ",
+"hintClearDone" : "Удалить выполненные",
+"buttonClearDone" : "x",
+"hintClearAll" : "Удалить все",
+"buttonClearAll" : "X"
 }
