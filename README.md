@@ -1,7 +1,7 @@
 Experimental web-app ToDo-list by Stanislav Kornienko's conception.
 You can try it in the cloud http://todo.works
 
-![logo](https://github.com/st-korn/KornToDoList/raw/newplatform/static/favicon.png =64x64)
+<img src="https://github.com/st-korn/KornToDoList/raw/newplatform/static/favicon.png" width="64">
 
 # Project Files
 * `main.go` - backend server application, that implements interfaces for HTML-generation, HTTP static-files transfer, JSON-api for javascript and mobile applications.
