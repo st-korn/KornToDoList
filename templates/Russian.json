@@ -1,3 +1,6 @@
 {
-"webPageTitle" : "Список задач"
+"webPageTitle" : "Список задач",
+"taskListsLabel" : "Список задач: ",
+"taskListsSelectorHint" : "Выберите список задач, с которым будете работать",
+"newListCreate" : "Создать новый список"
 }

@@ -10,26 +10,25 @@
 	<script src="/static/tasks.js?1"></script>
 </head>
 <body>
-	<div class="workplace">
-		<form id="ListForm">
-			<div class="leftLine">
-				<label id="ListTitle">Список задач: </label>
-				<select title="Выберите список задач с которым будете работать" name="list" id="ListSelect">
-				</select>
+	<div id="workplace-div">
+		<form id="control-form">
+			<div id="task-lists-div">
+				<label>{{.Labels.taskListsLabel}}</label>
+				<select title="{{.Labels.taskListsSelectorHint}}" name="list" id="task-lists-select"></select>
+				<button id="new-list-create-button">{{.Labels.newListCreate}}</button>
 			</div>
-			<div class="rightLine">
-				<label id="LangTitle">Язык: </label>
+			<div id="select-language-div">
+				<label>Язык: </label>
 				<select title="Выберите язык" name="lang" id="LangSelect">
 					{{- range .Langs}}
 				 	<option value="{{.EnglishName}}"{{if eq .EnglishName $.UserLang}} selected="selected"{{end}}>{{.NationalName}}</option>
 			 		{{- end}}
 				</select>
-				<button id="ListCreate">Создать новый список</button>
 				<label id="ListHelp">Помощь</label>
 			</div>
-			<br class="clearBoth">
+			<br>
 		</form>
-		<form id="TaskForm">
+		<form id="task-form">
 			<div class="leftLine">
 				<label id="TaskAction">Задача: </label>
 				<input type="hidden" id="TaskId" name="id">
@@ -48,7 +47,7 @@
 					<option value="remind">дожать</option>
 					<option value="call">позвонить</option>
 					<option value="force">заставить</option>
-					<option value="mail">написать</option>
+					<option value="mail">написать</toption>
 					<option value="prepare">разработать</option>
 					<option value="manage">организовать</option>
 					<option value="meet">встретиться</option>

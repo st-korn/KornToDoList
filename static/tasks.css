@@ -1,5 +1,5 @@
 /* ===============================================================
-   Общие стили документа
+   Global styles of web-application
    =============================================================== */
 html {
     -webkit-text-size-adjust: 100%; /* Prevent font scaling in landscape while allowing user zoom */
@@ -11,17 +11,34 @@ body {
 	background-size: 12px 12px;
 	background-position: center center;
 }
-div.workplace {
+div#workplace-div {
 	width: 100%;
+}
+br {
+	clear: both;
 }
 
 /* ===============================================================
-   Стили заголовков списка и формы редактирования задачи
+   Styles of top forms
    =============================================================== */
 form {
 	margin: 10px 0px 10px 0px;
 }
-div.leftLine {
+div#task-lists-div {
+	float: left;
+}
+div#filter-div {
+	float: right;
+}
+div#select-language-div {
+	float: right;
+}
+
+
+
+
+
+div.aligned-left {
 	float: left;
 }
 div.rightLine {
@@ -53,9 +70,7 @@ label#TaskResult {
 	line-height: 21px;
 	margin: 0px 0px 0px 4px;
 }
-br.clearBoth {
-	clear: both;
-}
+
 
 /* ===============================================================
    Стили задач, отображаемых в таблице
