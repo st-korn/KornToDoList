@@ -1,0 +1,64 @@
+{
+"titleWebPage" : "Task list",
+
+"labelTaskLists" : "Task list: ",
+"hintTaskListsSelector" : "Select task list for working",
+"buttonNewListCreate" : "Create new task list",
+
+"buttonLogin" : "Log In",
+"buttonRegister" : "Sign up",
+"buttonLogout" : "Log Out",
+
+"labelLanguages" : "Language: ",
+"hintLanguagesSelector" : "Select language",
+
+"labelHelp" : "Help",
+
+"labelTask" : "Task: ",
+
+"hintTaskSectionSelector" : "Section to which the task will be added",
+"sectionIU" : "IMPORTANT and URGENT",
+"sectionIN" : "IMPORTANT, but not urgent",
+"sectionNU" : "not important, but URGENT",
+"sectionNN" : "not important and not urgent",
+"sectionIB" : "incoming tasks",
+
+"hintTaskIconSelector" : "What should you do?",
+"iconWait" : "wait",
+"iconRemind" : "remind",
+"iconCall" : "call",
+"iconForce" : "force",
+"iconMail" : "mail",
+"iconPrepare" : "prepare",
+"iconManage" : "manage",
+"iconMeet" : "meet",
+"iconVisit" : "visit",
+"iconMake" : "make",
+"iconJourney" : "journay",
+"iconThink" : "think",
+
+"hintTaskStatusSelector" : "Current task status",
+"statusCreated" : "created",
+"statusMoved" : "moved",
+"statusCanceled" : "canceled",
+"statusDone" : "done",
+
+"labelTodayCheckbox" : "I will do today",
+"buttonAddTask" : "Add",
+"buttonSaveTask" : "Change",
+"bottonMoveTask" : "Move to new list",
+
+"hintSearchInput" : "Search task",
+"hintFilterSelector" : "Select the tasks display mode",
+"filterAll" : "all tasks",
+"filterCreatedOnly" : "current tasks",
+"statusCreatedNotWaitNotRemind" : "need activity",
+
+"labelToday" : "TODAY",
+"hintClearDone" : "Delete completed",
+"hintClearAll" : "Delete all",
+
+"labelStatisticTasks" : "Tasks",
+"labelStatisticDone" : "done",
+"labelStatisticCanceled" : "canceled"
+}

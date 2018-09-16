@@ -46,18 +46,24 @@ func webFormShow(res http.ResponseWriter, req *http.Request) {
 	detect := mobiledetect.NewMobileDetect(req, nil)
 	webFormData.IsMobile = detect.IsMobile() && !detect.IsTablet()
 
+	// Start detect user-language from cookie
+	var langCookieEnglishName string
+	var langTagCode string
+	langCookie, err := req.Cookie("User-Language")
+	if err == nil { langCookieEnglishName = langCookie.Value }
+
     // Load supported languages list
     webFormData.Langs = make([]typeLang,len(SupportedLangs))
 	for i, tag := range SupportedLangs {
 		webFormData.Langs[i].EnglishName = display.English.Tags().Name(tag)
 		webFormData.Langs[i].NationalName = display.Self.Name(tag)
+		if webFormData.Langs[i].EnglishName == langCookieEnglishName {langTagCode = tag.String()}
 	}
 
-	// Detect user-language
-	lang, _ := req.Cookie("User-Language")
+	// Finish detect user-language
     accept := req.Header.Get("Accept-Language")
     matcher := language.NewMatcher(SupportedLangs)
-    tag, _ := language.MatchStrings(matcher, lang.String(), accept)
+    tag, _ := language.MatchStrings(matcher, langTagCode, accept)
     webFormData.UserLang = display.English.Tags().Name(tag);
 
 	// Load strings-table for user-language

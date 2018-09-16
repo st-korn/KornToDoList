@@ -27,6 +27,22 @@ form {
 input, select, button {
 	margin: 1px 3px 2px 3px;
 }
+select#task-lists-select option:nth-child(1) {
+    font-weight:bold;
+}
+form#user-form {
+	float: right;
+	margin-left: 5px;
+}
+form#languages-and-help-form {
+	float: right;
+}
+label#help-label {
+	text-decoration: underline;
+}
+label#help-label:hover {
+	cursor: pointer;
+}
 input#checkbox-today-input {
 	margin-right: 0px;
 	vertical-align: middle;
@@ -35,27 +51,15 @@ div#spinner {
 	display: inline-block;
 	vertical-align: middle;
 }
-form#languages-and-help-form {
-	float: right;
-}
-form#filter-form {
-	float: right;
-}
-select#task-lists-select option:nth-child(1) {
-    font-weight:bold;
-}
-label#help-label {
-	text-decoration: underline;
-}
-label#help-label:hover {
-	cursor: pointer;
-}
 label#operation-status-label {
+	display: inline-block;
 	font-style: italic;
 	line-height: 21px;
 	margin-left: 4px;
 }
-
+form#filter-form {
+	float: right;
+}
 
 /* ===============================================================
    Styles of tasks table
@@ -98,9 +102,10 @@ p {
 	margin: 5px 0px 0px 0px;
 	padding: 0px 0px 0px 0px;
 }
-span.name {
-	color: rgba(0,0,255,1.0);
-}
+
+/* ===============================================================
+   Styles of tasks records
+   =============================================================== */
 .done {
 	text-decoration: line-through;
 	text-decoration-style: double;
@@ -125,108 +130,27 @@ span.name {
 	-webkit-text-decoration-color: rgba(255,0,0,0.3);
 	color: rgba(0,0,0,0.3);
 }
+span.name {
+	color: rgba(0,0,255,1.0);
+}
 p.done span.name, p.canceled span.name, p.moved span.name {
 	color: rgba(0,0,255,0.3);
 }
-
-
-
-
-
-
-
-
-
-
-
-/* ===============================================================
-   Стили, обеспечивающие интерактивность списка задач
-   =============================================================== */
 p:hover {
 	cursor: pointer;
 }
-p.done:hover::after {
-	content: "Выполнено"; /* Выводим текст */
-}
-p.canceled:hover::after {
-	content: "Отменено"; /* Выводим текст */
-}
-p.moved:hover::after {
-	content: "Перемещено в другой список"; /* Выводим текст */
-}
 p.done:hover::after, p.canceled:hover::after, p.moved:hover::after {
-	position: absolute; /* Абсолютное позиционирование */
-	z-index: 1; /* Отображаем подсказку поверх других элементов */
+	content: attr(tooltip); /* Use the attribute "tooltip" as the text of the hint */
+	position: absolute; /* Use absolute position */
+	z-index: 1; /* Display a hint on top of all other items */
 	color: rgba(0,0,0,1.0);
-	background: rgba(255,255,230,0.9); /* Полупрозрачный цвет фона */
-	padding: 5px; /* Поля */
-	border: 1px solid #000333; /* Параметры рамки */
+	background: rgba(255,255,230,0.9); /* Transparent background */
+	padding: 5px; /* Inner fields */
+	border: 1px solid #000333; /* Outer border */
 }
-
 
 /* ===============================================================
-   Стили, обеспечивающие работу со шкалой времени
-   =============================================================== */
-td.TimeLabels, td.TodayTasks {
-	vertical-align: top;
-	text-align: justify-all;
-}
-td.TimeLabels {
-	white-space: nowrap;
-}
-ul#TimeLabels {
-	list-style-type: none;
-	margin: 0px 0px 0px 0px;
-	padding: 0; 
-}
-li.TimeLabel {
-	margin: 0px 0px 0px 0px;
-	padding: 0;
-	text-decoration: overline;
-	height: 20px;
-}
-td.TodayTasks {
-	width: 100%;
-}
-ul#TodayTasks {
-	list-style-type: none;
-	margin: 0px 0px 0px 0px;; 
-	padding: 0; 
-}
-li.TodayTask {
-	margin: 0px 0px 0px 0px;
-	padding: 2px 0px 0px 0px;
-	border: 1px solid rgba(128,128,128,1);
-	border-radius: 3px;
-	box-sizing: border-box;
-	display: block;
-	overflow: hidden;
-}
-li.TodayRelax {
-	margin: 0px 0px 0px 0px;
-	padding: 0px 0px 0px 0px;
-	border: 1px solid rgba(128,128,128,0);
-	border-radius: 3px;
-	box-sizing: border-box;
-	display: block;
-	overflow: hidden;
-	height: 20px;
-}
-li.TodayTask:hover {
-	cursor: pointer;
-	border: 1px solid rgba(128,128,255,1);
-	background: rgba(128,128,255,0.1);
-}
-.ui-state-highlight {
-	height: 20px;
-}
-.ui-sortable-helper {
-    cursor: move;
-}
-
-
-/* ===============================================================
-   Стили, обеспечивающие работу с пиктограммами
+   Styles of icons
    =============================================================== */
 li img, p img {
 	display: inline-block;
@@ -239,9 +163,8 @@ li img, p img {
 	opacity: 0.3;
 }
 
-
 /* ===============================================================
-   Стили, обеспечивающие верчение спиннера
+   Styles for spinner rotation
    =============================================================== */
 .sk-fading-circle {
 	margin: 1px 0px 0px 4px;
@@ -374,155 +297,4 @@ li img, p img {
 @keyframes sk-circleFadeDelay {
   0%, 39%, 100% { opacity: 0; }
   40% { opacity: 1; } 
-}
-
-/* ===============================================================
-   Стили тура по системе
-   =============================================================== */
-div.tourplace {
-	top:0px;
-    left:0px;
-    width:100%;
-    z-index:1000;
-}
-section.tour {
-	height:100vh;
-	width: 100%;
-	vertical-align: middle;
-	text-align: center;
-	display: table;
-}
-div.tour-outer {  
-	display: table-cell; 
-	vertical-align: middle;
-	text-align: center;
-	padding: 20px 20px 20px 20px;
-}
-div.tour-inner {
-	max-width: 800px;
-	border: 1px solid rgba(128,128,128,1);
-	border-radius: 10px;
-	box-sizing: border-box;
-	padding: 20px 20px 20px 20px;
-	vertical-align: middle;
-	text-align: justify;
-	display: inline-block;
-	opacity:0.99;
-    background-color: rgba(255,255,255,1);	
-	background: linear-gradient( rgba(187,187,187,0.5),  rgba(255,255,255,0.7) 1px), linear-gradient( 90deg, rgba(187,187,187,0.5),  rgba(255,255,255,0.7) 1px);
-	background-size: 12px 12px;
-	background-position: center center;
-}
-div.tour-label {
-	position: absolute;
-	border: 3px solid rgba(255,128,128,1);
-	color: rgba(255,0,0,1);
-	padding: 5px 5px 5px 5px;
-	font-weight: bold;
-}
-div.tour-border {
-	position: absolute;
-	border: 3px solid rgba(255,128,128,1);
-	color: rgba(255,0,0,1);
-	padding: 5px 5px 5px 5px;
-	font-weight: bold;
-	background: transparent;
-}
-div.tour-inner h3 {
-	font-weight: bold;
-	font-size: 1.5rem;	
-	color: rgba(0,0,0,1);
-}
-div.tour-inner h4 {
-	font-weight: bold;
-	font-size: 1.25rem;	
-	color: rgba(0,0,0,1);
-}
-div.tour-inner h5 {
-	font-weight: normal;
-	font-size: 1rem;	
-	color: rgba(0,0,0,1);
-}
-div.tour-inner a:link, div.tour-inner a:visited {
-	font-weight: normal;
-	font-size: 1rem;	
-	color: rgba(0,0,255,1);
-}
-div.tour-inner span.sample {
-	font-style: italic;
-	font-size: 1rem;	
-	color: rgba(0,0,0,1);
-}
-div.tour-inner span.arrow {
-	font-size: 2rem;
-	font-weight: bold;
-}
-
-
-/* ===============================================================
-   Стили фоновых изображений в туре по системе
-   =============================================================== */
-div.tourplace-background {
-	width: 100%;
-	position: fixed;
-	background-size: cover;
-	background-position: center center;
- 	opacity:0.99;
-    background-color: rgba(255,255,255,1);
-}
-div.tour-background {
-	width: 100%;
-	height: 125vh;
- 	opacity:0.99;
-    background-color: rgba(255,255,255,1);
-}
-div#background1 {
-	background:url("/static/tour/tour1.jpg");
-	background-size: cover;
-	background-position: center center;
-}
-div#background2 {
-	background:url("/static/tour/tour2.jpg");
-	background-size: cover;
-	background-position: center center;
-}
-div#background3 {
-	background:url("/static/tour/tour3.jpg");
-	background-size: cover;
-	background-position: center center;
-}
-div#background4 {
-	background:url("/static/tour/tour4.jpg");
-	background-size: cover;
-	background-position: center center;
-}
-
-
-/* ===============================================================
-   Стили, обеспечивающие прыгание стрелки
-   =============================================================== */
-div.arrow {
-	position: relative;
-	left: 48%;
-	top: 10px;
-	width: 40px;
-	height: 40px;
-	font-size: 40px;
-	font-weight: bold;
-}
-div.bounce {
-  -moz-animation: bounce 2s infinite;
-  -webkit-animation: bounce 2s infinite;
-  animation: bounce 2s infinite;
-}
-@keyframes bounce {
-  0%, 20%, 50%, 80%, 100% {
-    transform: translateY(0);
-  }
-  40% {
-    transform: translateY(-30px);
-  }
-  60% {
-    transform: translateY(-15px);
-  }
 }

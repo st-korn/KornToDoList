@@ -4,10 +4,12 @@
 	<title>{{.Labels.titleWebPage}}</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
-	<link rel="stylesheet" type="text/css" href="/static/tasks.css?3">
+	<link rel="stylesheet" type="text/css" href="/static/tasks.css?4">
 	<link rel="icon" type="image/png" href="/static/favicon.png">
 	<link rel="apple-touch-icon" type="image/png" href="/static/faviphone.png">
-	<script src="/static/tasks.js?1"></script>
+	<script src="/static/libs/jquery-3.3.1.min.js"></script>
+	<script src="/static/libs/js.cookie.js"></script>
+	<script src="/static/tasks.js?2"></script>
 </head>
 <body>
 	<div id="workplace-div">
@@ -15,8 +17,19 @@
 			<form id="select-list-form">
 				<label>{{.Labels.labelTaskLists}}</label>
 				<select title="{{.Labels.hintTaskListsSelector}}" name="list" id="task-lists-select"></select>
-				<label id="tasks-statistic-label"></label>
+				<label>{{.Labels.labelStatisticTasks}}</label>
+				<label id="total-tasks-count-label"></label>
+				<label>{{.Labels.labelStatisticDone}}</label>
+				<label id="done-tasks-count-label"></label>
+				<label>{{.Labels.labelStatisticCanceled}}</label>
+				<label id="canceled-tasks-count-label"></label>
 				<button id="new-list-create-button">{{.Labels.buttonNewListCreate}}</button>
+			</form>
+			<form id="user-form">
+				<label id="user-label"></label>
+				<button id="login-user-button">{{.Labels.buttonLogin}}</button>
+				<button id="register-user-button">{{.Labels.buttonRegister}}</button>
+				<!--<button id="logout-user-button">{{.Labels.buttonLogout}}</button>-->
 			</form>
 			<form id="languages-and-help-form">
 				<label>{{.Labels.labelLanguages}}</label>
@@ -83,8 +96,12 @@
 				<label id="operation-status-label"></label>
 			</form>
 			<form id="filter-form">
-				<label>{{.Labels.labelFilter}}</label>
-				<input type="text" id="filter-input" name="filter" size="20">
+				<input type="text" id="filter-input" name="filter" size="20" placeholder="{{.Labels.hintSearchInput}}">
+				<select title="{{.Labels.hintFilterSelector}}" name="filter" id="filter-select">
+				 	<option value="all">{{.Labels.filterAll}}</option>
+				 	<option value="created-only">{{.Labels.filterCreatedOnly}}</option>
+				 	<option value="created-not-wait-not-remind">{{.Labels.statusCreatedNotWaitNotRemind}}</option>
+				</select>
 			</form>
 		</div>
 		<table id="tasks-table">

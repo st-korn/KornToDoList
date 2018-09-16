@@ -5,7 +5,9 @@
 "hintTaskListsSelector" : "Выберите список задач, с которым будете работать",
 "buttonNewListCreate" : "Создать новый список",
 
-"labelFilter" : "Фильтр: ",
+"buttonLogin" : "Войти",
+"buttonRegister" : "Регистрация",
+"buttonLogout" : "Выйти",
 
 "labelLanguages" : "Язык: ",
 "hintLanguagesSelector" : "Выберите язык",
@@ -46,9 +48,18 @@
 "buttonSaveTask" : "Изменить",
 "bottonMoveTask" : "Перенести в список",
 
+"hintSearchInput" : "Искать задачу",
+"hintFilterSelector" : "Выберите режим отображения задач",
+"filterAll" : "все задачи",
+"filterCreatedOnly" : "действующие",
+"statusCreatedNotWaitNotRemind" : "требующие активности",
+
 "labelToday" : "СЕГОДНЯ",
 "hintClearDone" : "Удалить выполненные",
-"buttonClearDone" : "x",
 "hintClearAll" : "Удалить все",
-"buttonClearAll" : "X"
+
+"labelStatisticTasks" : "Задач",
+"labelStatisticDone" : "выполнено",
+"labelStatisticCanceled" : "отменено"
+
 }
