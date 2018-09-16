@@ -1,67 +1,66 @@
 package main
 
 import (
-	"net/http" // для создания http-сервера
-	"os" // для получения переменных среды
-	"text/template" // для использования шаблонов html-страницы
-	"io/ioutil" // для чтения текстовых файлов с сервера
-	"encoding/json" // для парсинга json (языковые текстовки)
-	"golang.org/x/text/language" // для определения предпочтительного языка пользователя
-	"golang.org/x/text/language/display" // для вывода национальных наименования различных языков
-	"github.com/Shaked/gomobiledetect" // для определения мобильных браузеров
+	"net/http" // for HTTP-server
+	"os" // to get OS environment variables
+	"text/template" // for use HTML-page templates
+	"io/ioutil" // for read text files from the server
+	"encoding/json" // to parse JSON (language strings-tables)
+	"golang.org/x/text/language" // to detect user-perferred language
+	"golang.org/x/text/language/display" // to output national names of languages
+	"github.com/Shaked/gomobiledetect" // to detect mobile browsers
 )
 
-var URI string //URI базы данных MongoDB
-var DB string //имя базы данных MongoDB
+var URI string //URI MongoDB database
+var DB string //MongoDB database name
 
-// Все известные языки системы
+// All supported languages
 var SupportedLangs = []language.Tag{
-    language.English,   // The first language is used as fallback.
+    language.English,   // The first language is used as default
     language.German,
     language.Russian}
 
-// Структура, описывающая язык: английское_название_языка и национальное_название_языка
+// Language structure: english_name_of_language and national_name_of_language
 type typeLang struct {
 	EnglishName string
 	NationalName string
 }
 
-// Структура, детально описывающая список задач
-// Используется в HTML-шаблоне для вывода основной страницы списка задач
+// Structure to fill HTML-template of main web-page
 type typeWebFormData struct {
-	IsMobile bool // признак того, что страница открыта из мобильного браузера
-	UserLang string // английское_названия_языка, на котором следует показывать страницу
-	Langs []typeLang // общий перечень языков, на которые переведена система
-	Labels map[string]string // текстовки текущего выбранного языка
+	IsMobile bool // flag: the site was opened from a mobile browser 
+	UserLang string // english_name of current language, on which to display the page
+	Langs []typeLang // global list of supported languages
+	Labels map[string]string // strings-table of current language
 }
 
 // ================================================================================
-// Web-страница: Выводит основную страницу web-приложения
+// Web-page: main page of web-application
 // ================================================================================
 func webFormShow(res http.ResponseWriter, req *http.Request) {
 
-   	// Подготавливаем структуру для инициализации шаблона
+   	// Prepare main structure of HTML-template
 	var webFormData typeWebFormData
 
-	// Определяем, с какого устройства пришёл запрос
+	// Detect mobile devices
 	detect := mobiledetect.NewMobileDetect(req, nil)
 	webFormData.IsMobile = detect.IsMobile() && !detect.IsTablet()
 
-    // Загружаем полный список поддерживаемых языков
+    // Load supported languages list
     webFormData.Langs = make([]typeLang,len(SupportedLangs))
 	for i, tag := range SupportedLangs {
 		webFormData.Langs[i].EnglishName = display.English.Tags().Name(tag)
 		webFormData.Langs[i].NationalName = display.Self.Name(tag)
 	}
 
-	// Определяем язык, который следует использовать
+	// Detect user-language
 	lang, _ := req.Cookie("User-Language")
     accept := req.Header.Get("Accept-Language")
     matcher := language.NewMatcher(SupportedLangs)
     tag, _ := language.MatchStrings(matcher, lang.String(), accept)
     webFormData.UserLang = display.English.Tags().Name(tag);
 
-	// Загружаем текстовки выбранного языка
+	// Load strings-table for user-language
 	jsonFile, err := os.Open("templates/"+webFormData.UserLang+".json")
 	if err != nil { panic(err) }
 	defer jsonFile.Close()
@@ -69,7 +68,7 @@ func webFormShow(res http.ResponseWriter, req *http.Request) {
 	if err != nil { panic(err) }
 	json.Unmarshal(jsonText, &webFormData.Labels)
 
-	// Применяем HTML-шаблон
+	// Apply HTML-template
 	res.Header().Set("Content-type", "text/html")
 	t := template.New("tasks.html")
 	t, err = t.ParseFiles("templates/tasks.html")
@@ -80,22 +79,22 @@ func webFormShow(res http.ResponseWriter, req *http.Request) {
 
 
 // ================================================================================
-// Основная программа: запуск web-сервера
+// Main program: start the web-server
 // ================================================================================
 func main() {
 
-	// Считываем переменные окружения
+	// Read environment variables
 	URI = os.Getenv("MONGODB_ADDON_URI")
 	DB = os.Getenv("MONGODB_ADDON_DB")
 	PORT := os.Getenv("PORT")
 
-	// Назначаем обработчики для пользовательских web-запросов
+	// Assign handlers for web requests
 	http.HandleFunc("/",webFormShow)
 	
-	// Регистрируем файловый сервер для отдачи статичных файлов из папки static
+	// Register a HTTP file server for delivery static files from the static directory
 	fs := http.FileServer(http.Dir("./static"))
  	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
- 	// Запускаем web-сервер на всех интерфейсах на порту PORT
+ 	// Launch the web server on all interfaces on the PORT port
 	http.ListenAndServe(":"+PORT,nil)
 }
