@@ -32,7 +32,6 @@ select#task-lists-select option:nth-child(1) {
 }
 form#user-form {
 	float: right;
-	margin-left: 5px;
 }
 form#languages-and-help-form {
 	float: right;
@@ -152,12 +151,17 @@ p.done:hover::after, p.canceled:hover::after, p.moved:hover::after {
 /* ===============================================================
    Styles of icons
    =============================================================== */
-li img, p img {
+li img, p img, label img, form img {
 	display: inline-block;
 	vertical-align: text-top;
-	margin: -1px 2px 0px 0px;
-	padding: 0px 0px 0px 2px;
 	height: 16px;
+}
+li img, p img {
+  margin: -1px 2px 0px 0px;
+  padding: 0px 0px 0px 2px;
+}
+label img, form img {
+  margin: -1px -2px 0px 0px;
 }
 .done img, .canceled img, .moved img {
 	opacity: 0.3;

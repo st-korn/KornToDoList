@@ -4,7 +4,7 @@
 	<title>{{.Labels.titleWebPage}}</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
-	<link rel="stylesheet" type="text/css" href="/static/tasks.css?4">
+	<link rel="stylesheet" type="text/css" href="/static/tasks.css?7">
 	<link rel="icon" type="image/png" href="/static/favicon.png">
 	<link rel="apple-touch-icon" type="image/png" href="/static/faviphone.png">
 	<script src="/static/libs/jquery-3.3.1.min.js"></script>
@@ -25,12 +25,6 @@
 				<label id="canceled-tasks-count-label"></label>
 				<button id="new-list-create-button">{{.Labels.buttonNewListCreate}}</button>
 			</form>
-			<form id="user-form">
-				<label id="user-label"></label>
-				<button id="login-user-button">{{.Labels.buttonLogin}}</button>
-				<button id="register-user-button">{{.Labels.buttonRegister}}</button>
-				<!--<button id="logout-user-button">{{.Labels.buttonLogout}}</button>-->
-			</form>
 			<form id="languages-and-help-form">
 				<label>{{.Labels.labelLanguages}}</label>
 				<select title="{{.Labels.hintLanguagesSelector}}" name="lang" id="language-select">
@@ -39,6 +33,13 @@
 					{{- end}}
 				</select>
 				<label id="help-label">{{.Labels.labelHelp}}</label>
+			</form>
+			<form id="user-form">
+				<img id="user-img" src="/static/icons/user.svg">
+				<label id="user-label">stkorn@mail.ru</label>
+				<button id="login-user-button">{{.Labels.buttonLogin}}</button>
+				<button id="register-user-button">{{.Labels.buttonRegister}}</button>
+				<button id="logout-user-button">{{.Labels.buttonLogout}}</button>
 			</form>
 		</div>
 		<div class="header-controls-line">
@@ -96,6 +97,7 @@
 				<label id="operation-status-label"></label>
 			</form>
 			<form id="filter-form">
+				<img src="/static/icons/search.svg">
 				<input type="text" id="filter-input" name="filter" size="20" placeholder="{{.Labels.hintSearchInput}}">
 				<select title="{{.Labels.hintFilterSelector}}" name="filter" id="filter-select">
 				 	<option value="all">{{.Labels.filterAll}}</option>
