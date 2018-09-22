@@ -22,19 +22,19 @@ div.header-controls-line {
 	margin: 4px 0px 4px 0px;
 }
 form {
-	display: inline-block;
+  display: inline-block;
+}
+form.left-side {
+  float: left;
+}
+form.right-side {
+  float: right;
 }
 input, select, button {
 	margin: 1px 3px 2px 3px;
 }
 select#task-lists-select option:nth-child(1) {
     font-weight:bold;
-}
-form#user-form {
-	float: right;
-}
-form#languages-and-help-form {
-	float: right;
 }
 label#help-label {
 	text-decoration: underline;
@@ -56,8 +56,8 @@ label#operation-status-label {
 	line-height: 21px;
 	margin-left: 4px;
 }
-form#filter-form {
-	float: right;
+div.header-controls-line br {
+  clear: both;
 }
 
 /* ===============================================================
@@ -65,6 +65,7 @@ form#filter-form {
    =============================================================== */
 table#tasks-table {
 	width: 100%;
+  margin: 4px 0px 4px 0px;
 }
 table#tasks-table td {
 	width: 16.6%;

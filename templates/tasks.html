@@ -4,7 +4,7 @@
 	<title>{{.Labels.titleWebPage}}</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
-	<link rel="stylesheet" type="text/css" href="/static/tasks.css?7">
+	<link rel="stylesheet" type="text/css" href="/static/tasks.css?8">
 	<link rel="icon" type="image/png" href="/static/favicon.png">
 	<link rel="apple-touch-icon" type="image/png" href="/static/faviphone.png">
 	<script src="/static/libs/jquery-3.3.1.min.js"></script>
@@ -14,7 +14,23 @@
 <body>
 	<div id="workplace-div">
 		<div class="header-controls-line">
-			<form id="select-list-form">
+			<form id="user-form" {{if not .IsMobile}}class="right-side"{{end}}>
+				<img id="user-img" src="/static/icons/user.svg">
+				<label id="user-label">stkorn@mail.ru</label>
+				<button id="login-user-button">{{.Labels.buttonLogin}}</button>
+				<button id="register-user-button">{{.Labels.buttonRegister}}</button>
+				<button id="logout-user-button">{{.Labels.buttonLogout}}</button>
+			</form>
+			<form id="languages-and-help-form" {{if not .IsMobile}}class="right-side"{{end}}>
+				<label>{{.Labels.labelLanguages}}</label>
+				<select title="{{.Labels.hintLanguagesSelector}}" name="lang" id="language-select">
+					{{- range .Langs}}
+				 	<option value="{{.EnglishName}}"{{if eq .EnglishName $.UserLang}} selected="selected"{{end}}>{{.NationalName}}</option>
+					{{- end}}
+				</select>
+				<label id="help-label">{{.Labels.labelHelp}}</label>
+			</form>
+			<form id="select-list-form" {{if not .IsMobile}}class="left-side"{{end}}>
 				<label>{{.Labels.labelTaskLists}}</label>
 				<select title="{{.Labels.hintTaskListsSelector}}" name="list" id="task-lists-select"></select>
 				<label>{{.Labels.labelStatisticTasks}}</label>
@@ -25,25 +41,10 @@
 				<label id="canceled-tasks-count-label"></label>
 				<button id="new-list-create-button">{{.Labels.buttonNewListCreate}}</button>
 			</form>
-			<form id="languages-and-help-form">
-				<label>{{.Labels.labelLanguages}}</label>
-				<select title="{{.Labels.hintLanguagesSelector}}" name="lang" id="language-select">
-					{{- range .Langs}}
-				 	<option value="{{.EnglishName}}"{{if eq .EnglishName $.UserLang}} selected="selected"{{end}}>{{.NationalName}}</option>
-					{{- end}}
-				</select>
-				<label id="help-label">{{.Labels.labelHelp}}</label>
-			</form>
-			<form id="user-form">
-				<img id="user-img" src="/static/icons/user.svg">
-				<label id="user-label">stkorn@mail.ru</label>
-				<button id="login-user-button">{{.Labels.buttonLogin}}</button>
-				<button id="register-user-button">{{.Labels.buttonRegister}}</button>
-				<button id="logout-user-button">{{.Labels.buttonLogout}}</button>
-			</form>
+			<br>
 		</div>
 		<div class="header-controls-line">
-			<form id="edit-task-form">
+			<form id="edit-task-form" {{if not .IsMobile}}class="left-side"{{end}}>
 				<label>{{.Labels.labelTask}}</label>
 				<input type="hidden" id="task-id-input" name="id">
 				<input type="hidden" id="task-list-input" name="list">
@@ -96,7 +97,7 @@
 				</div>
 				<label id="operation-status-label"></label>
 			</form>
-			<form id="filter-form">
+			<form id="filter-form" {{if not .IsMobile}}class="right-side"{{end}}>
 				<img src="/static/icons/search.svg">
 				<input type="text" id="filter-input" name="filter" size="20" placeholder="{{.Labels.hintSearchInput}}">
 				<select title="{{.Labels.hintFilterSelector}}" name="filter" id="filter-select">
@@ -105,6 +106,7 @@
 				 	<option value="created-not-wait-not-remind">{{.Labels.statusCreatedNotWaitNotRemind}}</option>
 				</select>
 			</form>
+			<br>
 		</div>
 		<table id="tasks-table">
 		<tr>		
