@@ -52,7 +52,7 @@ div.tip img {
   display: inline-block;
   vertical-align: text-top;
   height: 32px;
-  margin: -1px 10px 0px 0px;
+  margin: 3px 10px 0px 0px;
 }
 div.tip code {
   padding: 1px 3px;
@@ -71,7 +71,7 @@ div#help-close-div {
 }
 
 /* ===============================================================
-   Styles of header control lines
+   Common styles of header control lines
    =============================================================== */
 div.header-controls-line {
 	margin: 4px 0px 4px 0px;
@@ -98,22 +98,56 @@ div.header-controls-line br {
   clear: both;
 }
 
+/* ===============================================================
+   Styles of welcome-form
+   =============================================================== */
 div#welcome-div {
-  margin: 15px auto 20px auto;
+  margin: 20px auto 20px auto;
   max-width: 800px;
   font-size : 16px;
 }
-form#welcome-form button {
-  margin-left: 0px;
+div.welcome-item {
   margin-bottom : 5px;
+  display: flex;
+  align-items: flex-start;
+  text-align: justify;
+}
+div.welcome-item-mobile {
+  margin-bottom : 10px;
+  text-align: justify;
+  display: flex;
+  flex-direction: column;
+}
+div.welcome-item button {
+  margin : -4px 5px 15px 0px;
   font-size : 16px;
+  white-space:nowrap;
+}
+div.welcome-item-mobile button {
+  margin : 0px 5px 0px 0px;
+  font-size : 16px;
+  white-space:nowrap;
 }
 
+/* ===============================================================
+   Styles of signup-form
+   =============================================================== */
 div#signup-div {
-  margin: 0px auto 0px auto;
+  margin: 0px auto 20px auto;
   max-width: 800px;
 }
+div#signup-spinner-div {
+  display: inline-block;
+  vertical-align: middle;
+}
+label#signup-result-label {
+  color: red;
+  font-weight: bold;
+}
 
+/* ===============================================================
+   Styles of user/help/list header line
+   =============================================================== */
 select#task-lists-select option:nth-child(1) {
     font-weight:bold;
 }
@@ -124,6 +158,10 @@ label#help-label {
 label#help-label:hover {
 	cursor: pointer;
 }
+
+/* ===============================================================
+   Styles of task/search header line
+   =============================================================== */
 input#checkbox-today-input {
 	margin-right: 0px;
 	vertical-align: middle;
@@ -139,12 +177,6 @@ label#operation-status-label {
 	margin-left: 4px;
 }
 
-div#signup-result-div {
-  margin : 10px 0px 10px 0px;
-  text-align: center;
-  color: red;
-  font-weight: bold;
-}
 
 /* ===============================================================
    Styles of tasks table

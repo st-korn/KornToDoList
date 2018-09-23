@@ -67,14 +67,7 @@ function showSignupForm() {
 // Submit sign-up form
 // ===========================================================================
 function submitSignup() {
-	if ( $("#password1-signup-input").val() != $("#password2-signup-input").val() ) {
-		$("#signup-result-label").text(resultPasswordsNotEquals);
-		return false;
-	}
-	if ( $("#password1-signup-input").val() == "" ) {
-		$("#signup-result-label").text(resultEmptyPassword);
-		return false;
-	}
+	// Validate fields
 	if ( $("#email-signup-input").val() == "" ) {
 		$("#signup-result-label").text(resultEmptyEMail);
 		return false;
@@ -87,7 +80,7 @@ function submitSignup() {
 		type : "post",
 		dataType: "json",
 		contentType: "application/json; charset=utf-8",
-		data : JSON.stringify( { EMail: $("#email-signup-input").val(), Password: $("#password1-signup-input").val() } ),
+		data : JSON.stringify( { EMail: $("#email-signup-input").val() } ),
 		// if success
 		success: function (response) {
 			$("#signup-spinner-div").hide();

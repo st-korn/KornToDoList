@@ -9,12 +9,16 @@ import (
 	"golang.org/x/text/language" // to detect user-perferred language
 	"golang.org/x/text/language/display" // to output national names of languages
 	"github.com/Shaked/gomobiledetect" // to detect mobile browsers
-	//"gopkg.in/mgo.v2" // to connect to MongoDB
-	//"gopkg.in/mgo.v2/bson" // to use BSON data format
+	"gopkg.in/mgo.v2" // to connect to MongoDB
+	"gopkg.in/mgo.v2/bson" // to use BSON data format
 )
 
 var URI string //URI MongoDB database
 var DB string //MongoDB database name
+
+// ================================================================================
+// Language defenition
+// ================================================================================
 
 // All supported languages
 var SupportedLangs = []language.Tag{
@@ -27,6 +31,19 @@ type typeLang struct {
 	NationalName string
 }
 
+// ================================================================================
+// Database collections defenition
+// ================================================================================
+
+type typeUser struct {
+	EMail string
+	PasswordHash string
+}
+
+// ================================================================================
+// Web-page: main page of web-application
+// ================================================================================
+
 // Structure to fill HTML-template of main web-page
 type typeWebFormData struct {
 	IsMobile bool // flag: the site was opened from a mobile browser 
@@ -35,9 +52,6 @@ type typeWebFormData struct {
 	Labels map[string]string // strings-table of current language for HTML
 }
 
-// ================================================================================
-// Web-page: main page of web-application
-// ================================================================================
 func webFormShow(res http.ResponseWriter, req *http.Request) {
 
    	// Prepare main structure of HTML-template
@@ -84,49 +98,57 @@ func webFormShow(res http.ResponseWriter, req *http.Request) {
 	if err != nil { panic(err) }
 }
 
+// ================================================================================
+// API: try to sign-up a new user. 
+// In case of success, a link is sent to the user, after which he can set password and complete the registration. 
+// Without opening the link, the account is not valid.
+// IN: JSON: { email : "" }
+// OUT: JSON: { result : string ["EMailEmpty", "UserJustExistsButEmailSent", "UserSignedUpEmailSent"] }
+// ================================================================================
+
 // Structure JSON-request for Sign Up new user
 type typeSignUpJSONRequest struct {
 	EMail string
-	Password string
 }
 // Structure JSON-response for Sign Up new user
 type typeSignUpJSONResponse struct {
 	Result string
 }
 
-// ================================================================================
-// API: try to sign-up a new user. 
-// In case of success, a link is sent to the user, after which he can complete the registration. 
-// Without openong the link, the account is not valid.
-// IN: JSON: { email : "", password : "" }
-// OUT: JSON: { result : string ["OK", "EMailEmpty", "PasswordEmpty", "JustExist"] }
-// ================================================================================
 func webSignUp(res http.ResponseWriter, req *http.Request) {
 
     // Parse request to struct
     var request typeSignUpJSONRequest
     err := json.NewDecoder(req.Body).Decode(&request)
-    if err != nil { http.Error(res, err.Error(), http.StatusInternalServerError) }
+    if err != nil { panic(err) }
 
     // Try to sign-up new user
     var response typeSignUpJSONResponse
     
     // Check request fields
     if request.EMail == "" { response.Result = "EMailEmpty" } else 
-    if request.Password == "" { response.Result = "PasswordEmpty" } else 
     {
+    	// Serarch for this user exist
+
 		// Connect to database
-		//session, err := mgo.Dial(URI)
-    	//if err != nil { panic(err) }
-    	//defer session.Close()
-   		//c := session.DB(DB).C("Users")
-   		//err = c.Find(bson.M{"emain": request.EMail}).One(&user)
-   		//if err != nil { http.Error(res, err.Error(), http.StatusInternalServerError) }
+		session, err := mgo.Dial(URI)
+    	if err != nil { panic(err) }
+    	defer session.Close()
+   		c := session.DB(DB).C("Users")
+
+   		var user typeUser
+   		err = c.Find(bson.M{"email": request.EMail}).One(&user)
+   		if err != nil { 
+   			response.Result = "UserSignedUpEmailSent" 
+   		} else
+   		{
+   			response.Result = "UserJustExistsButEmailSent"
+   		}
     }
 
     // Create json response from struct
     resJSON, err := json.Marshal(response)
-    if err != nil { http.Error(res, err.Error(), http.StatusInternalServerError) }
+    if err != nil { panic(err) }
     res.Write(resJSON)
 }
 

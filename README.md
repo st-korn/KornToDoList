@@ -26,11 +26,11 @@ Returns static files: icons, javascripts libs, css stylesheets, etc.
 
 ## `POST /SignUp`
 Try to sign-up a new user. 
-In case of success, a link is sent to the user, after which he can complete the registration. 
-Without openong the link, the account is not valid.
+In case of success, a link is sent to the user, after which he can set password and complete the registration. 
+Without opening the link, the account is not valid.
 
-	IN: JSON: { email : "", password : "" }
-	OUT: JSON: { result : string ["OK", "EMailEmpty", "PasswordEmpty", "JustExist"] }
+	IN: JSON: { email : "" }
+	OUT: JSON: { result : string ["EMailEmpty", "UserJustExistsButEmailSent", "UserSignedUpEmailSent"] }
 
 # Database structure
 

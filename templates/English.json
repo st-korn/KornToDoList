@@ -82,16 +82,12 @@
 "labelDeveloperPortal" : "Development portal",
 
 "placeholderEmailInputSignup" : "E-Mail",
-"placeholderPassword1InputSignup" : "Password",
-"placeholderPassword2InputSignup" : "Confirmation",
 "buttonSubmitSignup" : "Sign up",
 "buttonCancelSignup" : "Cancel",
 
-"resultSignupOK" : "To your email adress we send the letter with the link to confirm your registration. Click the link in the email to activate your account.",
-"resultPasswordsNotEquals" : "Passwords do not match",
 "resultEmptyEMail" : "E-Mail can not be empty",
-"resultEmptyPassword" : "Passwords can not be empty",
-"resultAllreadyExist" : "A user with such email address is already registered on the site. Click the &quot;Login&quot; button to access the password recovery.",
+"resultAllreadyExist" : "A user with such an email address is already registered on the site. An email with a link for password recovery was sent to his e-mail.",
+"resultSignupOK" : "An email with a link to confirm your registration has been sent to your e-mail. Follow the link from the email to set the password and activate your account.",
 
 "ajax0" : "Not connect. Verify Network.",
 "ajax404" : "Requested page not found [404].",
@@ -99,5 +95,10 @@
 "ajaxParseError" : "Requested parse failed.",
 "ajaxTimeOut" : "Time out error.",
 "ajaxAbort" : "Ajax request aborted.",
-"ajaxOther" : "Uncaught Error."
+"ajaxOther" : "Uncaught Error.",
+
+"placeholderPassword1InputSignup" : "Password",
+"placeholderPassword2InputSignup" : "Confirmation",
+"resultPasswordsNotEquals" : "Passwords do not match",
+"resultEmptyPassword" : "Passwords can not be empty"
 }
