@@ -73,6 +73,7 @@ function submitSignup() {
 		return false;
 	}
 	// Send Ajax POST request
+	$("#signup-result-label").text("");
 	$("#signup-spinner-div").show();
 	$.ajax( {
 		url : "/SignUp",
@@ -84,7 +85,12 @@ function submitSignup() {
 		// if success
 		success: function (response) {
 			$("#signup-spinner-div").hide();
-			$("#signup-result-label").html(response.Result);
+			switch(response.Result) {
+  				case "EMailEmpty" : $("#signup-result-label").html(resultEmptyEMail);
+  				case "UserJustExistsButEmailSent" : $("#signup-result-label").html(resultAllreadyExist);
+  				case "UserSignedUpEmailSent" : $("#signup-result-label").html(resultSignupOK);
+				default : $("#signup-result-label").html(resultUnknown);
+			}
 		},
 		// if error returns
 		error: function(jqXHR,exception) { 
