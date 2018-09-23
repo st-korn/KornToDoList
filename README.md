@@ -38,6 +38,10 @@ Without openong the link, the account is not valid.
 
 Main collection, that contains task records.
 
+## `Users`
+
+Collection of users and their hashed passwords.
+
 # How we name variables in Go?
 
 We use both: lowerCamelCase or UpperCamelCase:

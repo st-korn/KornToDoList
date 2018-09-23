@@ -9,6 +9,8 @@ import (
 	"golang.org/x/text/language" // to detect user-perferred language
 	"golang.org/x/text/language/display" // to output national names of languages
 	"github.com/Shaked/gomobiledetect" // to detect mobile browsers
+	//"gopkg.in/mgo.v2" // to connect to MongoDB
+	//"gopkg.in/mgo.v2/bson" // to use BSON data format
 )
 
 var URI string //URI MongoDB database
@@ -110,21 +112,21 @@ func webSignUp(res http.ResponseWriter, req *http.Request) {
     var response typeSignUpJSONResponse
     
     // Check request fields
-    if request.EMail == "" { response.Result = "EMailEmpty" }
-    else if request.Password == "" { response.Result = "PasswordEmpty" }
-    else {
-
+    if request.EMail == "" { response.Result = "EMailEmpty" } else 
+    if request.Password == "" { response.Result = "PasswordEmpty" } else 
+    {
 		// Connect to database
-		session, err := mgo.Dial(URI)
-    	if err != nil { panic(err) }
-    	defer session.Close()
-   		c := session.DB(DB).C("Tasks")
-
+		//session, err := mgo.Dial(URI)
+    	//if err != nil { panic(err) }
+    	//defer session.Close()
+   		//c := session.DB(DB).C("Users")
+   		//err = c.Find(bson.M{"emain": request.EMail}).One(&user)
+   		//if err != nil { http.Error(res, err.Error(), http.StatusInternalServerError) }
     }
 
     // Create json response from struct
     resJSON, err := json.Marshal(response)
-    if err != nil {http.Error(res, err.Error(), http.StatusInternalServerError) }
+    if err != nil { http.Error(res, err.Error(), http.StatusInternalServerError) }
     res.Write(resJSON)
 }
 
