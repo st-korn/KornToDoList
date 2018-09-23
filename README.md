@@ -14,7 +14,12 @@ To run .go server-application you need to set these environment variables:
 
     SET MONGODB_ADDON_URI=mongodb://username:password@domain.com:port/databasename
     SET MONGODB_ADDON_DB=databasename
-    SET PORT=port on which the web server listens
+    SET PORT=port on which the web-server listens
+    SET MAIL_HOST=smtp-server hostname
+    SET MAIL_PORT=smtp-server port number (usually 25)
+    SET MAIL_LOGIN=login of smtp-server account
+    SET MAIL_PASSWORD=password of smtp-server account
+    SET MAIL_FROM=E-mail address, from which will be sent emails
 
 # WEB-server API
 

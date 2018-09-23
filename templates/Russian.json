@@ -101,5 +101,9 @@
 "placeholderPassword1InputSignup" : "Пароль",
 "placeholderPassword2InputSignup" : "Подтверждение",
 "resultPasswordsNotEquals" : "Пароли не совпадают",
-"resultEmptyPassword" : "Пароль не может быть пустым"
+"resultEmptyPassword" : "Пароль не может быть пустым",
+
+"mailFrom" : "TODO.WORKS",
+"mailSignUpSubject" : "Регистрация аккаунта",
+"mailSignUpBody" : "Кто-то (ip $IP) зашёл на сайт todo.works и попытался зарегистрировать аккаунт на ваш адрес электронной почты. Мы очень надеемся, что это были Вы - в противном случае просто проигнорируйте данное письмо. Для завершения регистрации и установки пароля пройдите по ссылке:"
 }
