@@ -17,7 +17,6 @@ var DB string //MongoDB database name
 // All supported languages
 var SupportedLangs = []language.Tag{
     language.English,   // The first language is used as default
-    language.German,
     language.Russian}
 
 // Language structure: english_name_of_language and national_name_of_language
@@ -31,7 +30,7 @@ type typeWebFormData struct {
 	IsMobile bool // flag: the site was opened from a mobile browser 
 	UserLang string // english_name of current language, on which to display the page
 	Langs []typeLang // global list of supported languages
-	Labels map[string]string // strings-table of current language
+	Labels map[string]string // strings-table of current language for HTML
 }
 
 // ================================================================================
@@ -83,6 +82,51 @@ func webFormShow(res http.ResponseWriter, req *http.Request) {
 	if err != nil { panic(err) }
 }
 
+// Structure JSON-request for Sign Up new user
+type typeSignUpJSONRequest struct {
+	EMail string
+	Password string
+}
+// Structure JSON-response for Sign Up new user
+type typeSignUpJSONResponse struct {
+	Result string
+}
+
+// ================================================================================
+// API: try to sign-up a new user. 
+// In case of success, a link is sent to the user, after which he can complete the registration. 
+// Without openong the link, the account is not valid.
+// IN: JSON: { email : "", password : "" }
+// OUT: JSON: { result : string ["OK", "EMailEmpty", "PasswordEmpty", "JustExist"] }
+// ================================================================================
+func webSignUp(res http.ResponseWriter, req *http.Request) {
+
+    // Parse request to struct
+    var request typeSignUpJSONRequest
+    err := json.NewDecoder(req.Body).Decode(&request)
+    if err != nil { http.Error(res, err.Error(), http.StatusInternalServerError) }
+
+    // Try to sign-up new user
+    var response typeSignUpJSONResponse
+    
+    // Check request fields
+    if request.EMail == "" { response.Result = "EMailEmpty" }
+    else if request.Password == "" { response.Result = "PasswordEmpty" }
+    else {
+
+		// Connect to database
+		session, err := mgo.Dial(URI)
+    	if err != nil { panic(err) }
+    	defer session.Close()
+   		c := session.DB(DB).C("Tasks")
+
+    }
+
+    // Create json response from struct
+    resJSON, err := json.Marshal(response)
+    if err != nil {http.Error(res, err.Error(), http.StatusInternalServerError) }
+    res.Write(resJSON)
+}
 
 // ================================================================================
 // Main program: start the web-server
@@ -95,6 +139,7 @@ func main() {
 	PORT := os.Getenv("PORT")
 
 	// Assign handlers for web requests
+	http.HandleFunc("/SignUp",webSignUp)
 	http.HandleFunc("/",webFormShow)
 	
 	// Register a HTTP file server for delivery static files from the static directory

@@ -16,6 +16,28 @@ To run .go server-application you need to set these environment variables:
     SET MONGODB_ADDON_DB=databasename
     SET PORT=port on which the web server listens
 
+# WEB-server API
+
+## `GET /`
+Returns main html-page. The page is returned empty, without working information, such as tasks, lists or current user. Only list of languages and current-language value are included. Instead, the page contains javascript for authorization and further work with tasks.
+
+## `GET /static/...`
+Returns static files: icons, javascripts libs, css stylesheets, etc.
+
+## `POST /SignUp`
+Try to sign-up a new user. 
+In case of success, a link is sent to the user, after which he can complete the registration. 
+Without openong the link, the account is not valid.
+
+	IN: JSON: { email : "", password : "" }
+	OUT: JSON: { result : string ["OK", "EMailEmpty", "PasswordEmpty", "JustExist"] }
+
+# Database structure
+
+## `Tasks`
+
+Main collection, that contains task records.
+
 # How we name variables in Go?
 
 We use both: lowerCamelCase or UpperCamelCase:

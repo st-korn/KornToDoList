@@ -2,7 +2,7 @@
    Global styles of web-application
    =============================================================== */
 html {
-    -webkit-text-size-adjust: 100%; /* Prevent font scaling in landscape while allowing user zoom */
+  -webkit-text-size-adjust: 100%; /* Prevent font scaling in landscape while allowing user zoom */
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 9pt;
 }
@@ -13,6 +13,61 @@ body {
 }
 div#workplace-div {
 	width: 100%;
+}
+
+/* ===============================================================
+   Styles of Help div
+   =============================================================== */
+div#help-div {
+  margin: 0px auto 0px auto;
+  padding-top: 1px;
+  max-width: 800px;
+}
+div#help-div h1 {
+  margin: 5px 0px 5px 0px;
+  font-family: Geneva,Tahoma,Verdana,sans-serif;;
+  font-size : 24px;
+  font-weight: 400;
+  text-align: center;
+}
+div#help-div h2 {
+  margin: 5px 0px 5px 0px;
+  font-family: Geneva,Tahoma,Verdana,sans-serif;;
+  font-size : 18px;
+  font-weight: 800;
+}
+div.tip {
+  margin: 10px 0px 10px 0px;
+  display: flex;
+  align-items: flex-start;
+}
+div.tip-text {
+  font-family: Geneva,Tahoma,Verdana,sans-serif;;
+  font-size : 16px;
+  font-weight: normal;
+  display: inline; 
+  text-align: justify;
+}
+div.tip img {
+  display: inline-block;
+  vertical-align: text-top;
+  height: 32px;
+  margin: -1px 10px 0px 0px;
+}
+div.tip code {
+  padding: 1px 3px;
+  color: #c25;
+  background-color: #f7f7f9;
+  border-radius: 3px;
+  font-family: Courier New, Courier New, Courier6, monospace;
+  border: 1px solid #e1e2e8;
+}
+code span {
+  color: blue;
+}
+div#help-close-div {
+  text-align: center;
+  margin: 15px 0px 20px 0px;
 }
 
 /* ===============================================================
@@ -30,15 +85,35 @@ form.left-side {
 form.right-side {
   float: right;
 }
-input, select, button {
-	margin: 1px 3px 2px 3px;
-}
 form img {
   display: inline-block;
   vertical-align: text-top;
   height: 16px;
   margin: -1px -2px 0px 0px;
 }
+input, select, button {
+	margin: 1px 3px 2px 3px;
+}
+div.header-controls-line br {
+  clear: both;
+}
+
+div#welcome-div {
+  margin: 15px auto 20px auto;
+  max-width: 800px;
+  font-size : 16px;
+}
+form#welcome-form button {
+  margin-left: 0px;
+  margin-bottom : 5px;
+  font-size : 16px;
+}
+
+div#signup-div {
+  margin: 0px auto 0px auto;
+  max-width: 800px;
+}
+
 select#task-lists-select option:nth-child(1) {
     font-weight:bold;
 }
@@ -53,7 +128,7 @@ input#checkbox-today-input {
 	margin-right: 0px;
 	vertical-align: middle;
 }
-div#spinner {
+div#task-spinner-div {
 	display: inline-block;
 	vertical-align: middle;
 }
@@ -63,8 +138,12 @@ label#operation-status-label {
 	line-height: 21px;
 	margin-left: 4px;
 }
-div.header-controls-line br {
-  clear: both;
+
+div#signup-result-div {
+  margin : 10px 0px 10px 0px;
+  text-align: center;
+  color: red;
+  font-weight: bold;
 }
 
 /* ===============================================================
@@ -168,6 +247,19 @@ li img, p img{
 }
 .done img, .canceled img, .moved img {
 	opacity: 0.3;
+}
+
+/* ===============================================================
+   Styles for "About" footer
+   =============================================================== */
+div#about-div {
+  text-align: right;
+}
+div#about-div a {
+  font-size : 10px;
+}
+div#about-div a:link, div#about-div a:visited, div#about-div a:hover, div#about-div a:active {
+  color: rgba(187,187,187,1);
 }
 
 /* ===============================================================

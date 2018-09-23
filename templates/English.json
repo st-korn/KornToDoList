@@ -43,12 +43,12 @@
 "statusCanceled" : "canceled",
 "statusDone" : "done",
 
-"labelTodayCheckbox" : "I will do today",
+"labelTodayCheckbox" : "I'll do it today",
 "buttonAddTask" : "Add",
 "buttonSaveTask" : "Change",
 "bottonMoveTask" : "Move to new list",
 
-"hintSearchInput" : "Search task",
+"placeholderSearchInput" : "Search task",
 "hintFilterSelector" : "Select the tasks display mode",
 "filterAll" : "all tasks",
 "filterCreatedOnly" : "current tasks",
@@ -57,8 +57,47 @@
 "labelToday" : "TODAY",
 "hintClearDone" : "Delete completed",
 "hintClearAll" : "Delete all",
+"hintAddTask" : "Create new task",
 
 "labelStatisticTasks" : "Tasks",
 "labelStatisticDone" : "done",
-"labelStatisticCanceled" : "canceled"
+"labelStatisticCanceled" : "canceled",
+
+"buttonWelcomeRegister" : "Sign up",
+"labelWelcomeRegister" : "Need e-mail, registration takes 30 seconds.",
+"buttonWelcomeLogin" : "Log in",
+"labelWelcomeLogin" : ", if you already have a password.",
+"buttonWelcomeStartAnonymously" : "Start working anonymously",
+"labelWelcomeStartAnonymously" : "The data will be available from this device until the browser cookies are cleared. If you like, you can always sign up and all your tasks will be automatically transferred to your new account",
+"buttonHelpClose" : "Close",
+
+"helpH1" : "<strong>todo.works</strong> - A list of tasks, that allows you to start regularly from <strong>clean sheet</strong>.",
+"helpH2" : "How to use:",
+"helpSmartphone" : "Quickly write down the <strong>new task</strong> as soon as it came to mind. Just open the site from your smartphone, tablet or computer - and you're ready to enter the task. The created tasks are displayed in the &quot;incoming&quot; column.",
+"helpEvening" : "When there is free time, for example in the evening - classify incoming tasks: select the icons and arrange them by folders. Every evening or morning, make a list of tasks for <strong>today</strong>: to do this, select the cases you like and select the checkbox &#x2611; &quot;I'll do it today&quot;. To divide today's tasks into groups, add delimiters to the list of today's tasks.",
+"helpMeeting" : "If you <strong>delegate</strong> a task to someone: start the task with its name, then specify a text of the task via the <em>space-dash-space</em>, for example: <code><span>Peter</span> - send invoice</code>. When meeting with a colleague, you can filter out all of his assignments by entering his name in the search field.",
+"helpFilter" : "If there are too many tasks and they do not fit on the screen - <strong>hide</strong> completed or not requiring activity.",
+"helpChecklist" : "When the list is finally filled, create a new list on the weekend. Consistently go through each task from the old list: strike out completed and canceled tasks, and <strong>move to the new list</strong> remaining tasks. In the process of transfer tasks can be renamed.",
+
+"labelDeveloperPortal" : "Development portal",
+
+"placeholderEmailInputSignup" : "E-Mail",
+"placeholderPassword1InputSignup" : "Password",
+"placeholderPassword2InputSignup" : "Confirmation",
+"buttonSubmitSignup" : "Sign up",
+"buttonCancelSignup" : "Cancel",
+
+"resultSignupOK" : "To your email adress we send the letter with the link to confirm your registration. Click the link in the email to activate your account.",
+"resultPasswordsNotEquals" : "Passwords do not match",
+"resultEmptyEMail" : "E-Mail can not be empty",
+"resultEmptyPassword" : "Passwords can not be empty",
+"resultAllreadyExist" : "A user with such email address is already registered on the site. Click the &quot;Login&quot; button to access the password recovery.",
+
+"ajax0" : "Not connect. Verify Network.",
+"ajax404" : "Requested page not found [404].",
+"ajax500" : "Internal Server Error [500].",
+"ajaxParseError" : "Requested parse failed.",
+"ajaxTimeOut" : "Time out error.",
+"ajaxAbort" : "Ajax request aborted.",
+"ajaxOther" : "Uncaught Error."
 }

@@ -4,19 +4,80 @@
 	<title>{{.Labels.titleWebPage}}</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
-	<link rel="stylesheet" type="text/css" href="/static/tasks.css?8">
+	<link rel="stylesheet" type="text/css" href="/static/tasks.css?9">
 	<link rel="icon" type="image/png" href="/static/favicon.png">
 	<link rel="apple-touch-icon" type="image/png" href="/static/faviphone.png">
 	<script src="/static/libs/jquery-3.3.1.min.js"></script>
 	<script src="/static/libs/js.cookie.js"></script>
-	<script src="/static/tasks.js?2"></script>
+	<script src="/static/tasks.js?4"></script>
+	<script type="text/javascript">
+		{{- range $key, $value := .Labels}}
+		{{- if or (eq (printf "%.4s" $key) "ajax") (eq (printf "%.6s" $key) "result") }}
+		var {{$key}} = "{{$value}}";
+		{{- end}}
+		{{- end}}
+	</script>
 </head>
 <body>
 	<div id="workplace-div">
-		<div class="header-controls-line">
+		<div id="help-div">
+			<h1>{{.Labels.helpH1}}</h1>
+			<h2>{{.Labels.helpH2}}</h2>
+			<div class="tip">
+				<img src="/static/icons/smartphone.svg">
+				<div class="tip-text">{{.Labels.helpSmartphone}}</div>
+			</div>
+			<div class="tip">
+				<img src="/static/icons/evening.svg">
+				<div class="tip-text">{{.Labels.helpEvening}}</div>
+			</div>
+			<div class="tip">
+				<img src="/static/icons/meeting.svg">
+				<div class="tip-text">{{.Labels.helpMeeting}}</div>
+			</div>
+			<div class="tip">
+				<img src="/static/icons/filter.svg">
+				<div class="tip-text">{{.Labels.helpFilter}}</div>
+			</div>
+			<div class="tip">
+				<img src="/static/icons/checklist.svg">
+				<div class="tip-text">{{.Labels.helpChecklist}}</div>
+			</div>
+			<div id="help-close-div"><button id="help-close-button">{{.Labels.buttonHelpClose}}</button></div>
+		</div>
+		<div class="header-controls-line" id="welcome-div">
+			<form id="welcome-form" {{if not .IsMobile}}class="left-side"{{end}}>
+				<button id="wellcome-register-user-button">{{.Labels.buttonWelcomeRegister}}</button><label>{{.Labels.labelWelcomeRegister}}</label><br>
+				<button id="wellcome-login-user-button">{{.Labels.buttonWelcomeLogin}}</button><label>{{.Labels.labelWelcomeLogin}}</label><br>
+				<button id="wellcome-start-anonymously-button">{{.Labels.buttonWelcomeStartAnonymously}}</button><label>{{.Labels.labelWelcomeStartAnonymously}}</label><br>
+			</form>
+			<br>
+		</div>
+		<div class="header-controls-line" id="signup-div">
+			<form id="signup-form" {{if not .IsMobile}}class="center-side"{{end}}>
+				<div id="signup-form-div">
+					<input type="text" name="email" id="email-signup-input" placeholder="{{.Labels.placeholderEmailInputSignup}}">
+					<input type="password" name="password1" id="password1-signup-input" placeholder="{{.Labels.placeholderPassword1InputSignup}}">
+					<input type="password" name="password2" id="password2-signup-input" placeholder="{{.Labels.placeholderPassword2InputSignup}}">
+					<button id="submit-signup-button">{{.Labels.buttonSubmitSignup}}</button>
+					<button id="cancel-signup-button">{{.Labels.buttonCancelSignup}}</button>
+				</div>
+				<div id="signup-result-div">
+					<div class="sk-fading-circle" id="signup-spinner-div">
+						<div class="sk-circle1 sk-circle"></div><div class="sk-circle2 sk-circle"></div><div class="sk-circle3 sk-circle"></div>
+						<div class="sk-circle4 sk-circle"></div><div class="sk-circle5 sk-circle"></div><div class="sk-circle6 sk-circle"></div>
+						<div class="sk-circle7 sk-circle"></div><div class="sk-circle8 sk-circle"></div><div class="sk-circle9 sk-circle"></div>
+						<div class="sk-circle10 sk-circle"></div><div class="sk-circle11 sk-circle"></div><div class="sk-circle12 sk-circle"></div>
+					</div>
+					<label id="signup-result-label"></label>
+				</div>
+			</form>
+		</div>
+		<div class="header-controls-line" id="user-help-lists-div">
 			<form id="user-form" {{if not .IsMobile}}class="right-side"{{end}}>
 				<img id="user-img" src="/static/icons/user.svg">
-				<label id="user-label">stkorn@mail.ru</label>
+				<img id="anon-img" src="/static/icons/anon.svg">
+				<label id="user-label"></label>
 				<button id="login-user-button">{{.Labels.buttonLogin}}</button>
 				<button id="register-user-button">{{.Labels.buttonRegister}}</button>
 				<button id="logout-user-button">{{.Labels.buttonLogout}}</button>
@@ -43,7 +104,7 @@
 			</form>
 			<br>
 		</div>
-		<div class="header-controls-line">
+		<div class="header-controls-line" id="task-search-div">
 			<form id="edit-task-form" {{if not .IsMobile}}class="left-side"{{end}}>
 				<label>{{.Labels.labelTask}}</label>
 				<input type="hidden" id="task-id-input" name="id">
@@ -81,25 +142,17 @@
 		    	<label for="checkbox-today-input">{{.Labels.labelTodayCheckbox}}</label>
 				<button id="task-submit-button">{{.Labels.buttonAddTask}}</button>
 				<button id="task-move-button">{{.Labels.bottonMoveTask}}</button>
-				<div class="sk-fading-circle" id="spinner">
-					<div class="sk-circle1 sk-circle"></div>
-		  			<div class="sk-circle2 sk-circle"></div>
-					<div class="sk-circle3 sk-circle"></div>
-					<div class="sk-circle4 sk-circle"></div>
-					<div class="sk-circle5 sk-circle"></div>
-					<div class="sk-circle6 sk-circle"></div>
-					<div class="sk-circle7 sk-circle"></div>
-					<div class="sk-circle8 sk-circle"></div>
-					<div class="sk-circle9 sk-circle"></div>
-					<div class="sk-circle10 sk-circle"></div>
-					<div class="sk-circle11 sk-circle"></div>
-					<div class="sk-circle12 sk-circle"></div>
+				<div class="sk-fading-circle" id="task-spinner-div">
+					<div class="sk-circle1 sk-circle"></div><div class="sk-circle2 sk-circle"></div><div class="sk-circle3 sk-circle"></div>
+					<div class="sk-circle4 sk-circle"></div><div class="sk-circle5 sk-circle"></div><div class="sk-circle6 sk-circle"></div>
+					<div class="sk-circle7 sk-circle"></div><div class="sk-circle8 sk-circle"></div><div class="sk-circle9 sk-circle"></div>
+					<div class="sk-circle10 sk-circle"></div><div class="sk-circle11 sk-circle"></div><div class="sk-circle12 sk-circle"></div>
 				</div>
 				<label id="operation-status-label"></label>
 			</form>
 			<form id="filter-form" {{if not .IsMobile}}class="right-side"{{end}}>
 				<img src="/static/icons/search.svg">
-				<input type="text" id="filter-input" name="filter" size="20" placeholder="{{.Labels.hintSearchInput}}">
+				<input type="text" id="filter-input" name="filter" size="20" placeholder="{{.Labels.placeholderSearchInput}}">
 				<select title="{{.Labels.hintFilterSelector}}" name="filter" id="filter-select">
 				 	<option value="all">{{.Labels.filterAll}}</option>
 				 	<option value="created-only">{{.Labels.filterCreatedOnly}}</option>
@@ -122,30 +175,33 @@
 		{{- if .IsMobile}}</tr>
 		<tr>{{- end}}
 			<td class="iu">
-				<header>{{.Labels.sectionIU}}<button class="add">+</button></header>
+				<header>{{.Labels.sectionIU}}<button class="add" title="{{.Labels.hintAddTask}}">+</button></header>
 				</td>
 		{{- if .IsMobile}}</tr>
 		<tr>{{- end}}
 			<td class="in">
-				<header>{{.Labels.sectionIN}}<button class="add">+</button></header>
+				<header>{{.Labels.sectionIN}}<button class="add" title="{{.Labels.hintAddTask}}">+</button></header>
 			</td>
 		{{- if .IsMobile}}</tr>
 		<tr>{{- end}}
 			<td class="nu">
-				<header>{{.Labels.sectionNU}}<button class="add">+</button></header>
+				<header>{{.Labels.sectionNU}}<button class="add" title="{{.Labels.hintAddTask}}">+</button></header>
 			</td>
 		{{- if .IsMobile}}</tr>
 		<tr>{{- end}}
 			<td class="nn">
-				<header>{{.Labels.sectionNN}}<button class="add">+</button></header>
+				<header>{{.Labels.sectionNN}}<button class="add" title="{{.Labels.hintAddTask}}">+</button></header>
 			</td>
 		{{- if .IsMobile}}</tr>
 		<tr>{{- end}}
 			<td class="ib">
-				<header>{{.Labels.sectionIB}}<button class="add">+</button></header>
+				<header>{{.Labels.sectionIB}}<button class="add" title="{{.Labels.hintAddTask}}">+</button></header>
 			</td>
 		</tr>
 		</table>
+	<div id="about-div">
+		<a href="https://github.com/st-korn/KornToDoList">{{.Labels.labelDeveloperPortal}}</a>
+	</div>
 	</div>
 </body>
 </html>
