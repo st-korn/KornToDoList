@@ -52,6 +52,19 @@ func GetMongoDBSession() *mgo.Session {
 }
 
 // ===========================================================================================================================
+// Return JSON in response to a http-request
+// ===========================================================================================================================
+// IN: 
+func ReturnJSON(res http.ResponseWriter, structJSON interface{}) {
+    // Create json response from struct
+    resJSON, err := json.Marshal(structJSON)
+    if err != nil { panic(err) }
+    res.Header().Set("Content-type", "application/json; charset=utf-8")
+    res.Write(resJSON)
+
+}
+
+// ===========================================================================================================================
 // Language defenition and detection
 // ===========================================================================================================================
 
@@ -165,13 +178,13 @@ func SendEmail (fromName string, fromAddress string, toAddress string, subject s
 
 type typeUser struct {
 	EMail string
-	PasswordHash string
+	PasswordMD5 string
 }
 
 type typeSetPasswordLink struct {
 	EMail string
 	UUID string
-	expired time.Time
+	Expired time.Time
 }
 
 // ===========================================================================================================================
@@ -220,8 +233,8 @@ func webFormShow(res http.ResponseWriter, req *http.Request) {
 // POST /SignUp
 // In case of success, a link is sent to the user, after which he can set password and complete the registration. 
 // Without opening the link, the account is not valid.
-// IN: JSON: { email : string }
-// OUT: JSON: { result : string ["EMailEmpty", "UserJustExistsButEmailSent", "UserSignedUpAndEmailSent"] }
+// IN: JSON: { EMail : string }
+// OUT: JSON: { Result : string ["EMailEmpty", "UserJustExistsButEmailSent", "UserSignedUpAndEmailSent"] }
 // ===========================================================================================================================
 
 // Structure JSON-request for Sign Up new user
@@ -256,6 +269,7 @@ func webSignUp(res http.ResponseWriter, req *http.Request) {
     // Check request fields
     if request.EMail == "" { 
     	response.Result = "EMailEmpty"
+	    ReturnJSON(res, response)
     	return
     } 
 
@@ -300,11 +314,8 @@ func webSignUp(res http.ResponseWriter, req *http.Request) {
  	// Send email
  	SendEmail (labels["mailFrom"], MAILFROM, request.EMail, subject, bodyTemplate, eMailBodyData)
 
-    // Create json response from struct
-    resJSON, err := json.Marshal(response)
-    if err != nil { panic(err) }
-    res.Header().Set("Content-type", "application/json; charset=utf-8")
-    res.Write(resJSON)
+    // Return JSON response
+    ReturnJSON(res, response)
 }
 
 // ===========================================================================================================================
@@ -344,11 +355,11 @@ func webChangePasswordFormShow(res http.ResponseWriter, req *http.Request) {
 	// Remove all expired set-password-links
 	c.Remove(bson.M{"expired" : bson.M{"$lte":time.Now().UTC()} })
 
-	// Try to find current set-password-link and select HTML-template
+	// Try to find current set-password-link
 	var setPasswordLink typeSetPasswordLink
 	err := c.Find(bson.M{"uuid": changePasswordFormData.UUID}).One(&setPasswordLink)
 	if err != nil { 
-		changePasswordFormData.Result = changePasswordFormData.Labels["labelUUIDExpiredOrNotFound"]
+		changePasswordFormData.Result = changePasswordFormData.Labels["resultUUIDExpiredOrNotFound"]
 	}
 
 	// Apply HTML-template
@@ -360,6 +371,85 @@ func webChangePasswordFormShow(res http.ResponseWriter, req *http.Request) {
 	if err != nil { panic(err) }
 }
 
+// ===========================================================================================================================
+// API: add new user with password or change password for existing user. 
+// POST /SetPassword
+// Remove all expired set-password-links. 
+// Try to find current set-password-link. If not found - return "UUIDExpiredOrNotFound"
+// If access is allowed, insert a document in MongoDB "Users" collection, or update it. 
+// If success delete UUID record from MongoDB "SetPasswordLinks" collection (to block access to a link).
+// Then return "UserAdded" or "PasswordUpdated".
+// IN: JSON: { UUID : string, PasswordMD5 : string }
+// OUT: JSON: { Result : string ["UUIDExpiredOrNotFound", "EmptyPassword", "PasswordUpdated"] }
+// ===========================================================================================================================
+
+// Structure JSON-request for Set Password
+type typeSetPasswordJSONRequest struct {
+	UUID string
+	PasswordMD5 string
+}
+// Structure JSON-response for Set Password
+type typeSetPasswordJSONResponse struct {
+	Result string
+}
+
+func webSetPassword(res http.ResponseWriter, req *http.Request) {
+
+    // Parse request to struct
+    var request typeSetPasswordJSONRequest
+    err := json.NewDecoder(req.Body).Decode(&request)
+    if err != nil { panic(err) }
+
+    // Preparing to response
+    var response typeSignUpJSONResponse
+
+	// Check request fields
+    if request.PasswordMD5 == "" { 
+    	response.Result = "EmptyPassword"
+	    ReturnJSON(res, response)
+    	return
+    } 
+
+	// Connect to database
+	session := GetMongoDBSession()
+	defer session.Close()
+	c := session.DB(DB).C("SetPasswordLinks")
+
+	// Remove all expired set-password-links
+	c.Remove(bson.M{"expired" : bson.M{"$lte":time.Now().UTC()} })
+
+	// Try to find current set-password-link
+	var setPasswordLink typeSetPasswordLink
+	err = c.Find(bson.M{"uuid": request.UUID}).One(&setPasswordLink)
+	if err != nil { 
+		response.Result = "UUIDExpiredOrNotFound"
+	    ReturnJSON(res, response)
+		return
+	}
+	setPasswordLink.EMail = strings.ToLower(setPasswordLink.EMail)
+
+	// Try to find user record in database
+	c = session.DB(DB).C("Users")
+	var user typeUser
+	err = c.Find(bson.M{"email": setPasswordLink.EMail}).One(&user)
+	if err != nil { 
+		user.EMail = setPasswordLink.EMail
+		user.PasswordMD5 = request.PasswordMD5
+		c.Insert(user)
+		response.Result = "UserCreated"
+	} else
+	{
+		c.Update( bson.M{"email": setPasswordLink.EMail}, bson.M{"$set": bson.M{"passwordmd5": request.PasswordMD5}} )
+		response.Result = "PasswordUpdated"
+	}
+
+	// Remove old set-password-links
+	c = session.DB(DB).C("SetPasswordLinks")
+	c.Remove(bson.M{"email" : setPasswordLink.EMail })
+
+    // Return JSON response
+    ReturnJSON(res, response)
+}
 
 // ===========================================================================================================================
 // Main program: start the web-server
@@ -380,6 +470,7 @@ func main() {
 	// Assign handlers for web requests
  	http.HandleFunc("/SignUp",webSignUp)
  	http.HandleFunc("/ChangePassword",webChangePasswordFormShow)
+ 	http.HandleFunc("/SetPassword",webSetPassword)
 	http.HandleFunc("/",webFormShow)
 	
 	// Register a HTTP file server for delivery static files from the static directory

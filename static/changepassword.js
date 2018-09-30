@@ -17,6 +17,10 @@ function init() {
 		$("#password2-div").hide();
 		$("#submit-div").hide();
 	}
+	else
+	{
+		$("#password1-input").focus();
+	}
 }
 
 // ===========================================================================
@@ -45,14 +49,15 @@ function submitPasswords() {
 		type : "post",
 		dataType: "json",
 		contentType: "application/json; charset=utf-8",
-		data : JSON.stringify( { uuid: uuid, password: hash } ),
+		data : JSON.stringify( { UUID: uuid, PasswordMD5: hash } ),
 		// if success
 		success: function (response) {
 			$("#spinner-div").hide();
 			switch(response.Result) {
-  				case "PasswordsNotEquals" : $("#result-label").html(resultPasswordsNotEquals); break;
+				case "UUIDExpiredOrNotFound" : $("#result-label").html(resultUUIDExpiredOrNotFound); break;
   				case "EmptyPassword" : $("#result-label").html(resultEmptyPassword); break;
-  				case "PasswordUpdated" : $("#result-label").html(resultPasswordUpdated); break;
+  				case "UserCreated" : $("#result-label").html(resultUserCreated); window.location.href = "/"; break;
+  				case "PasswordUpdated" : $("#result-label").html(resultPasswordUpdated); window.location.href = "/"; break;
 				default : $("#result-label").html(resultUnknown);
 			}
 		},

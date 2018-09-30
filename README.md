@@ -38,8 +38,8 @@ Try to sign-up a new user.
 In case of success, a link is sent to the user, after which he can set password and complete the registration. 
 Without opening the link, the account is not valid.
 
-	IN: JSON: { email : string }
-	OUT: JSON: { result : string ["EMailEmpty", "UserJustExistsButEmailSent", "UserSignedUpAndEmailSent"] }
+	IN: JSON: { EMail : string }
+	OUT: JSON: { Result : string ["EMailEmpty", "UserJustExistsButEmailSent", "UserSignedUpAndEmailSent"] }
 
 ## `GET /ChangePassword?uuid=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX`
 
@@ -53,7 +53,16 @@ Returns html-page to set users-password.
 
 ## `POST /SetPassword`
 
-    IN
+Add new user with password or change password for existing user. 
+
+    IN: JSON: { UUID : string, PasswordMD5 : string }
+    OUT: JSON: { Result : string ["UUIDExpiredOrNotFound", "EmptyPassword", "UserCreated", "PasswordUpdated"] }
+
+* Remove all expired set-password-links. 
+* Try to find current set-password-link. If not found - return `"UUIDExpiredOrNotFound"`
+* If access is allowed, insert a document in MongoDB `Users` collection, or update it.
+* If success delete UUID record from MongoDB `SetPasswordLinks` collection (to block access to a link)
+* Then return `"UserCreated"` or `"PasswordUpdated"`.
 
 # Database structure
 
@@ -72,15 +81,6 @@ Main collection, that contains task records.
         "start" : 20
     }
 
-## `Users`
-
-Collection, that contains registered users records and their hashed passwords.
-
-    {
-        "email" : string
-        "passwordhash" : string
-    }
-
 ## `SetPasswordLinks`
 
 Collection, that contains links for changing user passwords.
@@ -91,7 +91,16 @@ Collection, that contains links for changing user passwords.
         "expired" : datetime UTC // UTC-datetime to which the link will be valid
     }
 
-# How we name variables in Go?
+## `Users`
+
+Collection, that contains registered users records and their hashed passwords.
+
+    {
+        "email" : string
+        "passwordmd5" : string
+    }
+
+# How we name identifiers in Go?
 
 We use both: lowerCamelCase or UpperCamelCase:
 * If the variable is global and should be visible in more than one procedure, then use **UpperCamelCase**.
@@ -102,6 +111,17 @@ We use both: lowerCamelCase or UpperCamelCase:
 * All **function parameters** must be lowerCamelCase.
 * We use **short names** of a small number of letters (eg `i`, `err`) if they are used in no more than several neighboring lines of code.
 * It's a good way to comment: why every external package imported in the program.
+
+# How we name identifiers in JavaScript?
+
+* Function and variables in JavaScript are named in **lowerCamelCase**.
+* All JSON filed names must be **UpperCamelCase**, same as fields of structures in Go. Do not forget to use correct case of JSON filed names in Javascript ajax-routines.
+
+# How we name identifiers in MongDB?
+
+* MongoDB collections are **UpperCamelCase** (eg `SetPasswordLinks`)
+* All MongoDB field names must be **lowercase**, in contrast to the fields of structures in Go. Do not forget to use correct case of collection fileds in all Go-routines (eg. `passwordmd5`).
+* EMail addresses must be stored in database only in **lowercase** style also. It's a good way to lowercase incomming email address in every Go server-function.
 
 # How we name classes and id's in HTML DOM?
 
@@ -116,6 +136,4 @@ The name of class and id's should reflect the content and purpose of the element
 
 # Other notes
 
-After changing files `.css` and `.js`, increase their suffix in `<link>` and `<script>` tags `.html` template. Browsers, that have this files cached, will apply the changes the next time the page is reloaded.
-
-EMail addresses must be stored in database only in **lowercase** style. It's a good way to lowercase incomming email address in every .go server-function.
+After changing files `.css` and `.js`, you can increase their suffix in `<link>` and `<script>` tags `.html` template. Browsers, that have this files cached, will apply the changes the next time the page is reloaded.
