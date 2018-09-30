@@ -6,16 +6,18 @@ $( init );
 function init() {
 	// Bind event handling
 	$("#language-select").change(onLanguageChange);
-	$("#wellcome-register-user-button").bind('click', showSignupForm);
+	$("#wellcome-register-user-button").bind('click', clickSignup);
 	$("#wellcome-login-user-button").bind('click', showLoginForm);
 	$("#wellcome-start-anonymously-button").bind('click', startAnonymously);
 	$("#help-label").bind('click', showHelp);
 	$("#help-close-button").bind('click', hideHelp);
 	$("#submit-signup-button").bind('click', submitSignup);
+	$("#submit-restore-button").bind('click', submitSignup);
 	$("#cancel-signup-button").bind('click', cancelSignup);
 	$("#submit-login-button").bind('click', submitLogin);
 	$("#cancel-login-button").bind('click', cancelLogin);
 	$("#logout-user-button").bind('click', clickLogout);
+	$("#forgot-password-label").bind('click', clickForgotPassword);
 
 	// Analyze the presence of a saved session
 	if ( Cookies.get('User-Session') == null )
@@ -105,11 +107,36 @@ function submitSignup() {
 }
 
 // ===========================================================================
-// Cancel sign-up form
+// Cancel signup form
 // ===========================================================================
 function cancelSignup() {
 	// Close sign-up <div>
 	$("#signup-div").animate({height: "hide"}, 100);
+	return false;
+}
+
+// ===========================================================================
+// Let user try to sign up
+// ===========================================================================
+function clickSignup() {
+	$("#submit-signup-button").show();
+	$("#submit-restore-button").hide();
+	showSignupForm();
+	return false;
+}
+
+// ===========================================================================
+// Show login form
+// ===========================================================================
+function showLoginForm() {
+	// Close sign-up <div> if necessary
+	if ( $("#signup-div").is(":visible") ) {
+		$("#signup-div").animate({height: "hide"}, 100);
+	};
+	// Show login <div>
+	$("#login-spinner-div").hide();
+	$("#login-result-label").text("");
+	$("#login-div").animate({height: "show"}, 100);
 	return false;
 }
 
@@ -187,6 +214,71 @@ function cancelLogin() {
 }
 
 // ===========================================================================
+// Restore forgotten password
+// ===========================================================================
+function clickForgotPassword() {
+	$("#submit-signup-button").hide();
+	$("#submit-restore-button").show();
+	showSignupForm();
+}
+
+// ===========================================================================
+// Start to work anonymously
+// ===========================================================================
+function startAnonymously() {
+	// Send Ajax POST request
+	$("#task-spinner-div").show();
+	$.ajax( {
+		url : "/GoAnonymous",
+		cache: false,
+		type : "post",
+		// if success
+		success: function (response) {
+			$("#task-spinner-div").hide();
+			switch(response.Result) {
+  				case "SuccessAnonymous" : 
+  					Cookies.set('User-Session', response.UUID, { expires: DefaultCookieLifetimeDays });
+  					location.reload();
+  					break;
+				default : ;
+			}
+		},
+		// if error returns
+		error: function(jqXHR,exception) { 
+			$("#login-spinner-div").hide();
+			showAjaxError("#login-result-label",jqXHR,exception);
+		}
+	} );
+	return false;
+}
+
+// ===========================================================================
+// Show to user Help <div>
+// ===========================================================================
+function showHelp() {
+	$("#help-close-div").show();
+	$("#help-div").animate({height: "show"}, 100);
+	$("#help-label").hide();
+}
+
+// ===========================================================================
+// Show from user Help <div>
+// ===========================================================================
+function hideHelp() {
+	$("#help-div").animate({height: "hide"}, 100);
+	$("#help-label").show();
+	return false;
+}
+
+// ===========================================================================
+// When the user selects a language from the list
+// ===========================================================================
+function onLanguageChange() {
+	Cookies.set('User-Language', $("#language-select").val(), { expires: DefaultCookieLifetimeDays });
+	location.reload();
+}
+
+// ===========================================================================
 // Click logout button
 // ===========================================================================
 function clickLogout() {
@@ -215,36 +307,6 @@ function clickLogout() {
 		}
 	} );
 	return false;
-}
-
-function startAnonymously() {
-
-}
-
-// ===========================================================================
-// Show to user Help <div>
-// ===========================================================================
-function showHelp() {
-	$("#help-close-div").show();
-	$("#help-div").animate({height: "show"}, 100);
-	$("#help-label").hide();
-}
-
-// ===========================================================================
-// Show from user Help <div>
-// ===========================================================================
-function hideHelp() {
-	$("#help-div").animate({height: "hide"}, 100);
-	$("#help-label").show();
-	return false;
-}
-
-// ===========================================================================
-// When the user selects a language from the list
-// ===========================================================================
-function onLanguageChange() {
-	Cookies.set('User-Language', $("#language-select").val(), { expires: DefaultCookieLifetimeDays });
-	location.reload();
 }
 
 // ===========================================================================

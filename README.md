@@ -73,7 +73,7 @@ Add new user with password or change password for existing user.
 
 ## `POST /LogIn`
 
-Try to login an user.
+Try to login an user, returns session-UUID.
 
     Cookies: User-Session : string (UUID)
     IN: JSON: { EMail : string, PasswordMD5 : string }
@@ -92,6 +92,19 @@ Logout user and erase information in database about his active session.
     IN: -
     OUT: JSON: { Result : string ["EmptySession", "LoggedOut"] }
 
+## `POST /GoAnonymous`
+
+Start an anonymous-session, returns session-UUID.
+
+    Cookies: User-Session : string (UUID)
+    IN: -
+    OUT: JSON: { Result : string ["SuccessAnonymous"], UUID : string }
+
+* Remove expired sessions from the database.
+* If current session exist - then logout.
+* Register new anonymous session in the `Sessions` database collection, and return its UUID to set cookie in browser.
+
+
 # Database structure
 
 ## `Tasks`
@@ -103,7 +116,7 @@ Main collection, that contains task records.
         "text" : string // tasks title, for example "Peter - send invoice"
         "section" : string // the importance and urgency of the task: ["iu","in","nu","nn","ib"]
         "status" : string // task status: ["created", "done", "canceled", "moved"]
-        "list" : string // list name in format: "email:YYYY-MM-DD" or "IP@YYYY-MM-DD:YYYY-MM-DD", for example "user@domain.com:2018-06-17",
+        "list" : string // list name in format: "email:YYYY-MM-DD" or "IP@YYYY-MM-DD-hh-mm-ss:YYYY-MM-DD", for example "user@domain.com:2018-06-17",
         "icon" : string // one of the icons: ["wait","remind","call","force","mail","prepare","manage","meet","visit","make","journey","think"]
         "length" : 0,
         "start" : 20

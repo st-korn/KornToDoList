@@ -83,6 +83,7 @@
 
 "placeholderEmailInputSignup" : "E-Mail",
 "buttonSubmitSignup" : "Sign up",
+"buttonSubmitRestore" : "Restore",
 "buttonCancelSignup" : "Cancel",
 "resultEmptyEMail" : "E-Mail can not be empty",
 "resultAllreadyExist" : "A user with such an email address is already registered on the site. An email with a link for password recovery was sent to his e-mail.",
@@ -118,6 +119,7 @@
 "placeholderEmailInputPassword" : "Password",
 "buttonSubmitLogin" : "Login",
 "buttonCancelLogin" : "Cancel",
+"labelForgotPassword" : "Forgot password?",
 "resultUserAndPasswordPairNotFound" : "Wrong username or password",
 "resultLoggedIn" : "User authorized"
 }

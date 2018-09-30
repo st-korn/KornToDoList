@@ -12,7 +12,7 @@
 	<script src="/static/libs/js.cookie.js"></script>
 	<script src="/static/libs/md5.min.js"></script>
 	<script src="/static/global.js?2"></script>
-	<script src="/static/tasks.js?4"></script>
+	<script src="/static/tasks.js?5"></script>
 	<script type="text/javascript">
 		{{- range $key, $value := .Labels}}
 		{{- if or (eq (printf "%.4s" $key) "ajax") (eq (printf "%.6s" $key) "result") }}
@@ -60,6 +60,7 @@
 			<form id="signup-form" {{if not .IsMobile}}class="left-side"{{end}}>
 				<input type="text" name="email" id="email-signup-input" placeholder="{{.Labels.placeholderEmailInputSignup}}">
 				<button id="submit-signup-button">{{.Labels.buttonSubmitSignup}}</button>
+				<button id="submit-restore-button">{{.Labels.buttonSubmitRestore}}</button>
 				<button id="cancel-signup-button">{{.Labels.buttonCancelSignup}}</button>
 				<div class="sk-fading-circle" id="signup-spinner-div">
 					<div class="sk-circle1 sk-circle"></div><div class="sk-circle2 sk-circle"></div><div class="sk-circle3 sk-circle"></div>
@@ -77,6 +78,7 @@
 				<input type="password" name="password" id="password-login-input" placeholder="{{.Labels.placeholderEmailInputPassword}}">
 				<button id="submit-login-button">{{.Labels.buttonSubmitLogin}}</button>
 				<button id="cancel-login-button">{{.Labels.buttonCancelLogin}}</button>
+				<label id="forgot-password-label" class="clickable">{{.Labels.labelForgotPassword}}</label>
 				<div class="sk-fading-circle" id="login-spinner-div">
 					<div class="sk-circle1 sk-circle"></div><div class="sk-circle2 sk-circle"></div><div class="sk-circle3 sk-circle"></div>
 					<div class="sk-circle4 sk-circle"></div><div class="sk-circle5 sk-circle"></div><div class="sk-circle6 sk-circle"></div>
@@ -103,7 +105,7 @@
 				 	<option value="{{.EnglishName}}"{{if eq .EnglishName $.UserLang}} selected="selected"{{end}}>{{.NationalName}}</option>
 					{{- end}}
 				</select>
-				<label id="help-label">{{.Labels.labelHelp}}</label>
+				<label id="help-label" class="clickable">{{.Labels.labelHelp}}</label>
 			</form>
 			<form id="select-list-form" {{if not .IsMobile}}class="left-side"{{end}}>
 				<label>{{.Labels.labelTaskLists}}</label>

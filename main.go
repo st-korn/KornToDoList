@@ -207,6 +207,7 @@ func main() {
  	http.HandleFunc("/SetPassword",webSetPassword)
  	http.HandleFunc("/LogIn",webLogIn)
  	http.HandleFunc("/LogOut",webLogOut)
+ 	http.HandleFunc("/GoAnonymous",webGoAnonymous)
 	http.HandleFunc("/",webFormShow)
 	
 	// Register a HTTP file server for delivery static files from the static directory

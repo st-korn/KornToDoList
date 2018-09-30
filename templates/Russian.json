@@ -83,6 +83,7 @@
 
 "placeholderEmailInputSignup" : "E-Mail",
 "buttonSubmitSignup" : "Регистрация",
+"buttonSubmitRestore" : "Восстановить",
 "buttonCancelSignup" : "Отмена",
 "resultEmptyEMail" : "Не указан E-Mail",
 "resultAllreadyExist" : "Пользователь с таким адресом электронной почты уже зарегистрирован на сайте. На его электронную почту отправлено письмо с ссылкой для восстановления пароля.",
@@ -118,6 +119,7 @@
 "placeholderEmailInputPassword" : "Пароль",
 "buttonSubmitLogin" : "Войти",
 "buttonCancelLogin" : "Отмена",
+"labelForgotPassword" : "Забыли пароль?",
 "resultUserAndPasswordPairNotFound" : "Неверное имя пользователя или пароль",
 "resultLoggedIn" : "Пользователь авторизован"
 }

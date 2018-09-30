@@ -187,7 +187,7 @@ func webSetPassword(res http.ResponseWriter, req *http.Request) {
 }
 
 // ===========================================================================================================================
-// API: Try to login an user. 
+// API: Try to login an user, returns session-UUID.
 // POST /LogIn
 // Remove expired sessions from the database.
 // If current session exist - then logout.
@@ -307,6 +307,63 @@ func webLogOut(res http.ResponseWriter, req *http.Request) {
 	// Remove session from the database
 	c.RemoveAll(bson.M{"uuid" : sessionCookie.Value })
 	response.Result = "LoggedOut"
+
+    // Return JSON response
+    ReturnJSON(res, response)
+}
+
+// ===========================================================================================================================
+// API: Start an anonymous-session, returns session-UUID.
+// POST /GoAnonymous
+// Remove expired sessions from the database.
+// If current session exist - then logout.
+// Register new anonymous session in the `Sessions` database collection, and return its UUID to set cookie in browser.
+// Cookies: User-Session : string (UUID)
+// IN: -
+// OUT: JSON: { Result : string ["SuccessAnonymous"], UUID : string }
+// ===========================================================================================================================
+// Structure JSON-response for Log In
+type typeGoAnonymousJSONResponse struct {
+	Result string
+	UUID string
+}
+
+func webGoAnonymous(res http.ResponseWriter, req *http.Request) {
+
+    // Preparing to response
+    var response typeGoAnonymousJSONResponse
+
+	// Connect to database
+	session := GetMongoDBSession()
+	defer session.Close()
+	c := session.DB(DB).C("Sessions")
+
+	// Remove all expired sessions
+	c.RemoveAll(bson.M{"expired" : bson.M{"$lte":time.Now().UTC()} })
+
+    // Try to detect previous user session
+	sessionCookie, err := req.Cookie("User-Session")
+	if err == nil { 
+		// Remove old session from the database
+		c.RemoveAll(bson.M{"uuid" : sessionCookie.Value })
+	}
+
+    // Generate new UUID
+	u := uuid.Must(uuid.NewV4())
+	response.Result = "SuccessAnonymous"
+	response.UUID = u.String()
+
+	// Generate anonymous email-style name
+	ip, _, err := net.SplitHostPort(req.RemoteAddr)
+	if err != nil { panic(err) }
+	timeStr := time.Now().UTC().Format("2006-01-02-15-04-05")
+
+    // Save new Session
+	c = session.DB(DB).C("Sessions")
+	c.Insert( bson.M{
+		"uuid" : u.String(),
+		"email" : ip+"@"+timeStr,
+		"expired" : time.Now().UTC().AddDate(0,0,DefaultSessionLifetimeDays) } )
 
     // Return JSON response
     ReturnJSON(res, response)
