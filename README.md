@@ -70,8 +70,8 @@ Collection, that contains links for changing user passwords.
 
     {
         "email" : string
-        "code" : string
-        "expired" : datetime
+        "uuid" : string
+        "expired" : datetime UTC
     }
 
 # How we name variables in Go?
@@ -100,3 +100,5 @@ The name of class and id's should reflect the content and purpose of the element
 # Other notes
 
 After changing files `tasks.css` and `tasks.js`, increase their suffix in `<link>` and `<script>` tags `tasks.html` template. Browsers, that have this files cached, will apply the changes the next time the page is reloaded.
+
+EMail addresses must be stored in database only in **lowercase** style. It's a good way to lowercase incomming email address in every .go server-function.

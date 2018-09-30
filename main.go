@@ -14,9 +14,11 @@ import (
 	"strings" // UpperCase and LowerCase functions
 	"fmt" // to generate emails body
 	"bytes" // string buffer to use string-templates
+	"time" // access to system date and time - to control uuid's expirations
 	"golang.org/x/text/language" // to detect user-perferred language
 	"golang.org/x/text/language/display" // to output national names of languages
 	"github.com/Shaked/gomobiledetect" // to detect mobile browsers
+	"github.com/satori/go.uuid" // generate UUIDs
 	"gopkg.in/mgo.v2" // to connect to MongoDB
 	"gopkg.in/mgo.v2/bson" // to use BSON data format
 )
@@ -179,7 +181,7 @@ func webFormShow(res http.ResponseWriter, req *http.Request) {
 		webFormData.Langs[i].NationalName = display.Self.Name(tag)
 	}
 
-	// Detect user-language
+	// Detect user-language and load it labels
 	_, webFormData.UserLang, webFormData.Labels = DetectLanguageAndLoadLabels(req)
 
 	// Apply HTML-template
@@ -223,6 +225,9 @@ func webSignUp(res http.ResponseWriter, req *http.Request) {
     err := json.NewDecoder(req.Body).Decode(&request)
     if err != nil { panic(err) }
 
+    // We store email-addresses only in lowecase
+    request.EMail = strings.ToLower(request.EMail)
+
     // Preparing to response
     var response typeSignUpJSONResponse
     
@@ -238,17 +243,25 @@ func webSignUp(res http.ResponseWriter, req *http.Request) {
 	defer session.Close()
 	c := session.DB(DB).C("Users")
 
+	// Detect user-language and load it labels
+	_, _, labels := DetectLanguageAndLoadLabels(req)
+
    	// Serarch for this user exist
 	var user typeUser
+	var subject, bodyTemplate string
 	err = c.Find(bson.M{"email": request.EMail}).One(&user)
 	if err != nil { 
 		response.Result = "UserSignedUpAndEmailSent"
+		subject = labels["mailSignUpSubject"]
+		bodyTemplate = labels["mailSignUpBody"]
 	} else
 	{
 		response.Result = "UserJustExistsButEmailSent"
+		subject = labels["mailRestorePasswordSubject"]
+		bodyTemplate = labels["mailRestorePasswordBody"]
 	}
 
-	// Prepare struct form email body
+	// Prepare struct for email body-template
 	var eMailBodyData typeEMailBodyData
 	eMailBodyData.RequestIP, _, err = net.SplitHostPort(req.RemoteAddr)
 	if err != nil { panic(err) }
@@ -256,12 +269,15 @@ func webSignUp(res http.ResponseWriter, req *http.Request) {
 
     // Generate change_password link
 	c = session.DB(DB).C("SetPasswordLinks")
-
-	// Detect user-language and load it labels
-	_, _, labels := DetectLanguageAndLoadLabels(req)
+	u := uuid.Must(uuid.NewV4())
+	c.Insert( bson.M {
+		"email" : request.EMail,
+		"uuid" : u.String(),
+		"expired" : time.Now().UTC().AddDate(0,0,1) } )
+	eMailBodyData.SetPasswordLink = "https://"+SERVERHOSTNAME+"/SetPassword?uuid="+u.String()
 
  	// Send email
- 	SendEmail (labels["mailFrom"], MAILFROM, request.EMail, labels["mailSignUpSubject"], labels["mailSignUpBody"], eMailBodyData)
+ 	SendEmail (labels["mailFrom"], MAILFROM, request.EMail, subject, bodyTemplate, eMailBodyData)
 
     // Create json response from struct
     resJSON, err := json.Marshal(response)
