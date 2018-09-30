@@ -14,12 +14,13 @@ To run .go server-application you need to set these environment variables:
 
     SET MONGODB_ADDON_URI=mongodb://username:password@domain.com:port/databasename
     SET MONGODB_ADDON_DB=databasename
-    SET PORT=port on which the web-server listens
     SET MAIL_HOST=smtp-server hostname
     SET MAIL_PORT=smtp-server port number (usually 25)
     SET MAIL_LOGIN=login of smtp-server account
     SET MAIL_PASSWORD=password of smtp-server account
     SET MAIL_FROM=E-mail address, from which will be sent emails
+    SET SERVER_HOST_NAME=http-server hostname without any http or https prefix (for example "todo.works")
+    SET PORT=port on which the web-server listens HTTP-requests (for example 9000 for clever-cloud.com)
 
 # WEB-server API
 
@@ -34,8 +35,8 @@ Try to sign-up a new user.
 In case of success, a link is sent to the user, after which he can set password and complete the registration. 
 Without opening the link, the account is not valid.
 
-	IN: JSON: { email : "" }
-	OUT: JSON: { result : string ["EMailEmpty", "UserJustExistsButEmailSent", "UserSignedUpEmailSent"] }
+	IN: JSON: { email : string }
+	OUT: JSON: { result : string ["EMailEmpty", "UserJustExistsButEmailSent", "UserSignedUpAndEmailSent"] }
 
 # Database structure
 
@@ -43,18 +44,47 @@ Without opening the link, the account is not valid.
 
 Main collection, that contains task records.
 
+    {
+        "_id" : ObjectId // unique object identifier
+        "text" : string // tasks title, for example "Peter - send invoice"
+        "section" : string // the importance and urgency of the task: ["iu","in","nu","nn","ib"]
+        "status" : string // task status: ["created", "done", "canceled", "moved"]
+        "list" : string // list name in format: "email:YYYY-MM-DD" or "IP@YYYY-MM-DD:YYYY-MM-DD", for example "user@domain.com:2018-06-17",
+        "icon" : string // one of the icons: ["wait","remind","call","force","mail","prepare","manage","meet","visit","make","journey","think"]
+        "length" : 0,
+        "start" : 20
+    }
+
 ## `Users`
 
-Collection of users and their hashed passwords.
+Collection, that contains registered users records and their hashed passwords.
+
+    {
+        "email" : string
+        "passwordhash" : string
+    }
+
+## `SetPasswordLinks`
+
+Collection, that contains links for changing user passwords.
+
+    {
+        "email" : string
+        "code" : string
+        "expired" : datetime
+    }
 
 # How we name variables in Go?
 
 We use both: lowerCamelCase or UpperCamelCase:
 * If the variable is global and should be visible in more than one procedure, then use **UpperCamelCase**.
 * For local variables that are used on short segments of the code, we use **lowerCamelCase**.
+* Global variables, which are set once at the start of the program and used in most functions, are written **UPPERCASE**.
 * For **type identifiers**, we use lowerCamelCase, which begins with the word "type": eg `typeTaskList`.
 * All **fields of structures** are named in UpperCamelCase.
+* All **function parameters** must be lowerCamelCase.
 * We use **short names** of a small number of letters (eg `i`, `err`) if they are used in no more than several neighboring lines of code.
+* It's a good way to comment: why every external package imported in the program.
 
 # How we name classes and id's in HTML DOM?
 

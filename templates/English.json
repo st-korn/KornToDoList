@@ -101,5 +101,9 @@
 "placeholderPassword1InputSignup" : "Password",
 "placeholderPassword2InputSignup" : "Confirmation",
 "resultPasswordsNotEquals" : "Passwords do not match",
-"resultEmptyPassword" : "Passwords can not be empty"
+"resultEmptyPassword" : "Passwords can not be empty",
+
+"mailFrom" : "TODO.WORKS",
+"mailSignUpSubject" : "Account registration",
+"mailSignUpBody" : "<p>Someone from ip-address {{.RequestIP}} went to the site <a href=\"https://{{.HostName}}\">{{.HostName}}</a> and tried to register an account to your email address.<br>We hope that it was you - otherwise just ignore this letter.</p><p>To complete registration and set the password, click on the link: <a href=\"https://{{.SetPasswordLink}}\">{{.SetPasswordLink}}</a></p>"
 }

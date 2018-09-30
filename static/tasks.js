@@ -88,7 +88,7 @@ function submitSignup() {
 			switch(response.Result) {
   				case "EMailEmpty" : $("#signup-result-label").html(resultEmptyEMail); break;
   				case "UserJustExistsButEmailSent" : $("#signup-result-label").html(resultAllreadyExist); break;
-  				case "UserSignedUpEmailSent" : $("#signup-result-label").html(resultSignupOK); break;
+  				case "UserSignedUpAndEmailSent" : $("#signup-result-label").html(resultSignupOK); break;
 				default : $("#signup-result-label").html(resultUnknown);
 			}
 		},
