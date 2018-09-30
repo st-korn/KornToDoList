@@ -25,18 +25,35 @@ To run .go server-application you need to set these environment variables:
 # WEB-server API
 
 ## `GET /`
+
 Returns main html-page. The page is returned empty, without working information, such as tasks, lists or current user. Only list of languages and current-language value are included. Instead, the page contains javascript for authorization and further work with tasks.
 
 ## `GET /static/...`
+
 Returns static files: icons, javascripts libs, css stylesheets, etc.
 
 ## `POST /SignUp`
+
 Try to sign-up a new user. 
 In case of success, a link is sent to the user, after which he can set password and complete the registration. 
 Without opening the link, the account is not valid.
 
 	IN: JSON: { email : string }
 	OUT: JSON: { result : string ["EMailEmpty", "UserJustExistsButEmailSent", "UserSignedUpAndEmailSent"] }
+
+## `GET /ChangePassword?uuid=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX`
+
+Returns html-page to set users-password. 
+
+* First remove all expired links from the `SetPasswordLinks` table. 
+* Then find uuid parameter in `SetPasswordLinks` table.
+* If not found - returns html-page with errors and "Return" button.
+* If found -returns html-page with two input boxes for new password.
+* When html-form is submited, it calls POST /SetPassword
+
+## `POST /SetPassword`
+
+    IN
 
 # Database structure
 
@@ -69,9 +86,9 @@ Collection, that contains registered users records and their hashed passwords.
 Collection, that contains links for changing user passwords.
 
     {
-        "email" : string
-        "uuid" : string
-        "expired" : datetime UTC
+        "email" : string // email address for password change
+        "uuid" : string // UUID to access password changing
+        "expired" : datetime UTC // UTC-datetime to which the link will be valid
     }
 
 # How we name variables in Go?
@@ -99,6 +116,6 @@ The name of class and id's should reflect the content and purpose of the element
 
 # Other notes
 
-After changing files `tasks.css` and `tasks.js`, increase their suffix in `<link>` and `<script>` tags `tasks.html` template. Browsers, that have this files cached, will apply the changes the next time the page is reloaded.
+After changing files `.css` and `.js`, increase their suffix in `<link>` and `<script>` tags `.html` template. Browsers, that have this files cached, will apply the changes the next time the page is reloaded.
 
 EMail addresses must be stored in database only in **lowercase** style. It's a good way to lowercase incomming email address in every .go server-function.

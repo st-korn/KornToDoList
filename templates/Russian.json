@@ -98,14 +98,19 @@
 "ajaxAbort" : "Запрос прерван.",
 "ajaxOther" : "Неопознанная ошибка.",
 
-"placeholderPassword1InputSignup" : "Пароль",
-"placeholderPassword2InputSignup" : "Подтверждение",
-"resultPasswordsNotEquals" : "Пароли не совпадают",
-"resultEmptyPassword" : "Пароль не может быть пустым",
-
 "mailFrom" : "TODO.WORKS",
 "mailSignUpSubject" : "Регистрация аккаунта",
 "mailSignUpBody" : "<p>Кто-то с ip-адреса {{.RequestIP}} зашёл на сайт <a href=\"https://{{.HostName}}\">{{.HostName}}</a> и попытался зарегистрировать аккаунт на ваш адрес электронной почты.<br>Мы надеемся, что это были Вы - в противном случае просто игнорируйте данное письмо.</p><p>Для завершения регистрации и установки пароля пройдите по ссылке: <a href=\"{{.SetPasswordLink}}\">{{.SetPasswordLink}}</a><br>Ссылка будет действительна в течении 24 часов.</p>",
 "mailRestorePasswordSubject" : "Восстановление пароля",
-"mailRestorePasswordBody" : "<p>Кто-то с ip-адреса {{.RequestIP}} зашёл на сайт <a href=\"https://{{.HostName}}\">{{.HostName}}</a> и попытался восстановить пароль аккаунту, зарегистрированному на ваш адрес электронной почты.<br>Мы надеемся, что это были Вы - в противном случае просто игнорируйте данное письмо.</p><p>Для смены пароля пройдите по ссылке: <a href=\"{{.SetPasswordLink}}\">{{.SetPasswordLink}}</a><br>Ссылка будет действительна в течении 24 часов.</p>"
+"mailRestorePasswordBody" : "<p>Кто-то с ip-адреса {{.RequestIP}} зашёл на сайт <a href=\"https://{{.HostName}}\">{{.HostName}}</a> и попытался восстановить пароль аккаунту, зарегистрированному на ваш адрес электронной почты.<br>Мы надеемся, что это были Вы - в противном случае просто игнорируйте данное письмо.</p><p>Для смены пароля пройдите по ссылке: <a href=\"{{.SetPasswordLink}}\">{{.SetPasswordLink}}</a><br>Ссылка будет действительна в течении 24 часов.</p>",
+
+"titleChangePassword" : "Установить пароль к списку задач",
+"labelUUIDExpiredOrNotFound" : "Истёк срок действия ссылки или аккаунт не найден.",
+"buttonReturn" : "Вернуться",
+"placeholderPassword1InputSignup" : "Пароль",
+"placeholderPassword2InputSignup" : "Подтверждение",
+"buttonSubmitPassword" : "Установить пароль",
+"resultPasswordsNotEquals" : "Пароли не совпадают",
+"resultEmptyPassword" : "Пароль не может быть пустым",
+"resultPasswordUpdated" : "Пароль успешно установлен"
 }

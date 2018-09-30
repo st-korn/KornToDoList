@@ -152,10 +152,16 @@ type typeUser struct {
 	PasswordHash string
 }
 
-// ================================================================================
+type typeSetPasswordLink struct {
+	EMail string
+	UUID string
+	expired time.Time
+}
+
+// ===========================================================================================================================
 // WEB-PAGE: main page of web-application
 // GET /
-// ================================================================================
+// ===========================================================================================================================
 
 // Structure to fill HTML-template of main web-page
 type typeWebFormData struct {
@@ -274,7 +280,7 @@ func webSignUp(res http.ResponseWriter, req *http.Request) {
 		"email" : request.EMail,
 		"uuid" : u.String(),
 		"expired" : time.Now().UTC().AddDate(0,0,1) } )
-	eMailBodyData.SetPasswordLink = "https://"+SERVERHOSTNAME+"/SetPassword?uuid="+u.String()
+	eMailBodyData.SetPasswordLink = "https://"+SERVERHOSTNAME+"/ChangePassword?uuid="+u.String()
 
  	// Send email
  	SendEmail (labels["mailFrom"], MAILFROM, request.EMail, subject, bodyTemplate, eMailBodyData)
@@ -285,6 +291,61 @@ func webSignUp(res http.ResponseWriter, req *http.Request) {
     res.Header().Set("Content-type", "application/json; charset=utf-8")
     res.Write(resJSON)
 }
+
+// ===========================================================================================================================
+// WEB-PAGE: web-page to set user-s password
+// GET /SetPassword?uuid=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+// ===========================================================================================================================
+
+// Structure to fill HTML-template of main web-page
+type typeChangePasswordFormData struct {
+	UUID string // UUID set-password-link
+	IsMobile bool // flag: the site was opened from a mobile browser
+	Labels typeLabels // strings-table of current language for HTML
+	Result string // A string that passes a precomputed and predefined result to a form, for example "Link is expired or account is not found"
+}
+
+func webChangePasswordFormShow(res http.ResponseWriter, req *http.Request) {
+
+   	// Prepare main structure of HTML-template
+	var changePasswordFormData typeChangePasswordFormData
+
+	// Parse http GET-request params
+	q := req.URL.Query()
+	changePasswordFormData.UUID = q.Get("uuid")
+
+	// Detect mobile devices
+	detect := mobiledetect.NewMobileDetect(req, nil)
+	changePasswordFormData.IsMobile = detect.IsMobile() && !detect.IsTablet()
+
+	// Detect user-language and load it labels
+	_, _, changePasswordFormData.Labels = DetectLanguageAndLoadLabels(req)
+
+	// Connect to database
+	session, err := mgo.Dial(URI)
+	if err != nil { panic(err) }
+	defer session.Close()
+	c := session.DB(DB).C("SetPasswordLinks")
+
+	// Remove all expired set-password-links
+	c.Remove(bson.M{"expired" : bson.M{"$lte":time.Now().UTC()} })
+
+	// Try to find current set-password-link and select HTML-template
+	var setPasswordLink typeSetPasswordLink
+	err = c.Find(bson.M{"uuid": changePasswordFormData.UUID}).One(&setPasswordLink)
+	if err != nil { 
+		changePasswordFormData.Result = changePasswordFormData.Labels["labelUUIDExpiredOrNotFound"]
+	}
+
+	// Apply HTML-template
+	t := template.New("changePassword.html")
+	t, err = t.ParseFiles("templates/changePassword.html")
+	if err != nil { panic(err) }
+	res.Header().Set("Content-type", "text/html")
+	err = t.Execute(res, changePasswordFormData)
+	if err != nil { panic(err) }
+}
+
 
 // ===========================================================================================================================
 // Main program: start the web-server
@@ -304,6 +365,7 @@ func main() {
 
 	// Assign handlers for web requests
  	http.HandleFunc("/SignUp",webSignUp)
+ 	http.HandleFunc("/ChangePassword",webChangePasswordFormShow)
 	http.HandleFunc("/",webFormShow)
 	
 	// Register a HTTP file server for delivery static files from the static directory

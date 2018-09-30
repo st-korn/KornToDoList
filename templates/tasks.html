@@ -4,11 +4,13 @@
 	<title>{{.Labels.titleWebPage}}</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+	<link rel="stylesheet" type="text/css" href="/static/global.css?1">
 	<link rel="stylesheet" type="text/css" href="/static/tasks.css?9">
 	<link rel="icon" type="image/png" href="/static/favicon.png">
 	<link rel="apple-touch-icon" type="image/png" href="/static/faviphone.png">
 	<script src="/static/libs/jquery-3.3.1.min.js"></script>
 	<script src="/static/libs/js.cookie.js"></script>
+	<script src="/static/global.js?1"></script>
 	<script src="/static/tasks.js?4"></script>
 	<script type="text/javascript">
 		{{- range $key, $value := .Labels}}
@@ -194,9 +196,9 @@
 			</td>
 		</tr>
 		</table>
-	<div id="about-div">
-		<a href="https://github.com/st-korn/KornToDoList">{{.Labels.labelDeveloperPortal}}</a>
-	</div>
+		<div id="about-div">
+			<a href="https://github.com/st-korn/KornToDoList">{{.Labels.labelDeveloperPortal}}</a>
+		</div>
 	</div>
 </body>
 </html>
