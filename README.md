@@ -4,7 +4,9 @@ You can try it in the cloud http://todo.works
 <img src="https://github.com/st-korn/KornToDoList/raw/newplatform/static/favicon.png" width="64">
 
 # Project Files
-* `main.go` - backend server application, that implements interfaces for HTML-generation, HTTP static-files transfer, JSON-api for javascript and mobile applications.
+* `main.go` - main part of backend server application, that implements common functions, global variables and constants, Go-types of database collections, starts web-server with HTTP static-files transfer.
+* `web.go` - implements interfaces for HTML-generation
+* `users.go` - implements JSON-api of users-routines (such as SignIn, LogIn, LogOut, etc..) for javascript and mobile applications.
 * `templates/` - here are HTML-templates and JSON language packages. A file from this folder is used by the main server application, but not transmitted to clients directly via HTTP requests.
 * `static/` - here are the static files that clients should receive via http requests: javascripts, CSSs, icons, etc.
 * `.graphics/` - in this folder the original images and the results of their processing are saved. All images received from third-party sites and services must necessarily contain a license, which allows their public commercial use.
@@ -14,19 +16,21 @@ To run .go server-application you need to set these environment variables:
 
     SET MONGODB_ADDON_URI=mongodb://username:password@domain.com:port/databasename
     SET MONGODB_ADDON_DB=databasename
-    SET MAIL_HOST=smtp-server hostname
+    SET MAIL_HOST=smtp-server hostname (eg. smtp.mail.ru)
     SET MAIL_PORT=smtp-server port number (usually 25)
     SET MAIL_LOGIN=login of smtp-server account
     SET MAIL_PASSWORD=password of smtp-server account
     SET MAIL_FROM=E-mail address, from which will be sent emails
-    SET SERVER_HOST_NAME=http-server hostname without any http or https prefix (for example "todo.works")
-    SET PORT=port on which the web-server listens HTTP-requests (for example 9000 for clever-cloud.com)
+    SET SERVER_HTTP_ADDRESS=http-server hostname with http or https prefix, and without any path: (eg. http://127.0.0.1:9000 or https://todo.works)
+    SET LISTEN_PORT=port on which the web-server listens HTTP-requests (for example 8080 for golang applications, hosted on clever-cloud.com)
 
 # WEB-server API
 
 ## `GET /`
 
 Returns main html-page. The page is returned empty, without working information, such as tasks, lists or current user. Only list of languages and current-language value are included. Instead, the page contains javascript for authorization and further work with tasks.
+
+    Cookies: User-Language : string
 
 ## `GET /static/...`
 
@@ -39,11 +43,14 @@ In case of success, a link is sent to the user, after which he can set password 
 Without opening the link, the account is not valid.
 
 	IN: JSON: { EMail : string }
-	OUT: JSON: { Result : string ["EMailEmpty", "UserJustExistsButEmailSent", "UserSignedUpAndEmailSent"] }
+	OUT: JSON: { Result : string ["EmptyEMail", "UserJustExistsButEmailSent", "UserSignedUpAndEmailSent"] }
 
 ## `GET /ChangePassword?uuid=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX`
 
 Returns html-page to set users-password. 
+
+    Cookies: User-Language : string
+    IN: uuid : string
 
 * First remove all expired links from the `SetPasswordLinks` table. 
 * Then find uuid parameter in `SetPasswordLinks` table.
@@ -63,6 +70,27 @@ Add new user with password or change password for existing user.
 * If access is allowed, insert a document in MongoDB `Users` collection, or update it.
 * If success delete UUID record from MongoDB `SetPasswordLinks` collection (to block access to a link)
 * Then return `"UserCreated"` or `"PasswordUpdated"`.
+
+## `POST /LogIn`
+
+Try to login an user.
+
+    Cookies: User-Session : string (UUID)
+    IN: JSON: { EMail : string, PasswordMD5 : string }
+    OUT: JSON: { Result : string ["EmptyEMail", "EmptyPassword", "UserAndPasswordPairNotFound", "LoggedIn"], UUID : string }
+
+* Remove expired sessions from the database.
+* If current session exist - then logout.
+* If the pair (EMail and PasswordMD5) is not present in the collection `Users`, return "UserAndPasswordPairNotFound".
+* Otherwise register new session in the `Sessions` database collection, and return its UUID to set cookie in browser.
+
+## `POST /LogOut`
+
+Logout user and erase information in database about his active session.
+
+    Cookies: User-Session : string (UUID)
+    IN: -
+    OUT: JSON: { Result : string ["EmptySession", "LoggedOut"] }
 
 # Database structure
 
@@ -96,8 +124,18 @@ Collection, that contains links for changing user passwords.
 Collection, that contains registered users records and their hashed passwords.
 
     {
-        "email" : string
-        "passwordmd5" : string
+        "email" : string // email address of the registred user
+        "passwordmd5" : string // MD5-hash of his password
+    }
+
+## `Sessions`
+
+Collection, that contains active cookies sessions for users.
+
+    {
+        "uuid" : string // UUID cookie of the session
+        "email" : string // email address of the session user
+        "expired" : datetime UTC // UTC-datetime to which the session is valid
     }
 
 # How we name identifiers in Go?
@@ -121,7 +159,7 @@ We use both: lowerCamelCase or UpperCamelCase:
 
 * MongoDB collections are **UpperCamelCase** (eg `SetPasswordLinks`)
 * All MongoDB field names must be **lowercase**, in contrast to the fields of structures in Go. Do not forget to use correct case of collection fileds in all Go-routines (eg. `passwordmd5`).
-* EMail addresses must be stored in database only in **lowercase** style also. It's a good way to lowercase incomming email address in every Go server-function.
+* EMail addresses must be stored in database only in **lowercase** style also. It's a good way to lowercase incomming email address in every backend Go-routine.
 
 # How we name classes and id's in HTML DOM?
 

@@ -84,7 +84,6 @@
 "placeholderEmailInputSignup" : "E-Mail",
 "buttonSubmitSignup" : "Sign up",
 "buttonCancelSignup" : "Cancel",
-
 "resultEmptyEMail" : "E-Mail can not be empty",
 "resultAllreadyExist" : "A user with such an email address is already registered on the site. An email with a link for password recovery was sent to his e-mail.",
 "resultSignupOK" : "An email with a link to confirm your registration has been sent to your e-mail. Follow the link from the email to set the password and activate your account.",
@@ -113,5 +112,12 @@
 "resultEmptyPassword" : "Passwords can not be empty",
 "resultUUIDExpiredOrNotFound" : "Link is expired or account is not found.",
 "resultUserCreated" : "Account activated",
-"resultPasswordUpdated" : "Password changed successfully"
+"resultPasswordUpdated" : "Password changed successfully",
+
+"placeholderEmailInputLogin" : "E-Mail",
+"placeholderEmailInputPassword" : "Password",
+"buttonSubmitLogin" : "Login",
+"buttonCancelLogin" : "Cancel",
+"resultUserAndPasswordPairNotFound" : "Wrong username or password",
+"resultLoggedIn" : "User authorized"
 }

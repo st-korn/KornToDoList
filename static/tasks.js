@@ -13,9 +13,12 @@ function init() {
 	$("#help-close-button").bind('click', hideHelp);
 	$("#submit-signup-button").bind('click', submitSignup);
 	$("#cancel-signup-button").bind('click', cancelSignup);
+	$("#submit-login-button").bind('click', submitLogin);
+	$("#cancel-login-button").bind('click', cancelLogin);
+	$("#logout-user-button").bind('click', clickLogout);
 
 	// Analyze the presence of a saved session
-	if ( Cookies.get('User-session') == null )
+	if ( Cookies.get('User-Session') == null )
 	{
 		// Hide and disable forms before user select one of the welcome-form buttons
 		$("#user-form").hide();
@@ -38,7 +41,7 @@ function init() {
 		$("#signup-div").hide();
 		$("#login-div").hide();
 
-		// Validate "User-session" cookie
+		// Validate "User-Session" cookie
 
 	}
 
@@ -86,7 +89,7 @@ function submitSignup() {
 		success: function (response) {
 			$("#signup-spinner-div").hide();
 			switch(response.Result) {
-  				case "EMailEmpty" : $("#signup-result-label").html(resultEmptyEMail); break;
+  				case "EmptyEMail" : $("#signup-result-label").html(resultEmptyEMail); break;
   				case "UserJustExistsButEmailSent" : $("#signup-result-label").html(resultAllreadyExist); break;
   				case "UserSignedUpAndEmailSent" : $("#signup-result-label").html(resultSignupOK); break;
 				default : $("#signup-result-label").html(resultUnknown);
@@ -102,21 +105,6 @@ function submitSignup() {
 }
 
 // ===========================================================================
-// Universal function to parse Ajax errors
-// ===========================================================================
-function showAjaxError(labelID, jqXHR, exception) {
-	var msg = '';
-	if (jqXHR.status == 0) { msg = ajax0; } 
-	else if (jqXHR.status == 404) { msg = ajax404; }
-	else if (jqXHR.status == 500) { msg = ajax500 + ' ' + jqXHR.responseText; }
-	else if (exception == 'parsererror') { msg = ajaxParseError; } 
-	else if (exception == 'timeout') { msg = ajaxTimeOut; } 
-	else if (exception == 'abort') { msg = ajaxAbort; }
-	else { msg = ajaxOther + ' ' + jqXHR.responseText; }
-	$(labelID).text(msg);
-}
-
-// ===========================================================================
 // Cancel sign-up form
 // ===========================================================================
 function cancelSignup() {
@@ -125,8 +113,108 @@ function cancelSignup() {
 	return false;
 }
 
+// ===========================================================================
+// Show login form
+// ===========================================================================
 function showLoginForm() {
+	// Close sign-up <div> if necessary
+	if ( $("#signup-div").is(":visible") ) {
+		$("#signup-div").animate({height: "hide"}, 100);
+	};
+	// Show login <div>
+	$("#login-spinner-div").hide();
+	$("#login-result-label").text("");
+	$("#login-div").animate({height: "show"}, 100);
+	return false;
+}
 
+// ===========================================================================
+// Submit login form
+// ===========================================================================
+function submitLogin() {
+	// Validate fields
+	if ( $("#email-login-input").val() == "" ) {
+		$("#login-result-label").text(resultEmptyEMail);
+		return false;
+	}
+	if ( $("#password-login-input").val() == "" ) {
+		$("#login-result-label").text(resultEmptyPassword);
+		return false;
+	}
+	// Calculate password's hash
+	var hash = md5($("#password-login-input").val());
+	// Send Ajax POST request
+	$("#login-result-label").text("");
+	$("#login-spinner-div").show();
+	$.ajax( {
+		url : "/LogIn",
+		cache: false,
+		type : "post",
+		dataType: "json",
+		contentType: "application/json; charset=utf-8",
+		data : JSON.stringify( { EMail: $("#email-login-input").val(), PasswordMD5: hash } ),
+		// if success
+		success: function (response) {
+			$("#login-spinner-div").hide();
+			switch(response.Result) {
+  				case "EmptyEMail" : $("#login-result-label").html(resultEmptyEMail); break;
+  				case "EmptyPassword" : $("#login-result-label").html(resultEmptyPassword); break;
+  				case "UserAndPasswordPairNotFound" : $("#login-result-label").html(resultUserAndPasswordPairNotFound); break;
+  				case "LoggedIn" : 
+  					$("#login-result-label").html(resultLoggedIn); 
+  					Cookies.set('User-Session', response.UUID, { expires: DefaultCookieLifetimeDays });
+  					location.reload();
+  					break;
+				default : $("#login-result-label").html(resultUnknown);
+			}
+		},
+		// if error returns
+		error: function(jqXHR,exception) { 
+			$("#login-spinner-div").hide();
+			showAjaxError("#login-result-label",jqXHR,exception);
+		}
+	} );
+	return false;
+}
+
+// ===========================================================================
+// Cancel login form
+// ===========================================================================
+function cancelLogin() {
+	// Close sign-up <div>
+	$("#login-div").animate({height: "hide"}, 100);
+	return false;
+}
+
+// ===========================================================================
+// Click logout button
+// ===========================================================================
+function clickLogout() {
+	// Send Ajax POST request
+	$("#task-spinner-div").show();
+	$.ajax( {
+		url : "/LogOut",
+		cache: false,
+		type : "post",
+		// if success
+		success: function (response) {
+			$("#task-spinner-div").hide();
+			switch(response.Result) {
+  				case "EmptySession" : break;
+  				case "LoggedOut" : 
+  					Cookies.remove('User-Session');
+  					location.reload();
+  					break;
+				default : ;
+			}
+		},
+		// if error returns
+		error: function(jqXHR,exception) { 
+			$("#login-spinner-div").hide();
+			showAjaxError("#login-result-label",jqXHR,exception);
+		}
+	} );
+	return false;
 }
 
 function startAnonymously() {
@@ -155,7 +243,7 @@ function hideHelp() {
 // When the user selects a language from the list
 // ===========================================================================
 function onLanguageChange() {
-	Cookies.set('User-Language', $("#language-select").val(), { expires: 365 });
+	Cookies.set('User-Language', $("#language-select").val(), { expires: DefaultCookieLifetimeDays });
 	location.reload();
 }
 

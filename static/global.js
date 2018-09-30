@@ -1,3 +1,6 @@
+// Default cookies lifetime interval (days)
+const DefaultCookieLifetimeDays = 365
+
 // ===========================================================================
 // Universal function to parse Ajax errors
 // ===========================================================================

@@ -10,7 +10,8 @@
 	<link rel="apple-touch-icon" type="image/png" href="/static/faviphone.png">
 	<script src="/static/libs/jquery-3.3.1.min.js"></script>
 	<script src="/static/libs/js.cookie.js"></script>
-	<script src="/static/global.js?1"></script>
+	<script src="/static/libs/md5.min.js"></script>
+	<script src="/static/global.js?2"></script>
 	<script src="/static/tasks.js?4"></script>
 	<script type="text/javascript">
 		{{- range $key, $value := .Labels}}
@@ -67,6 +68,22 @@
 					<div class="sk-circle10 sk-circle"></div><div class="sk-circle11 sk-circle"></div><div class="sk-circle12 sk-circle"></div>
 				</div>
 				<label id="signup-result-label"></label>
+			</form>
+			<br>
+		</div>
+		<div class="header-controls-line" id="login-div">
+			<form id="login-form" {{if not .IsMobile}}class="left-side"{{end}}>
+				<input type="text" name="email" id="email-login-input" placeholder="{{.Labels.placeholderEmailInputLogin}}">
+				<input type="password" name="password" id="password-login-input" placeholder="{{.Labels.placeholderEmailInputPassword}}">
+				<button id="submit-login-button">{{.Labels.buttonSubmitLogin}}</button>
+				<button id="cancel-login-button">{{.Labels.buttonCancelLogin}}</button>
+				<div class="sk-fading-circle" id="login-spinner-div">
+					<div class="sk-circle1 sk-circle"></div><div class="sk-circle2 sk-circle"></div><div class="sk-circle3 sk-circle"></div>
+					<div class="sk-circle4 sk-circle"></div><div class="sk-circle5 sk-circle"></div><div class="sk-circle6 sk-circle"></div>
+					<div class="sk-circle7 sk-circle"></div><div class="sk-circle8 sk-circle"></div><div class="sk-circle9 sk-circle"></div>
+					<div class="sk-circle10 sk-circle"></div><div class="sk-circle11 sk-circle"></div><div class="sk-circle12 sk-circle"></div>
+				</div>
+				<label id="login-result-label"></label>
 			</form>
 			<br>
 		</div>
