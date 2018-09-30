@@ -6,7 +6,7 @@ You can try it in the cloud http://todo.works
 # Project Files
 * `main.go` - backend server application, that implements interfaces for HTML-generation, HTTP static-files transfer, JSON-api for javascript and mobile applications.
 * `templates/` - here are HTML-templates and JSON language packages. A file from this folder is used by the main server application, but not transmitted to clients directly via HTTP requests.
-* `static/` - here are the static files that clients should receive via http requests: javascripts, icons, etc.
+* `static/` - here are the static files that clients should receive via http requests: javascripts, CSSs, icons, etc.
 * `.graphics/` - in this folder the original images and the results of their processing are saved. All images received from third-party sites and services must necessarily contain a license, which allows their public commercial use.
 
 # Environment variables

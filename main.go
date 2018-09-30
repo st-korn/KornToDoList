@@ -23,7 +23,7 @@ import (
 	"gopkg.in/mgo.v2/bson" // to use BSON data format
 )
 
-// Global variables
+// Global envirnment variables
 var URI string //URI MongoDB database
 var DB string //MongoDB database name
 var MAILHOST string //smtp-server hostname
@@ -34,6 +34,22 @@ var MAILFROM string //E-mail address, from which will be sent emails
 var SERVERHOSTNAME string //Hostname for web-server
 var PORT string //port on which the web server listens
 
+// ===========================================================================================================================
+// MongoDB session working
+// ===========================================================================================================================
+
+var SESSION *mgo.Session // global MongoDB session variable
+
+// Always return active MongoDB session object
+// If necessary, reconnect to the database
+func GetMongoDBSession() *mgo.Session {
+	if SESSION == nil {
+		var err error
+		SESSION, err = mgo.Dial(URI)
+		if err != nil { panic(err) }
+	}
+	return SESSION.Clone()
+}
 
 // ===========================================================================================================================
 // Language defenition and detection
@@ -244,8 +260,7 @@ func webSignUp(res http.ResponseWriter, req *http.Request) {
     } 
 
 	// Connect to database
-	session, err := mgo.Dial(URI)
-	if err != nil { panic(err) }
+	session := GetMongoDBSession()
 	defer session.Close()
 	c := session.DB(DB).C("Users")
 
@@ -322,8 +337,7 @@ func webChangePasswordFormShow(res http.ResponseWriter, req *http.Request) {
 	_, _, changePasswordFormData.Labels = DetectLanguageAndLoadLabels(req)
 
 	// Connect to database
-	session, err := mgo.Dial(URI)
-	if err != nil { panic(err) }
+	session := GetMongoDBSession()
 	defer session.Close()
 	c := session.DB(DB).C("SetPasswordLinks")
 
@@ -332,7 +346,7 @@ func webChangePasswordFormShow(res http.ResponseWriter, req *http.Request) {
 
 	// Try to find current set-password-link and select HTML-template
 	var setPasswordLink typeSetPasswordLink
-	err = c.Find(bson.M{"uuid": changePasswordFormData.UUID}).One(&setPasswordLink)
+	err := c.Find(bson.M{"uuid": changePasswordFormData.UUID}).One(&setPasswordLink)
 	if err != nil { 
 		changePasswordFormData.Result = changePasswordFormData.Labels["labelUUIDExpiredOrNotFound"]
 	}
