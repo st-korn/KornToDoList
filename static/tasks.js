@@ -42,8 +42,12 @@ function init() {
 		$("#welcome-div").hide();
 		$("#signup-div").hide();
 		$("#login-div").hide();
+
+		// Hide user-buttons
 		$("#user-img").hide();
 		$("#anon-img").hide();
+		$("#login-user-button").hide();
+		$("#register-user-button").hide();
 
 		// Validate "User-Session" cookie
 		getUserInfo();
@@ -322,11 +326,15 @@ function getUserInfo() {
   					$("#user-img").show();
   					$("#anon-img").hide();
   					$("#user-label").html(response.EMail);
+  					$("#login-user-button").hide();
+  					$("#register-user-button").hide();
   					break;
   				case "ValidAnonymousSession" : 
   					$("#user-img").hide();
   					$("#anon-img").show();
   					$("#user-label").html(response.EMail);
+  					$("#login-user-button").shoow();
+  					$("#register-user-button").show();
   					break;
 				default : $("#operation-status-label").html(resultUnknown);
 			}
