@@ -42,8 +42,11 @@ function init() {
 		$("#welcome-div").hide();
 		$("#signup-div").hide();
 		$("#login-div").hide();
+		$("#user-img").hide();
+		$("#anon-img").hide();
 
 		// Validate "User-Session" cookie
+		getUserInfo();
 
 	}
 
@@ -65,6 +68,7 @@ function showSignupForm() {
 	$("#signup-spinner-div").hide();
 	$("#signup-result-label").text("");
 	$("#signup-div").animate({height: "show"}, 100);
+	$("#email-signup-input").focus();
 	return false;
 }
 
@@ -137,21 +141,7 @@ function showLoginForm() {
 	$("#login-spinner-div").hide();
 	$("#login-result-label").text("");
 	$("#login-div").animate({height: "show"}, 100);
-	return false;
-}
-
-// ===========================================================================
-// Show login form
-// ===========================================================================
-function showLoginForm() {
-	// Close sign-up <div> if necessary
-	if ( $("#signup-div").is(":visible") ) {
-		$("#signup-div").animate({height: "hide"}, 100);
-	};
-	// Show login <div>
-	$("#login-spinner-div").hide();
-	$("#login-result-label").text("");
-	$("#login-div").animate({height: "show"}, 100);
+	$("#email-login-input").focus();
 	return false;
 }
 
@@ -240,13 +230,13 @@ function startAnonymously() {
   					Cookies.set('User-Session', response.UUID, { expires: DefaultCookieLifetimeDays });
   					location.reload();
   					break;
-				default : ;
+				default : $("#operation-status-label").html(resultUnknown);
 			}
 		},
 		// if error returns
 		error: function(jqXHR,exception) { 
-			$("#login-spinner-div").hide();
-			showAjaxError("#login-result-label",jqXHR,exception);
+			$("#task-spinner-div").hide();
+			showAjaxError("#operation-status-label",jqXHR,exception);
 		}
 	} );
 	return false;
@@ -297,13 +287,54 @@ function clickLogout() {
   					Cookies.remove('User-Session');
   					location.reload();
   					break;
-				default : ;
+				default : $("#operation-status-label").html(resultUnknown);
 			}
 		},
 		// if error returns
 		error: function(jqXHR,exception) { 
-			$("#login-spinner-div").hide();
-			showAjaxError("#login-result-label",jqXHR,exception);
+			$("#task-spinner-div").hide();
+			showAjaxError("#operation-status-label",jqXHR,exception);
+		}
+	} );
+	return false;
+}
+
+// ===========================================================================
+// Fetch user info from server and put in on page
+// ===========================================================================
+function getUserInfo() {
+	// Send Ajax POST request
+	$("#task-spinner-div").show();
+	$.ajax( {
+		url : "/UserInfo",
+		cache: false,
+		type : "post",
+		// if success
+		success: function (response) {
+			$("#task-spinner-div").hide();
+			switch(response.Result) {
+  				case "EmptySession" : break;
+  				case "SessionNotFoundOrExpired" :
+  					Cookies.remove('User-Session');
+  					location.reload();
+  					break;
+  				case "ValidUserSession" :
+  					$("#user-img").show();
+  					$("#anon-img").hide();
+  					$("#user-label").html(response.EMail);
+  					break;
+  				case "ValidAnonymousSession" : 
+  					$("#user-img").hide();
+  					$("#anon-img").show();
+  					$("#user-label").html(response.EMail);
+  					break;
+				default : $("#operation-status-label").html(resultUnknown);
+			}
+		},
+		// if error returns
+		error: function(jqXHR,exception) { 
+			$("#task-spinner-div").hide();
+			showAjaxError("#operation-status-label",jqXHR,exception);
 		}
 	} );
 	return false;

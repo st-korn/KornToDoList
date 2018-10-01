@@ -216,6 +216,9 @@ func webLogIn(res http.ResponseWriter, req *http.Request) {
     err := json.NewDecoder(req.Body).Decode(&request)
     if err != nil { panic(err) }
 
+    // We store email-addresses only in lowecase
+    request.EMail = strings.ToLower(request.EMail)
+
     // Preparing to response
     var response typeLogInJSONResponse
 
@@ -322,7 +325,8 @@ func webLogOut(res http.ResponseWriter, req *http.Request) {
 // IN: -
 // OUT: JSON: { Result : string ["SuccessAnonymous"], UUID : string }
 // ===========================================================================================================================
-// Structure JSON-response for Log In
+
+// Structure JSON-response for Go Anonymous
 type typeGoAnonymousJSONResponse struct {
 	Result string
 	UUID string
@@ -364,6 +368,72 @@ func webGoAnonymous(res http.ResponseWriter, req *http.Request) {
 		"uuid" : u.String(),
 		"email" : ip+"@"+timeStr,
 		"expired" : time.Now().UTC().AddDate(0,0,DefaultSessionLifetimeDays) } )
+
+    // Return JSON response
+    ReturnJSON(res, response)
+}
+
+// ===========================================================================================================================
+// API: Check session's UUID and get information of current user.
+// POST /UserInfo
+// Remove expired sessions from the database.
+// Checks the current session for validity.
+// If the session is valid, returns the Email (real or imaginary) of the current user. Returns flag: is the current user anonymous or not.
+// If the session is not valid, it returns "SessionNotFoundOrExpired" as a result.
+// Cookies: User-Session : string (UUID)
+// IN: -
+// OUT: JSON: { Result : string ["EmptySession", "ValidUserSession", "ValidAnonymousSession", "SessionNotFoundOrExpired"], EMail : string }
+// ===========================================================================================================================
+
+// Structure JSON-response for User Info
+type typeUserInfoJSONResponse struct {
+	Result string
+	EMail string
+}
+
+func webUserInfo(res http.ResponseWriter, req *http.Request) {
+
+    // Preparing to response
+    var response typeUserInfoJSONResponse
+
+	// Connect to database
+	session := GetMongoDBSession()
+	defer session.Close()
+	c := session.DB(DB).C("Sessions")
+
+	// Remove all expired sessions
+	c.RemoveAll(bson.M{"expired" : bson.M{"$lte":time.Now().UTC()} })
+
+    // Try to detect previous user session
+	sessionCookie, err := req.Cookie("User-Session")
+	if err != nil { 
+		response.Result = "EmptySession"
+	    ReturnJSON(res, response)
+    	return
+	}
+
+	// Try to find active session
+	var sid typeSession
+	err = c.Find(bson.M{"uuid": sessionCookie.Value}).One(&sid)
+	if err != nil {
+		response.Result = "SessionNotFoundOrExpired"
+	    ReturnJSON(res, response)
+    	return
+	}
+
+	response.EMail = sid.EMail
+
+	// Try to find registered user
+	var user typeUser
+	c = session.DB(DB).C("Users")
+	err = c.Find(bson.M{"email": sid.EMail}).One(&user)
+	if err != nil {
+		response.Result = "ValidAnonymousSession"
+	    ReturnJSON(res, response)
+    	return
+	}
+
+	response.Result = "ValidUserSession"
 
     // Return JSON response
     ReturnJSON(res, response)

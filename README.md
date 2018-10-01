@@ -1,5 +1,6 @@
-Experimental web-app ToDo-list by Stanislav Kornienko's conception.
-You can try it in the cloud http://todo.works
+The task list for easy work with a large number of tasks (**100+**), which makes it easy to start regularly **from scratch**.
+
+Experimental web-app ToDo-list by Stanislav Kornienko's conception. You can try it in the cloud https://todo.works
 
 <img src="https://github.com/st-korn/KornToDoList/raw/newplatform/static/favicon.png" width="64">
 
@@ -104,6 +105,18 @@ Start an anonymous-session, returns session-UUID.
 * If current session exist - then logout.
 * Register new anonymous session in the `Sessions` database collection, and return its UUID to set cookie in browser.
 
+## `POST /UserInfo`
+
+Check session's UUID and get information of current user.
+
+    Cookies: User-Session : string (UUID)
+    IN: -
+    OUT: JSON: { Result : string ["EmptySession", "ValidUserSession", "ValidAnonymousSession", "SessionNotFoundOrExpired"], EMail : string }
+
+* Remove expired sessions from the database.
+* Checks the current session for validity.
+* If the session is valid, returns the Email (real or imaginary) of the current user. Returns flag: is the current user anonymous or not.
+* If the session is not valid, it returns "SessionNotFoundOrExpired" as a result.
 
 # Database structure
 

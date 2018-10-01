@@ -184,6 +184,12 @@ type typeSetPasswordLink struct {
 	Expired time.Time
 }
 
+type typeSession struct {
+	UUID string
+	EMail string
+	Expired time.Time
+}
+
 
 // ===========================================================================================================================
 // Main program: start the web-server
@@ -208,6 +214,7 @@ func main() {
  	http.HandleFunc("/LogIn",webLogIn)
  	http.HandleFunc("/LogOut",webLogOut)
  	http.HandleFunc("/GoAnonymous",webGoAnonymous)
+ 	http.HandleFunc("/UserInfo",webUserInfo)
 	http.HandleFunc("/",webFormShow)
 	
 	// Register a HTTP file server for delivery static files from the static directory
