@@ -57,16 +57,25 @@ div#help-close-div {
    Common styles of header control lines
    =============================================================== */
 div.header-controls-line {
-	margin: 4px 0px 4px 0px;
+	margin: 0px 0px 0px 0px;
 }
 form {
   display: inline-block;
+  background: rgba(242,242,242,1);
+  border: dotted rgba(187,187,187,1) 1px;
+  border-radius: 5px;
+  padding: 1px 1px 1px 1px;
+  margin: 0px 0px 3px 0px;
 }
 form.left-side {
   float: left;
 }
 form.right-side {
   float: right;
+}
+form.full-wide {
+  width: 100%;
+  box-sizing: border-box;
 }
 form img {
   display: inline-block;
@@ -95,6 +104,9 @@ div#welcome-div {
   margin: 20px auto 20px auto;
   max-width: 800px;
   font-size : 16px;
+}
+form#welcome-form {
+  padding: 5px 5px 5px 5px;
 }
 div.welcome-item {
   margin-bottom : 5px;
@@ -148,10 +160,6 @@ label#login-result-label {
    =============================================================== */
 select#task-lists-select option:nth-child(1) {
     font-weight:bold;
-}
-
-form#languages-and-help-form {
-  margin-right: 10px
 }
 
 /* ===============================================================

@@ -4,8 +4,8 @@
 	<title>{{.Labels.titleWebPage}}</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
-	<link rel="stylesheet" type="text/css" href="/static/global.css?1">
-	<link rel="stylesheet" type="text/css" href="/static/tasks.css?9">
+	<link rel="stylesheet" type="text/css" href="/static/global.css?5">
+	<link rel="stylesheet" type="text/css" href="/static/tasks.css?14">
 	<link rel="icon" type="image/png" href="/static/favicon.png">
 	<link rel="apple-touch-icon" type="image/png" href="/static/faviphone.png">
 	<script src="/static/libs/jquery-3.3.1.min.js"></script>
@@ -49,7 +49,7 @@
 			<div id="help-close-div"><button id="help-close-button">{{.Labels.buttonHelpClose}}</button></div>
 		</div>
 		<div class="header-controls-line" id="welcome-div">
-			<form id="welcome-form" {{if not .IsMobile}}class="left-side"{{end}}>
+			<form id="welcome-form" class="left-side">
 				<div class="welcome-item{{if .IsMobile}}-mobile{{end}}"><button id="wellcome-register-user-button">{{.Labels.buttonWelcomeRegister}}</button><label>{{.Labels.labelWelcomeRegister}}</label></div>
 				<div class="welcome-item{{if .IsMobile}}-mobile{{end}}"><button id="wellcome-login-user-button">{{.Labels.buttonWelcomeLogin}}</button><label>{{.Labels.labelWelcomeLogin}}</label></div>
 				<div class="welcome-item{{if .IsMobile}}-mobile{{end}}"><button id="wellcome-start-anonymously-button">{{.Labels.buttonWelcomeStartAnonymously}}</button><label>{{.Labels.labelWelcomeStartAnonymously}}</label></div>
@@ -57,7 +57,7 @@
 			<br>
 		</div>
 		<div class="header-controls-line" id="signup-div">
-			<form id="signup-form" {{if not .IsMobile}}class="left-side"{{end}}>
+			<form id="signup-form" class="left-side">
 				<input type="text" name="email" id="email-signup-input" placeholder="{{.Labels.placeholderEmailInputSignup}}">
 				<button id="submit-signup-button">{{.Labels.buttonSubmitSignup}}</button>
 				<button id="submit-restore-button">{{.Labels.buttonSubmitRestore}}</button>
@@ -73,7 +73,7 @@
 			<br>
 		</div>
 		<div class="header-controls-line" id="login-div">
-			<form id="login-form" {{if not .IsMobile}}class="left-side"{{end}}>
+			<form id="login-form" class="left-side">
 				<input type="text" name="email" id="email-login-input" placeholder="{{.Labels.placeholderEmailInputLogin}}">
 				<input type="password" name="password" id="password-login-input" placeholder="{{.Labels.placeholderEmailInputPassword}}">
 				<button id="submit-login-button">{{.Labels.buttonSubmitLogin}}</button>
@@ -90,14 +90,14 @@
 			<br>
 		</div>
 		<div class="header-controls-line" id="user-help-lists-div">
-			<form id="user-form" {{if not .IsMobile}}class="right-side"{{end}}>
+			<form id="user-form" class="{{if .IsMobile}}left-side{{else}}right-side{{end}}">
 				<img id="user-img" src="/static/icons/user.svg">
 				<img id="anon-img" src="/static/icons/anon.svg">
 				<label id="user-label"></label>
 				<button id="register-user-button">{{.Labels.buttonRegister}}</button>
 				<button id="logout-user-button">{{.Labels.buttonLogout}}</button>
 			</form>
-			<form id="languages-and-help-form" {{if not .IsMobile}}class="right-side"{{end}}>
+			<form id="languages-and-help-form" class="right-side">
 				<label>{{.Labels.labelLanguages}}</label>
 				<select title="{{.Labels.hintLanguagesSelector}}" name="lang" id="language-select">
 					{{- range .Langs}}
@@ -106,7 +106,8 @@
 				</select>
 				<label id="help-label" class="clickable">{{.Labels.labelHelp}}</label>
 			</form>
-			<form id="select-list-form" {{if not .IsMobile}}class="left-side"{{end}}>
+			{{- if .IsMobile}}<br>{{- end}}
+			<form id="select-list-form" class="{{if .IsMobile}}full-wide{{else}}left-side{{end}}">
 				<label>{{.Labels.labelTaskLists}}</label>
 				<select title="{{.Labels.hintTaskListsSelector}}" name="list" id="task-lists-select"></select>
 				<label>{{.Labels.labelStatisticTasks}}</label>
@@ -120,7 +121,17 @@
 			<br>
 		</div>
 		<div class="header-controls-line" id="task-search-div">
-			<form id="edit-task-form" {{if not .IsMobile}}class="left-side"{{end}}>
+			<form id="filter-form" class="{{if .IsMobile}}full-wide{{else}}right-side{{end}}">
+				<img src="/static/icons/search.svg">
+				<input type="text" id="filter-input" name="filter" size="20" placeholder="{{.Labels.placeholderSearchInput}}">
+				<select title="{{.Labels.hintFilterSelector}}" name="filter" id="filter-select">
+				 	<option value="all">{{.Labels.filterAll}}</option>
+				 	<option value="created-only">{{.Labels.filterCreatedOnly}}</option>
+				 	<option value="created-not-wait-not-remind">{{.Labels.statusCreatedNotWaitNotRemind}}</option>
+				</select>
+			</form>
+			{{- if .IsMobile}}<br>{{- end}}
+			<form id="edit-task-form" class="{{if .IsMobile}}full-wide{{else}}left-side{{end}}">
 				<label>{{.Labels.labelTask}}</label>
 				<input type="hidden" id="task-id-input" name="id">
 				<input type="hidden" id="task-list-input" name="list">
@@ -164,15 +175,6 @@
 					<div class="sk-circle10 sk-circle"></div><div class="sk-circle11 sk-circle"></div><div class="sk-circle12 sk-circle"></div>
 				</div>
 				<label id="operation-status-label"></label>
-			</form>
-			<form id="filter-form" {{if not .IsMobile}}class="right-side"{{end}}>
-				<img src="/static/icons/search.svg">
-				<input type="text" id="filter-input" name="filter" size="20" placeholder="{{.Labels.placeholderSearchInput}}">
-				<select title="{{.Labels.hintFilterSelector}}" name="filter" id="filter-select">
-				 	<option value="all">{{.Labels.filterAll}}</option>
-				 	<option value="created-only">{{.Labels.filterCreatedOnly}}</option>
-				 	<option value="created-not-wait-not-remind">{{.Labels.statusCreatedNotWaitNotRemind}}</option>
-				</select>
 			</form>
 			<br>
 		</div>
