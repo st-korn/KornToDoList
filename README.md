@@ -191,12 +191,22 @@ We use both: lowerCamelCase or UpperCamelCase:
 
 We use **lower-case-with-dash-delimeter** style. If there are several elements with these characteristics on the page, give them a common **class** name. If this element is unique - specify its **id**. Elements with interactivity and with which the javascript interacts, must necessarily have defined id's. For some elements there are both: class and id defined.
 
+* If you need to access  an element from JavaScript or set unique characteristics of an element in CSS, determine and use the element **ID**.
+
+* If similar characteristics and behavior should be on several elements with the same tag, but not on all, define and use a **class**.
+
+* If all elements of this tag must have the same behavior and characteristics - you can work directly with the **tag**, without classes or ID.
+
 This is not good, if the **class-name** contains the tag-name to which this class applies. A class with the same name can have different CSS-implementations for different elements of the HTML DOM. Good idea for class name is `task` or `icon`. Bad idea is `task-div` or `icon-img`. 
 Opposite the **id** should contain the name of the element's tag, for example: `edit-task-form` or `operation-status-label`.
 
 If the class name contains its distinctive qualities (modifiers), then they should be written via a double dash: `<p class="task--done">`. If the modifier is global and can be applied not only to this class, it should be allocated to a separate stand-alone class: `<p class="task done">`...`<img class="done">`.
 
-The name of class and id's should reflect the content and purpose of the element, not its location or characteristics. Good idea for class name is `task--done`, bad idea is `green-strikeout`. Goog idea is to use CSS for aling div-tag with id `search-div`. It's a bad idea to give him class `right-align`.
+The name of class and id's should reflect the content and purpose of the element, not its location or characteristics. Good idea for class name is `task-done`, bad idea is `green-strikeout`. Goog idea is to use CSS for aling div-tag with id `search-div`. It's a bad idea to give him class `right-align`.
+
+To determine the CSS properties of objects of a given class or ID, do not refer to their tags. It is wrong to write `div#welcome-div`, right `#welcome-div`.
+
+It is not necessary to start each html tag from a new line. You can fit several html tags in one line, if this improves the readability of the document.
 
 # Other notes
 

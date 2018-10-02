@@ -3,16 +3,31 @@
    =============================================================== */
 html {
   -webkit-text-size-adjust: 100%; /* Prevent font scaling in landscape while allowing user zoom */
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 9pt;
+	font: 9px Arial, Helvetica, sans-serif;
 }
 body {
 	background: linear-gradient( rgba(187,187,187,0.3), transparent 1px), linear-gradient( 90deg, rgba(187,187,187,0.3), transparent 1px);
 	background-size: 12px 12px;
 	background-position: center center;
 }
-div#workplace-div {
-	width: 100%;
+h1 {
+  margin: 5px 0 10px 0;
+  font: 400 18px Geneva,Tahoma,Verdana,sans-serif;
+  text-align: center;
+}
+h2 {
+  margin: 5px 0 5px 0;
+  font: 800 16px Geneva,Tahoma,Verdana,sans-serif;
+}
+h3 {
+  margin: 0;
+  padding: 0;
+  font: bold 12px "Arial Black", Gadget, sans-serif;
+  color: rgb(105,105,105);
+}
+label.result {
+  font-style: italic;
+  line-height: 21px;
 }
 
 /* ===============================================================

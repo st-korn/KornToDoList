@@ -1,93 +1,96 @@
 /* ===============================================================
-   Styles of Help div
+   Styles of Help and Welcome header blocks
    =============================================================== */
-div#help-div {
-  margin: 0px auto 0px auto;
-  padding-top: 1px;
+header {
+  margin: 0 auto 0 auto;
+  padding: 1px;
   max-width: 800px;
+  font: normal 14px Geneva,Tahoma,Verdana,sans-serif;;
 }
-div#help-div h1 {
-  margin: 5px 0px 5px 0px;
-  font-family: Geneva,Tahoma,Verdana,sans-serif;;
-  font-size : 24px;
-  font-weight: 400;
-  text-align: center;
-}
-div#help-div h2 {
-  margin: 5px 0px 5px 0px;
-  font-family: Geneva,Tahoma,Verdana,sans-serif;;
-  font-size : 18px;
-  font-weight: 800;
-}
-div.tip {
-  margin: 10px 0px 10px 0px;
+article {
+  margin: 10px 0 10px 0;
   display: flex;
+}
+article.tip {
+  flex-direction: row;
+  justify-content: flex-start;
   align-items: flex-start;
 }
-div.tip-text {
-  font-family: Geneva,Tahoma,Verdana,sans-serif;;
-  font-size : 16px;
-  font-weight: normal;
-  display: inline; 
+@media (max-width: 899px) { 
+  article.welcome {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+}
+@media (min-width: 900px) { 
+  article.welcome {
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+}
+article > img {
+  display: block;
+  height: 32px;
+  margin: 3px 10px 0 0;
+}
+article > div {
+  display: block;
   text-align: justify;
 }
-div.tip img {
-  display: inline-block;
-  vertical-align: text-top;
-  height: 32px;
-  margin: 3px 10px 0px 0px;
+article > button {
+  font-size: 14px;
+  white-space:nowrap;
 }
-div.tip code {
+@media (max-width: 899px) { 
+  article > button {
+    margin : 0 5px 0 0;
+    width: 100%;
+  }
+}
+@media (min-width: 900px) { 
+  article > button {
+    margin : -2px 5px 0 0;
+  }
+}
+code {
   padding: 1px 3px;
   color: #c25;
   background-color: #f7f7f9;
   border-radius: 3px;
-  font-family: Courier New, Courier New, Courier6, monospace;
   border: 1px solid #e1e2e8;
 }
 code span {
   color: blue;
 }
-div#help-close-div {
+#help-close-div {
   text-align: center;
-  margin: 15px 0px 20px 0px;
 }
 
 /* ===============================================================
-   Common styles of header control lines
+   Common forms styles
    =============================================================== */
-div.header-controls-line {
-	margin: 0px 0px 0px 0px;
-}
 form {
-  display: inline-block;
+  display: block;
   background: rgba(242,242,242,1);
   border: dotted rgba(187,187,187,1) 1px;
   border-radius: 5px;
-  padding: 1px 1px 1px 1px;
-  margin: 0px 0px 3px 0px;
-}
-form.left-side {
-  float: left;
-}
-form.right-side {
-  float: right;
-}
-form.full-wide {
-  width: 100%;
-  box-sizing: border-box;
+  padding: 1px;
+  margin: 0 0 3px 0;
+  font: 12px Arial, Helvetica, sans-serif;
 }
 form img {
-  display: inline-block;
+  display: inline;
   vertical-align: text-top;
   height: 16px;
-  margin: -1px -2px 0px 0px;
+  margin: -1px -2px 0 0;
 }
-input, select, button {
-	margin: 1px 3px 2px 3px;
-}
-div.header-controls-line br {
-  clear: both;
+input, 
+select, 
+button {
+  margin: 1px 3px 2px 3px;
+  font: 12px Arial, Helvetica, sans-serif;
 }
 label.clickable {
   text-decoration: underline;
@@ -98,131 +101,95 @@ label.clickable:hover {
 }
 
 /* ===============================================================
-   Styles of welcome-form
+   Styles of horizontal nav-toolbars with forms blocks inside
    =============================================================== */
-div#welcome-div {
-  margin: 20px auto 20px auto;
-  max-width: 800px;
-  font-size : 16px;
-}
-form#welcome-form {
-  padding: 5px 5px 5px 5px;
-}
-div.welcome-item {
-  margin-bottom : 5px;
+nav {
   display: flex;
-  align-items: flex-start;
-  text-align: justify;
+  flex-direction: row-reverse;
+  justify-content: flex-start;
+  align-items: stretch;
+  flex-wrap: wrap;
 }
-div.welcome-item-mobile {
-  margin-bottom : 10px;
-  text-align: justify;
-  display: flex;
-  flex-direction: column;
+#user-form {
+  flex-grow: 1;
 }
-div.welcome-item button {
-  margin : -4px 5px 15px 0px;
-  font-size : 16px;
-  white-space:nowrap;
+#languages-and-help-form {
+  flex-grow: 1;
 }
-div.welcome-item-mobile button {
-  margin : 0px 5px 0px 0px;
-  font-size : 16px;
-  white-space:nowrap;
+#select-list-form {
+  flex-grow: 100;
 }
-
-/* ===============================================================
-   Styles of signup-form
-   =============================================================== */
-div#signup-div {
-  margin: 0px auto 20px auto;
-  max-width: 800px;
+#filter-form {
+  flex-grow: 1;
 }
-label#signup-result-label {
-  color: red;
-  font-weight: bold;
+#edit-task-form {
+  flex-grow: 100;
 }
-
-/* ===============================================================
-   Styles of login-form
-   =============================================================== */
-div#login-div {
-  margin: 0px auto 20px auto;
-  max-width: 800px;
-}
-label#login-result-label {
-  color: red;
-  font-weight: bold;
-}
-
-/* ===============================================================
-   Styles of user/help/list header line
-   =============================================================== */
 select#task-lists-select option:nth-child(1) {
-    font-weight:bold;
+  font-weight:bold;
 }
-
-/* ===============================================================
-   Styles of task/search header line
-   =============================================================== */
 input#checkbox-today-input {
-	margin-right: 0px;
-	vertical-align: middle;
-}
-label#operation-status-label {
-	display: inline-block;
-	font-style: italic;
-	line-height: 21px;
-	margin-left: 4px;
+  margin-right: 0;
+  vertical-align: middle;
 }
 
 
 /* ===============================================================
    Styles of tasks table
    =============================================================== */
-table#tasks-table {
-	width: 100%;
-  margin: 4px 0px 4px 0px;
+main {
+  display: flex;
 }
-table#tasks-table td {
-	width: 16.6%;
-	vertical-align: top;
-	text-align: justify-all;
-	padding: 5px 5px 5px 5px;
-	position:relative;
+@media (max-width: 899px) { 
+  main {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+  }
 }
-table#tasks-table header {
-	font-family: "Arial Black", Gadget, sans-serif;
-	font-weight: bold;
-	color: rgb(105,105,105);
-	margin: 0px 0px 0px 0px;
+@media (min-width: 900px) { 
+  main {
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: stretch;
+  }
 }
-td.td {
+section {
+  padding: 2px;
+  text-align: justify-all;
+}
+section.td {
 	background-color:rgba(251,180,174, 0.5);
+  flex-grow: 1;
 }
-td.iu {
+section.iu {
 	background-color:rgba(254,217,166, 0.5);
+  flex-grow: 1;
 }
-td.in {
+section.in {
 	background-color:rgba(255,255,204, 0.5);
+  flex-grow: 1;
 }
-td.nu {
+section.nu {
 	background-color:rgba(204,235,197, 0.5);
+  flex-grow: 1;
 }
-td.nn {
+section.nn {
 	background-color:rgba(179,205,227, 0.5);
+  flex-grow: 1;
 }
-td.ib {
+section.ib {
 	background-color:rgba(222,203,228, 0.5);
-}
-p {
-	margin: 5px 0px 0px 0px;
-	padding: 0px 0px 0px 0px;
+  flex-grow: 1;
 }
 
 /* ===============================================================
    Styles of tasks records
    =============================================================== */
+p {
+  margin: 5px 0 0 0;
+  padding: 0;
+}
 .done {
 	text-decoration: line-through;
 	text-decoration-style: double;
@@ -250,13 +217,17 @@ p {
 span.name {
 	color: rgba(0,0,255,1.0);
 }
-p.done span.name, p.canceled span.name, p.moved span.name {
+p.done span.name, 
+p.canceled span.name, 
+p.moved span.name {
 	color: rgba(0,0,255,0.3);
 }
 p:hover {
 	cursor: pointer;
 }
-p.done:hover::after, p.canceled:hover::after, p.moved:hover::after {
+p.done:hover::after, 
+p.canceled:hover::after, 
+p.moved:hover::after {
 	content: attr(tooltip); /* Use the attribute "tooltip" as the text of the hint */
 	position: absolute; /* Use absolute position */
 	z-index: 1; /* Display a hint on top of all other items */
@@ -269,26 +240,30 @@ p.done:hover::after, p.canceled:hover::after, p.moved:hover::after {
 /* ===============================================================
    Styles of icons
    =============================================================== */
-li img, p img{
+li img, 
+p img{
 	display: inline-block;
 	vertical-align: text-top;
 	height: 16px;
-  margin: -1px 2px 0px 0px;
-  padding: 0px 0px 0px 2px;
+  margin: -1px 2px 0 0;
+  padding: 0 0 0 2px;
 }
-.done img, .canceled img, .moved img {
+.done img, 
+.canceled img, 
+.moved img {
 	opacity: 0.3;
 }
 
 /* ===============================================================
-   Styles for "About" footer
+   Styles for footer
    =============================================================== */
-div#about-div {
+footer {
   text-align: right;
 }
-div#about-div a {
-  font-size : 10px;
-}
-div#about-div a:link, div#about-div a:visited, div#about-div a:hover, div#about-div a:active {
+footer a,
+footer a:link,
+footer a:visited,
+footer a:hover,
+footer a:active {
   color: rgba(187,187,187,1);
 }

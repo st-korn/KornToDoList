@@ -5,7 +5,6 @@ import (
 	"text/template" // for use HTML-page templates
 	"time" // access to system date and time - to control uuid's expirations
 	"golang.org/x/text/language/display" // to output national names of languages
-	"github.com/Shaked/gomobiledetect" // to detect mobile browsers
 	"gopkg.in/mgo.v2/bson" // to use BSON data format
 )
 
@@ -18,7 +17,6 @@ import (
 
 // Structure to fill HTML-template of main web-page
 type typeWebFormData struct {
-	IsMobile bool // flag: the site was opened from a mobile browser 
 	UserLang string // english_name of current language, on which to display the page
 	Langs []typeLang // global list of supported languages
 	Labels typeLabels // strings-table of current language for HTML
@@ -28,10 +26,6 @@ func webFormShow(res http.ResponseWriter, req *http.Request) {
 
    	// Prepare main structure of HTML-template
 	var webFormData typeWebFormData
-
-	// Detect mobile devices
-	detect := mobiledetect.NewMobileDetect(req, nil)
-	webFormData.IsMobile = detect.IsMobile() && !detect.IsTablet()
 
     // Load supported languages list
     webFormData.Langs = make([]typeLang,len(SupportedLangs))
@@ -62,7 +56,6 @@ func webFormShow(res http.ResponseWriter, req *http.Request) {
 // Structure to fill HTML-template of main web-page
 type typeChangePasswordFormData struct {
 	UUID string // UUID set-password-link
-	IsMobile bool // flag: the site was opened from a mobile browser
 	Labels typeLabels // strings-table of current language for HTML
 	Result string // A string that passes a precomputed and predefined result to a form, for example "Link is expired or account is not found"
 }
@@ -75,10 +68,6 @@ func webChangePasswordFormShow(res http.ResponseWriter, req *http.Request) {
 	// Parse http GET-request params
 	q := req.URL.Query()
 	changePasswordFormData.UUID = q.Get("uuid")
-
-	// Detect mobile devices
-	detect := mobiledetect.NewMobileDetect(req, nil)
-	changePasswordFormData.IsMobile = detect.IsMobile() && !detect.IsTablet()
 
 	// Detect user-language and load it labels
 	_, _, changePasswordFormData.Labels = DetectLanguageAndLoadLabels(req)

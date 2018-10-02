@@ -66,7 +66,7 @@
 "buttonWelcomeRegister" : "Зарегистрируйтесь",
 "labelWelcomeRegister" : "Понадобится e-mail, регистрация занимает 30 секунд.",
 "buttonWelcomeLogin" : "Войдите",
-"labelWelcomeLogin" : ", если у вас уже есть пароль.",
+"labelWelcomeLogin" : "если у вас уже есть пароль.",
 "buttonWelcomeStartAnonymously" : "Начните работать анонимно",
 "labelWelcomeStartAnonymously" : "Данные будут доступны с этого устройства до очистки cookies браузера. Если вам понравится, вы всегда сможете зарегистрироваться и ваши задачи будут автоматически перенесены в ваш аккаунт",
 "buttonHelpClose" : "Готово",
@@ -121,5 +121,5 @@
 "buttonCancelLogin" : "Отмена",
 "labelForgotPassword" : "Забыли пароль?",
 "resultUserAndPasswordPairNotFound" : "Неверное имя пользователя или пароль",
-"resultLoggedIn" : "Пользователь авторизован"
+"resultLoggedIn" : "Успешно"
 }

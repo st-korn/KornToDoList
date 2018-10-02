@@ -66,7 +66,7 @@
 "buttonWelcomeRegister" : "Sign up",
 "labelWelcomeRegister" : "Need e-mail, registration takes 30 seconds.",
 "buttonWelcomeLogin" : "Log in",
-"labelWelcomeLogin" : ", if you already have a password.",
+"labelWelcomeLogin" : "if you already have a password.",
 "buttonWelcomeStartAnonymously" : "Start working anonymously",
 "labelWelcomeStartAnonymously" : "The data will be available from this device until the browser cookies are cleared. If you like, you can always sign up and all your tasks will be automatically transferred to your new account",
 "buttonHelpClose" : "Close",
@@ -121,5 +121,5 @@
 "buttonCancelLogin" : "Cancel",
 "labelForgotPassword" : "Forgot password?",
 "resultUserAndPasswordPairNotFound" : "Wrong username or password",
-"resultLoggedIn" : "User authorized"
+"resultLoggedIn" : "Success"
 }

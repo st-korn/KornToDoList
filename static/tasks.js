@@ -25,23 +25,23 @@ function init() {
 		// Hide and disable forms before user select one of the welcome-form buttons
 		$("#user-form").hide();
 		$("#select-list-form").hide();
-		$("#task-search-div *").prop( "disabled", true );
+		$("#task-search-nav *").prop( "disabled", true );
 		$("td button").prop( "disabled", true );
 		$("#help-label").hide();
 		$("#help-close-div").hide();
-		$("#signup-div").hide();
-		$("#login-div").hide();
+		$("#signup-header").hide();
+		$("#login-header").hide();
 		// Fade out main task table
-		$("#task-search-div").fadeTo("slow",0.5);
-		$("#tasks-table").fadeTo("slow",0.5);
+		$("#task-search-nav").fadeTo("slow",0.5);
+		$("#tasks-main").fadeTo("slow",0.5);
 	}
 	else
 	{
 		// Hide controls lines
-		$("#help-div").hide();
-		$("#welcome-div").hide();
-		$("#signup-div").hide();
-		$("#login-div").hide();
+		$("#help-header").hide();
+		$("#welcome-header").hide();
+		$("#signup-header").hide();
+		$("#login-header").hide();
 
 		// Hide user-buttons
 		$("#user-img").hide();
@@ -64,13 +64,13 @@ function init() {
 // ===========================================================================
 function showSignupForm() {
 	// Close login <div> if necessary
-	if ( $("#login-div").is(":visible") ) {
-		$("#login-div").animate({height: "hide"}, 100);
+	if ( $("#login-header").is(":visible") ) {
+		$("#login-header").animate({height: "hide"}, 100);
 	};
 	// Show sign-up <div>
 	$("#signup-spinner-div").hide();
 	$("#signup-result-label").text("");
-	$("#signup-div").animate({height: "show"}, 100);
+	$("#signup-header").animate({height: "show"}, 100);
 	$("#email-signup-input").focus();
 	return false;
 }
@@ -118,7 +118,7 @@ function submitSignup() {
 // ===========================================================================
 function cancelSignup() {
 	// Close sign-up <div>
-	$("#signup-div").animate({height: "hide"}, 100);
+	$("#signup-header").animate({height: "hide"}, 100);
 	return false;
 }
 
@@ -137,13 +137,13 @@ function clickSignup() {
 // ===========================================================================
 function showLoginForm() {
 	// Close sign-up <div> if necessary
-	if ( $("#signup-div").is(":visible") ) {
-		$("#signup-div").animate({height: "hide"}, 100);
+	if ( $("#signup-header").is(":visible") ) {
+		$("#signup-header").animate({height: "hide"}, 100);
 	};
 	// Show login <div>
 	$("#login-spinner-div").hide();
 	$("#login-result-label").text("");
-	$("#login-div").animate({height: "show"}, 100);
+	$("#login-header").animate({height: "show"}, 100);
 	$("#email-login-input").focus();
 	return false;
 }
@@ -202,7 +202,7 @@ function submitLogin() {
 // ===========================================================================
 function cancelLogin() {
 	// Close sign-up <div>
-	$("#login-div").animate({height: "hide"}, 100);
+	$("#login-header").animate({height: "hide"}, 100);
 	return false;
 }
 
@@ -250,7 +250,7 @@ function startAnonymously() {
 // ===========================================================================
 function showHelp() {
 	$("#help-close-div").show();
-	$("#help-div").animate({height: "show"}, 100);
+	$("#help-header").animate({height: "show"}, 100);
 	$("#help-label").hide();
 }
 
@@ -258,7 +258,7 @@ function showHelp() {
 // Show from user Help <div>
 // ===========================================================================
 function hideHelp() {
-	$("#help-div").animate({height: "hide"}, 100);
+	$("#help-header").animate({height: "hide"}, 100);
 	$("#help-label").show();
 	return false;
 }

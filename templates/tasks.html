@@ -4,8 +4,8 @@
 	<title>{{.Labels.titleWebPage}}</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
-	<link rel="stylesheet" type="text/css" href="/static/global.css?5">
-	<link rel="stylesheet" type="text/css" href="/static/tasks.css?14">
+	<link rel="stylesheet" type="text/css" href="/static/global.css?9">
+	<link rel="stylesheet" type="text/css" href="/static/tasks.css?15">
 	<link rel="icon" type="image/png" href="/static/favicon.png">
 	<link rel="apple-touch-icon" type="image/png" href="/static/faviphone.png">
 	<script src="/static/libs/jquery-3.3.1.min.js"></script>
@@ -22,203 +22,165 @@
 	</script>
 </head>
 <body>
-	<div id="workplace-div">
-		<div id="help-div">
-			<h1>{{.Labels.helpH1}}</h1>
-			<h2>{{.Labels.helpH2}}</h2>
-			<div class="tip">
-				<img src="/static/icons/smartphone.svg">
-				<div class="tip-text">{{.Labels.helpSmartphone}}</div>
+	<header id="help-header">
+		<h1>{{.Labels.helpH1}}</h1>
+		<h2>{{.Labels.helpH2}}</h2>
+		<article class="tip"><img src="/static/icons/smartphone.svg"><div>{{.Labels.helpSmartphone}}</div></article>
+		<article class="tip"><img src="/static/icons/evening.svg"><div>{{.Labels.helpEvening}}</div></article>
+		<article class="tip"><img src="/static/icons/meeting.svg"><div>{{.Labels.helpMeeting}}</div></article>
+		<article class="tip"><img src="/static/icons/filter.svg"><div>{{.Labels.helpFilter}}</div></article>
+		<article class="tip"><img src="/static/icons/checklist.svg"><div>{{.Labels.helpChecklist}}</div></article>
+		<div id="help-close-div"><button id="help-close-button">{{.Labels.buttonHelpClose}}</button></div>
+	</header>
+	<header id="welcome-header">
+		<article class="welcome"><button id="wellcome-register-user-button">{{.Labels.buttonWelcomeRegister}}</button><div>{{.Labels.labelWelcomeRegister}}</div></article>
+		<article class="welcome"><button id="wellcome-login-user-button">{{.Labels.buttonWelcomeLogin}}</button><div>{{.Labels.labelWelcomeLogin}}</div></article>
+		<article class="welcome"><button id="wellcome-start-anonymously-button">{{.Labels.buttonWelcomeStartAnonymously}}</button><div>{{.Labels.labelWelcomeStartAnonymously}}</div></article>
+	</header>
+	<header id="signup-header">
+		<form id="signup-form" class="left-side">
+			<input type="text" name="email" id="email-signup-input" placeholder="{{.Labels.placeholderEmailInputSignup}}">
+			<button id="submit-signup-button">{{.Labels.buttonSubmitSignup}}</button>
+			<button id="submit-restore-button">{{.Labels.buttonSubmitRestore}}</button>
+			<button id="cancel-signup-button">{{.Labels.buttonCancelSignup}}</button>
+			<div class="sk-fading-circle" id="signup-spinner-div">
+				<div class="sk-circle1 sk-circle"></div><div class="sk-circle2 sk-circle"></div><div class="sk-circle3 sk-circle"></div>
+				<div class="sk-circle4 sk-circle"></div><div class="sk-circle5 sk-circle"></div><div class="sk-circle6 sk-circle"></div>
+				<div class="sk-circle7 sk-circle"></div><div class="sk-circle8 sk-circle"></div><div class="sk-circle9 sk-circle"></div>
+				<div class="sk-circle10 sk-circle"></div><div class="sk-circle11 sk-circle"></div><div class="sk-circle12 sk-circle"></div>
 			</div>
-			<div class="tip">
-				<img src="/static/icons/evening.svg">
-				<div class="tip-text">{{.Labels.helpEvening}}</div>
+			<label class="result" id="signup-result-label"></label>
+		</form>
+	</header>
+	<header id="login-header">
+		<form id="login-form" class="left-side">
+			<input type="text" name="email" id="email-login-input" placeholder="{{.Labels.placeholderEmailInputLogin}}">
+			<input type="password" name="password" id="password-login-input" placeholder="{{.Labels.placeholderEmailInputPassword}}">
+			<button id="submit-login-button">{{.Labels.buttonSubmitLogin}}</button>
+			<button id="cancel-login-button">{{.Labels.buttonCancelLogin}}</button>
+			<label id="forgot-password-label" class="clickable">{{.Labels.labelForgotPassword}}</label>
+			<div class="sk-fading-circle" id="login-spinner-div">
+				<div class="sk-circle1 sk-circle"></div><div class="sk-circle2 sk-circle"></div><div class="sk-circle3 sk-circle"></div>
+				<div class="sk-circle4 sk-circle"></div><div class="sk-circle5 sk-circle"></div><div class="sk-circle6 sk-circle"></div>
+				<div class="sk-circle7 sk-circle"></div><div class="sk-circle8 sk-circle"></div><div class="sk-circle9 sk-circle"></div>
+				<div class="sk-circle10 sk-circle"></div><div class="sk-circle11 sk-circle"></div><div class="sk-circle12 sk-circle"></div>
 			</div>
-			<div class="tip">
-				<img src="/static/icons/meeting.svg">
-				<div class="tip-text">{{.Labels.helpMeeting}}</div>
+			<label class="result" id="login-result-label"></label>
+		</form>
+	</header>
+	<nav id="user-help-lists-nav">
+		<form id="user-form">
+			<img id="user-img" src="/static/icons/user.svg">
+			<img id="anon-img" src="/static/icons/anon.svg">
+			<label id="user-label"></label>
+			<button id="register-user-button">{{.Labels.buttonRegister}}</button>
+			<button id="logout-user-button">{{.Labels.buttonLogout}}</button>
+		</form>
+		<form id="languages-and-help-form">
+			<label>{{.Labels.labelLanguages}}</label>
+			<select title="{{.Labels.hintLanguagesSelector}}" name="lang" id="language-select">
+				{{- range .Langs}}
+			 	<option value="{{.EnglishName}}"{{if eq .EnglishName $.UserLang}} selected="selected"{{end}}>{{.NationalName}}</option>
+				{{- end}}
+			</select>
+			<label id="help-label" class="clickable">{{.Labels.labelHelp}}</label>
+		</form>
+		<form id="select-list-form">
+			<label>{{.Labels.labelTaskLists}}</label>
+			<select title="{{.Labels.hintTaskListsSelector}}" name="list" id="task-lists-select"></select>
+			<label>{{.Labels.labelStatisticTasks}}</label>
+			<label id="total-tasks-count-label"></label>
+			<label>{{.Labels.labelStatisticDone}}</label>
+			<label id="done-tasks-count-label"></label>
+			<label>{{.Labels.labelStatisticCanceled}}</label>
+			<label id="canceled-tasks-count-label"></label>
+			<button id="new-list-create-button">{{.Labels.buttonNewListCreate}}</button>
+		</form>
+	</nav>
+	<nav id="task-search-nav">
+		<form id="filter-form">
+			<img src="/static/icons/search.svg">
+			<input type="text" id="filter-input" name="filter" size="20" placeholder="{{.Labels.placeholderSearchInput}}">
+			<select title="{{.Labels.hintFilterSelector}}" name="filter" id="filter-select">
+			 	<option value="all">{{.Labels.filterAll}}</option>
+			 	<option value="created-only">{{.Labels.filterCreatedOnly}}</option>
+			 	<option value="created-not-wait-not-remind">{{.Labels.statusCreatedNotWaitNotRemind}}</option>
+			</select>
+		</form>
+		<form id="edit-task-form">
+			<label>{{.Labels.labelTask}}</label>
+			<input type="hidden" id="task-id-input" name="id">
+			<input type="hidden" id="task-list-input" name="list">
+			<input type="text" id="task-text-input" name="text" size="55">
+			<select title="{{.Labels.hintTaskSectionSelector}}" name="section" id="task-section-select">
+			 	<option value="iu">{{.Labels.sectionIU}}</option>
+			 	<option value="in">{{.Labels.sectionIN}}</option>
+			 	<option value="nu">{{.Labels.sectionNU}}</option>
+				<option value="nn">{{.Labels.sectionNN}}</option>
+			 	<option value="ib">{{.Labels.sectionIB}}</option>
+			</select>
+			<select title="{{.Labels.hintTaskIconSelector}}" name="icon" id="task-icon-select">
+				<option value=""></option>
+				<option value="wait">{{.Labels.iconWait}}</option>
+				<option value="remind">{{.Labels.iconRemind}}</option>
+				<option value="call">{{.Labels.iconCall}}</option>
+				<option value="force">{{.Labels.iconForce}}</option>
+				<option value="mail">{{.Labels.iconMail}}</toption>
+				<option value="prepare">{{.Labels.iconPrepare}}</option>
+				<option value="manage">{{.Labels.iconManage}}</option>
+				<option value="meet">{{.Labels.iconMeet}}</option>
+				<option value="visit">{{.Labels.iconVisit}}</option>
+				<option value="make">{{.Labels.iconMake}}</option>
+				<option value="journey">{{.Labels.iconJourney}}</option>
+				<option value="think">{{.Labels.iconThink}}</option>
+			</select>
+			<select title="{{.Labels.hintTaskStatusSelector}}" name="status" id="task-status-select">
+			 	<option value="created">{{.Labels.statusCreated}}</option>
+			 	<option value="moved">{{.Labels.statusMoved}}</option>
+			 	<option value="canceled">{{.Labels.statusCanceled}}</option>
+			 	<option value="done">{{.Labels.statusDone}}</option>
+			</select>
+			<input type="checkbox" id="checkbox-today-input" name="today" value="1">
+	    	<label for="checkbox-today-input">{{.Labels.labelTodayCheckbox}}</label>
+			<button id="task-submit-button">{{.Labels.buttonAddTask}}</button>
+			<button id="task-move-button">{{.Labels.bottonMoveTask}}</button>
+			<div class="sk-fading-circle" id="task-spinner-div">
+				<div class="sk-circle1 sk-circle"></div><div class="sk-circle2 sk-circle"></div><div class="sk-circle3 sk-circle"></div>
+				<div class="sk-circle4 sk-circle"></div><div class="sk-circle5 sk-circle"></div><div class="sk-circle6 sk-circle"></div>
+				<div class="sk-circle7 sk-circle"></div><div class="sk-circle8 sk-circle"></div><div class="sk-circle9 sk-circle"></div>
+				<div class="sk-circle10 sk-circle"></div><div class="sk-circle11 sk-circle"></div><div class="sk-circle12 sk-circle"></div>
 			</div>
-			<div class="tip">
-				<img src="/static/icons/filter.svg">
-				<div class="tip-text">{{.Labels.helpFilter}}</div>
-			</div>
-			<div class="tip">
-				<img src="/static/icons/checklist.svg">
-				<div class="tip-text">{{.Labels.helpChecklist}}</div>
-			</div>
-			<div id="help-close-div"><button id="help-close-button">{{.Labels.buttonHelpClose}}</button></div>
-		</div>
-		<div class="header-controls-line" id="welcome-div">
-			<form id="welcome-form" class="left-side">
-				<div class="welcome-item{{if .IsMobile}}-mobile{{end}}"><button id="wellcome-register-user-button">{{.Labels.buttonWelcomeRegister}}</button><label>{{.Labels.labelWelcomeRegister}}</label></div>
-				<div class="welcome-item{{if .IsMobile}}-mobile{{end}}"><button id="wellcome-login-user-button">{{.Labels.buttonWelcomeLogin}}</button><label>{{.Labels.labelWelcomeLogin}}</label></div>
-				<div class="welcome-item{{if .IsMobile}}-mobile{{end}}"><button id="wellcome-start-anonymously-button">{{.Labels.buttonWelcomeStartAnonymously}}</button><label>{{.Labels.labelWelcomeStartAnonymously}}</label></div>
-			</form>
-			<br>
-		</div>
-		<div class="header-controls-line" id="signup-div">
-			<form id="signup-form" class="left-side">
-				<input type="text" name="email" id="email-signup-input" placeholder="{{.Labels.placeholderEmailInputSignup}}">
-				<button id="submit-signup-button">{{.Labels.buttonSubmitSignup}}</button>
-				<button id="submit-restore-button">{{.Labels.buttonSubmitRestore}}</button>
-				<button id="cancel-signup-button">{{.Labels.buttonCancelSignup}}</button>
-				<div class="sk-fading-circle" id="signup-spinner-div">
-					<div class="sk-circle1 sk-circle"></div><div class="sk-circle2 sk-circle"></div><div class="sk-circle3 sk-circle"></div>
-					<div class="sk-circle4 sk-circle"></div><div class="sk-circle5 sk-circle"></div><div class="sk-circle6 sk-circle"></div>
-					<div class="sk-circle7 sk-circle"></div><div class="sk-circle8 sk-circle"></div><div class="sk-circle9 sk-circle"></div>
-					<div class="sk-circle10 sk-circle"></div><div class="sk-circle11 sk-circle"></div><div class="sk-circle12 sk-circle"></div>
-				</div>
-				<label id="signup-result-label"></label>
-			</form>
-			<br>
-		</div>
-		<div class="header-controls-line" id="login-div">
-			<form id="login-form" class="left-side">
-				<input type="text" name="email" id="email-login-input" placeholder="{{.Labels.placeholderEmailInputLogin}}">
-				<input type="password" name="password" id="password-login-input" placeholder="{{.Labels.placeholderEmailInputPassword}}">
-				<button id="submit-login-button">{{.Labels.buttonSubmitLogin}}</button>
-				<button id="cancel-login-button">{{.Labels.buttonCancelLogin}}</button>
-				<label id="forgot-password-label" class="clickable">{{.Labels.labelForgotPassword}}</label>
-				<div class="sk-fading-circle" id="login-spinner-div">
-					<div class="sk-circle1 sk-circle"></div><div class="sk-circle2 sk-circle"></div><div class="sk-circle3 sk-circle"></div>
-					<div class="sk-circle4 sk-circle"></div><div class="sk-circle5 sk-circle"></div><div class="sk-circle6 sk-circle"></div>
-					<div class="sk-circle7 sk-circle"></div><div class="sk-circle8 sk-circle"></div><div class="sk-circle9 sk-circle"></div>
-					<div class="sk-circle10 sk-circle"></div><div class="sk-circle11 sk-circle"></div><div class="sk-circle12 sk-circle"></div>
-				</div>
-				<label id="login-result-label"></label>
-			</form>
-			<br>
-		</div>
-		<div class="header-controls-line" id="user-help-lists-div">
-			<form id="user-form" class="{{if .IsMobile}}left-side{{else}}right-side{{end}}">
-				<img id="user-img" src="/static/icons/user.svg">
-				<img id="anon-img" src="/static/icons/anon.svg">
-				<label id="user-label"></label>
-				<button id="register-user-button">{{.Labels.buttonRegister}}</button>
-				<button id="logout-user-button">{{.Labels.buttonLogout}}</button>
-			</form>
-			<form id="languages-and-help-form" class="right-side">
-				<label>{{.Labels.labelLanguages}}</label>
-				<select title="{{.Labels.hintLanguagesSelector}}" name="lang" id="language-select">
-					{{- range .Langs}}
-				 	<option value="{{.EnglishName}}"{{if eq .EnglishName $.UserLang}} selected="selected"{{end}}>{{.NationalName}}</option>
-					{{- end}}
-				</select>
-				<label id="help-label" class="clickable">{{.Labels.labelHelp}}</label>
-			</form>
-			{{- if .IsMobile}}<br>{{- end}}
-			<form id="select-list-form" class="{{if .IsMobile}}full-wide{{else}}left-side{{end}}">
-				<label>{{.Labels.labelTaskLists}}</label>
-				<select title="{{.Labels.hintTaskListsSelector}}" name="list" id="task-lists-select"></select>
-				<label>{{.Labels.labelStatisticTasks}}</label>
-				<label id="total-tasks-count-label"></label>
-				<label>{{.Labels.labelStatisticDone}}</label>
-				<label id="done-tasks-count-label"></label>
-				<label>{{.Labels.labelStatisticCanceled}}</label>
-				<label id="canceled-tasks-count-label"></label>
-				<button id="new-list-create-button">{{.Labels.buttonNewListCreate}}</button>
-			</form>
-			<br>
-		</div>
-		<div class="header-controls-line" id="task-search-div">
-			<form id="filter-form" class="{{if .IsMobile}}full-wide{{else}}right-side{{end}}">
-				<img src="/static/icons/search.svg">
-				<input type="text" id="filter-input" name="filter" size="20" placeholder="{{.Labels.placeholderSearchInput}}">
-				<select title="{{.Labels.hintFilterSelector}}" name="filter" id="filter-select">
-				 	<option value="all">{{.Labels.filterAll}}</option>
-				 	<option value="created-only">{{.Labels.filterCreatedOnly}}</option>
-				 	<option value="created-not-wait-not-remind">{{.Labels.statusCreatedNotWaitNotRemind}}</option>
-				</select>
-			</form>
-			{{- if .IsMobile}}<br>{{- end}}
-			<form id="edit-task-form" class="{{if .IsMobile}}full-wide{{else}}left-side{{end}}">
-				<label>{{.Labels.labelTask}}</label>
-				<input type="hidden" id="task-id-input" name="id">
-				<input type="hidden" id="task-list-input" name="list">
-				<input type="text" id="task-text-input" name="text" size="55">
-				<select title="{{.Labels.hintTaskSectionSelector}}" name="section" id="task-section-select">
-				 	<option value="iu">{{.Labels.sectionIU}}</option>
-				 	<option value="in">{{.Labels.sectionIN}}</option>
-				 	<option value="nu">{{.Labels.sectionNU}}</option>
-					<option value="nn">{{.Labels.sectionNN}}</option>
-				 	<option value="ib">{{.Labels.sectionIB}}</option>
-				</select>
-				<select title="{{.Labels.hintTaskIconSelector}}" name="icon" id="task-icon-select">
-					<option value=""></option>
-					<option value="wait">{{.Labels.iconWait}}</option>
-					<option value="remind">{{.Labels.iconRemind}}</option>
-					<option value="call">{{.Labels.iconCall}}</option>
-					<option value="force">{{.Labels.iconForce}}</option>
-					<option value="mail">{{.Labels.iconMail}}</toption>
-					<option value="prepare">{{.Labels.iconPrepare}}</option>
-					<option value="manage">{{.Labels.iconManage}}</option>
-					<option value="meet">{{.Labels.iconMeet}}</option>
-					<option value="visit">{{.Labels.iconVisit}}</option>
-					<option value="make">{{.Labels.iconMake}}</option>
-					<option value="journey">{{.Labels.iconJourney}}</option>
-					<option value="think">{{.Labels.iconThink}}</option>
-				</select>
-				<select title="{{.Labels.hintTaskStatusSelector}}" name="status" id="task-status-select">
-				 	<option value="created">{{.Labels.statusCreated}}</option>
-				 	<option value="moved">{{.Labels.statusMoved}}</option>
-				 	<option value="canceled">{{.Labels.statusCanceled}}</option>
-				 	<option value="done">{{.Labels.statusDone}}</option>
-				</select>
-				<input type="checkbox" id="checkbox-today-input" name="today" value="1">
-		    	<label for="checkbox-today-input">{{.Labels.labelTodayCheckbox}}</label>
-				<button id="task-submit-button">{{.Labels.buttonAddTask}}</button>
-				<button id="task-move-button">{{.Labels.bottonMoveTask}}</button>
-				<div class="sk-fading-circle" id="task-spinner-div">
-					<div class="sk-circle1 sk-circle"></div><div class="sk-circle2 sk-circle"></div><div class="sk-circle3 sk-circle"></div>
-					<div class="sk-circle4 sk-circle"></div><div class="sk-circle5 sk-circle"></div><div class="sk-circle6 sk-circle"></div>
-					<div class="sk-circle7 sk-circle"></div><div class="sk-circle8 sk-circle"></div><div class="sk-circle9 sk-circle"></div>
-					<div class="sk-circle10 sk-circle"></div><div class="sk-circle11 sk-circle"></div><div class="sk-circle12 sk-circle"></div>
-				</div>
-				<label id="operation-status-label"></label>
-			</form>
-			<br>
-		</div>
-		<table id="tasks-table">
-		<tr>		
-			<td class="td">
-				<header>
-					{{.Labels.labelToday}}
-					<button id="clear-done-button" title="{{.Labels.hintClearDone}}">x</button>
-					<button id="clear-all-button" title="{{.Labels.hintClearAll}}">X</button>
-				</header>
-				<ul id="today-tasks-ul">
-				</ul>
-			</td>
-		{{- if .IsMobile}}</tr>
-		<tr>{{- end}}
-			<td class="iu">
-				<header>{{.Labels.sectionIU}}<button class="add" title="{{.Labels.hintAddTask}}">+</button></header>
-				</td>
-		{{- if .IsMobile}}</tr>
-		<tr>{{- end}}
-			<td class="in">
-				<header>{{.Labels.sectionIN}}<button class="add" title="{{.Labels.hintAddTask}}">+</button></header>
-			</td>
-		{{- if .IsMobile}}</tr>
-		<tr>{{- end}}
-			<td class="nu">
-				<header>{{.Labels.sectionNU}}<button class="add" title="{{.Labels.hintAddTask}}">+</button></header>
-			</td>
-		{{- if .IsMobile}}</tr>
-		<tr>{{- end}}
-			<td class="nn">
-				<header>{{.Labels.sectionNN}}<button class="add" title="{{.Labels.hintAddTask}}">+</button></header>
-			</td>
-		{{- if .IsMobile}}</tr>
-		<tr>{{- end}}
-			<td class="ib">
-				<header>{{.Labels.sectionIB}}<button class="add" title="{{.Labels.hintAddTask}}">+</button></header>
-			</td>
-		</tr>
-		</table>
-		<div id="about-div">
-			<a href="https://github.com/st-korn/KornToDoList">{{.Labels.labelDeveloperPortal}}</a>
-		</div>
-	</div>
+			<label class="result" id="operation-status-label"></label>
+		</form>
+	</nav>
+	<main id="tasks-main">
+		<section class="td">
+			<h3>
+				{{.Labels.labelToday}}
+				<button id="clear-done-button" title="{{.Labels.hintClearDone}}">x</button>
+				<button id="clear-all-button" title="{{.Labels.hintClearAll}}">X</button>
+			</h3>
+			<ul id="today-tasks-ul">
+			</ul>
+		</section>
+		<section class="iu">
+			<h3>{{.Labels.sectionIU}}<button class="add" title="{{.Labels.hintAddTask}}">+</button></h3>
+		</section>
+		<section class="in">
+			<h3>{{.Labels.sectionIN}}<button class="add" title="{{.Labels.hintAddTask}}">+</button></h3>
+		</section>
+		<section class="nu">
+			<h3>{{.Labels.sectionNU}}<button class="add" title="{{.Labels.hintAddTask}}">+</button></h3>
+		</section>
+		<section class="nn">
+			<h3>{{.Labels.sectionNN}}<button class="add" title="{{.Labels.hintAddTask}}">+</button></h3>
+		</section>
+		<section class="ib">
+			<h3>{{.Labels.sectionIB}}<button class="add" title="{{.Labels.hintAddTask}}">+</button></h3>
+		</section>
+	</main>
+	<footer>
+		<a href="https://github.com/st-korn/KornToDoList">{{.Labels.labelDeveloperPortal}}</a>
+	</footer>
 </body>
 </html>
