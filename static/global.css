@@ -25,6 +25,15 @@ h3 {
   font: bold 12px "Arial Black", Gadget, sans-serif;
   color: rgb(105,105,105);
 }
+form {
+  font: 12px Arial, Helvetica, sans-serif;
+}
+input, 
+select, 
+button {
+  font: 12px Arial, Helvetica, sans-serif;
+  margin: 1px 3px 2px 3px;
+}
 label.result {
   font-style: italic;
   line-height: 21px;

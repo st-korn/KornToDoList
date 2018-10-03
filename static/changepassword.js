@@ -8,9 +8,6 @@ function init() {
 	$("#submit-button").bind('click', submitPasswords);
 	$("#return-button").bind('click', returnBack);
 
-	// Hide spinner
-	$("#spinner-div").hide();
-
 	// If Result is already known
 	if ( textResult != "") {
 		$("#password1-div").hide();

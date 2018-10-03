@@ -1,11 +1,29 @@
 /* ===============================================================
+   Hide several elements to prevent blinking when loading the page
+   =============================================================== */
+header,
+#user-form,
+#select-list-form,
+#help-label
+#help-close-div
+#user-img
+#anon-img
+#register-user-button
+#signup-spinner-div
+#login-spinner-div
+#task-spinner-div
+ {
+  display: none;
+}
+
+/* ===============================================================
    Styles of Help and Welcome header blocks
    =============================================================== */
 header {
   margin: 0 auto 0 auto;
   padding: 1px;
   max-width: 800px;
-  font: normal 14px Geneva,Tahoma,Verdana,sans-serif;;
+  font: normal 14px Geneva,Tahoma,Verdana,sans-serif;
 }
 article {
   margin: 10px 0 10px 0;
@@ -78,19 +96,12 @@ form {
   border-radius: 5px;
   padding: 1px;
   margin: 0 0 3px 0;
-  font: 12px Arial, Helvetica, sans-serif;
 }
 form img {
   display: inline;
   vertical-align: text-top;
   height: 16px;
   margin: -1px -2px 0 0;
-}
-input, 
-select, 
-button {
-  margin: 1px 3px 2px 3px;
-  font: 12px Arial, Helvetica, sans-serif;
 }
 label.clickable {
   text-decoration: underline;

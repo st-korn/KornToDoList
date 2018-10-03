@@ -22,40 +22,30 @@ function init() {
 	// Analyze the presence of a saved session
 	if ( Cookies.get('User-Session') == null )
 	{
+		// Show welcome-headers
+		$("#help-header").show();
+		$("#welcome-header").show();
 		// Hide and disable forms before user select one of the welcome-form buttons
-		$("#user-form").hide();
-		$("#select-list-form").hide();
 		$("#task-search-nav *").prop( "disabled", true );
-		$("td button").prop( "disabled", true );
-		$("#help-label").hide();
-		$("#help-close-div").hide();
-		$("#signup-header").hide();
-		$("#login-header").hide();
+		$("section button").prop( "disabled", true );
 		// Fade out main task table
 		$("#task-search-nav").fadeTo("slow",0.5);
 		$("#tasks-main").fadeTo("slow",0.5);
 	}
 	else
 	{
-		// Hide controls lines
-		$("#help-header").hide();
-		$("#welcome-header").hide();
-		$("#signup-header").hide();
-		$("#login-header").hide();
-
-		// Hide user-buttons
-		$("#user-img").hide();
-		$("#anon-img").hide();
-		$("#register-user-button").hide();
-
+		// show severals hidden forms
+		$("#user-form").show();
+		$("#select-list-form").show();
+		$("#help-label").show();
+		$("#help-close-div").show();
 		// Validate "User-Session" cookie
 		getUserInfo();
-
 	}
 
 	// Start working with page
 	afterUpdate();
-	$("td.vh button").click();
+	$("section.vh button").click();
 	$("#task-spinner-div").hide();
 }
 
