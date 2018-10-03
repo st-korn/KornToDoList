@@ -316,12 +316,14 @@ function getUserInfo() {
   					$("#anon-img").hide();
   					$("#user-label").html(response.EMail);
   					$("#register-user-button").hide();
+  					Cookies.set('User-Session', Cookies.get('User-Session'), { expires: DefaultCookieLifetimeDays });
   					break;
   				case "ValidAnonymousSession" : 
   					$("#user-img").hide();
   					$("#anon-img").show();
   					$("#user-label").html(response.EMail);
   					$("#register-user-button").show();
+  					Cookies.set('User-Session', Cookies.get('User-Session'), { expires: DefaultCookieLifetimeDays });
   					break;
 				default : $("#operation-status-label").html(resultUnknown);
 			}
