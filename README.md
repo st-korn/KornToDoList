@@ -53,7 +53,6 @@ Returns html-page to set users-password.
     Cookies: User-Language : string
     IN: uuid : string
 
-* First remove all expired links from the `SetPasswordLinks` table. 
 * Then find uuid parameter in `SetPasswordLinks` table.
 * If not found - returns html-page with errors and "Return" button.
 * If found -returns html-page with two input boxes for new password.
@@ -66,7 +65,6 @@ Add new user with password or change password for existing user.
     IN: JSON: { UUID : string, PasswordMD5 : string }
     OUT: JSON: { Result : string ["UUIDExpiredOrNotFound", "EmptyPassword", "UserCreated", "PasswordUpdated"] }
 
-* Remove all expired set-password-links. 
 * Try to find current set-password-link. If not found - return `"UUIDExpiredOrNotFound"`
 * If access is allowed, insert a document in MongoDB `Users` collection, or update it.
 * If success delete UUID record from MongoDB `SetPasswordLinks` collection (to block access to a link)
@@ -80,7 +78,6 @@ Try to login an user, returns session-UUID.
     IN: JSON: { EMail : string, PasswordMD5 : string }
     OUT: JSON: { Result : string ["EmptyEMail", "EmptyPassword", "UserAndPasswordPairNotFound", "LoggedIn"], UUID : string }
 
-* Remove expired sessions from the database.
 * If current session exist - then logout.
 * If the pair (EMail and PasswordMD5) is not present in the collection `Users`, return "UserAndPasswordPairNotFound".
 * Otherwise register new session in the `Sessions` database collection, and return its UUID to set cookie in browser.
@@ -101,7 +98,6 @@ Start an anonymous-session, returns session-UUID.
     IN: -
     OUT: JSON: { Result : string ["SuccessAnonymous"], UUID : string }
 
-* Remove expired sessions from the database.
 * If current session exist - then logout.
 * Register new anonymous session in the `Sessions` database collection, and return its UUID to set cookie in browser.
 
@@ -113,7 +109,6 @@ Check session's UUID and get information of current user.
     IN: -
     OUT: JSON: { Result : string ["EmptySession", "ValidUserSession", "ValidAnonymousSession", "SessionNotFoundOrExpired"], EMail : string }
 
-* Remove expired sessions from the database.
 * Checks the current session for validity.
 * If the session is valid, returns the Email (real or imaginary) of the current user. Returns flag: is the current user anonymous or not.
 * If the session is not valid, it returns "SessionNotFoundOrExpired" as a result.

@@ -3,9 +3,8 @@ package main
 import (
 	"net/http" // for HTTP-server
 	"text/template" // for use HTML-page templates
-	"time" // access to system date and time - to control uuid's expirations
 	"golang.org/x/text/language/display" // to output national names of languages
-	"gopkg.in/mgo.v2/bson" // to use BSON data format
+	"gopkg.in/mgo.v2/bson" // to use BSON queries format
 )
 
 
@@ -76,9 +75,6 @@ func webChangePasswordFormShow(res http.ResponseWriter, req *http.Request) {
 	session := GetMongoDBSession()
 	defer session.Close()
 	c := session.DB(DB).C("SetPasswordLinks")
-
-	// Remove all expired set-password-links
-	c.RemoveAll(bson.M{"expired" : bson.M{"$lte":time.Now().UTC()} })
 
 	// Try to find current set-password-link
 	var setPasswordLink typeSetPasswordLink

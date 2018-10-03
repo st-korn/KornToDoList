@@ -12,10 +12,11 @@ import (
 	"net/smtp" // to send emails
 	"fmt" // to generate emails body
 	"bytes" // string buffer to use string-templates
-	"time" // to define MongoDB time type for structure elements
+	"time" // to define MongoDB time type for structure elements, for timers
 	"golang.org/x/text/language" // to detect user-perferred language
 	"golang.org/x/text/language/display" // to output national names of languages
 	"gopkg.in/mgo.v2" // to connect to MongoDB
+	"gopkg.in/mgo.v2/bson" // to use BSON queries format
 )
 
 // Global envirnment variables
@@ -44,8 +45,28 @@ func GetMongoDBSession() *mgo.Session {
 		var err error
 		SESSION, err = mgo.Dial(URI)
 		if err != nil { panic(err) }
+        SESSION.SetMode(mgo.Monotonic, true)
 	}
 	return SESSION.Clone()
+}
+
+// Regularly clears the base of expired sessions
+func ClearExpiredSessiond() {
+
+	// Connect to database
+	session := GetMongoDBSession()
+	defer session.Close()
+
+	// Remove all expired set-password-links
+	c := session.DB(DB).C("SetPasswordLinks")
+	c.RemoveAll(bson.M{"expired" : bson.M{"$lte":time.Now().UTC()} })
+
+	// Remove all expired sessions
+	c = session.DB(DB).C("Sessions")
+	c.RemoveAll(bson.M{"expired" : bson.M{"$lte":time.Now().UTC()} })
+
+	// Write log to STDOUT
+	fmt.Println(time.Now().Format("2006-01-02 15:04:05 MST")+" Expired sesions cleaned.")
 }
 
 // ===========================================================================================================================
@@ -220,6 +241,15 @@ func main() {
 	// Register a HTTP file server for delivery static files from the static directory
 	fs := http.FileServer(http.Dir("./static"))
  	http.Handle("/static/", http.StripPrefix("/static/", fs))
+
+	// Start timer to clean expired session every hour
+    ticker := time.NewTicker(time.Hour)
+    defer ticker.Stop()
+    go func() {
+        for _ = range ticker.C {
+            ClearExpiredSessiond()
+        }
+    }()
 
  	// Launch the web server on all interfaces on the PORT port
 	http.ListenAndServe(":"+LISTENPORT,nil)

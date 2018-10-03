@@ -8,7 +8,7 @@ import (
 	"strings" // UpperCase and LowerCase functions
 	"time" // access to system date and time - to control uuid's expirations
 	"github.com/satori/go.uuid" // generate UUIDs
-	"gopkg.in/mgo.v2/bson" // to use BSON data format
+	"gopkg.in/mgo.v2/bson" // to use BSON queries format
 )
 
 // ===========================================================================================================================
@@ -109,7 +109,6 @@ func webSignUp(res http.ResponseWriter, req *http.Request) {
 // ===========================================================================================================================
 // API: add new user with password or change password for existing user. 
 // POST /SetPassword
-// Remove all expired set-password-links. 
 // Try to find current set-password-link. If not found - return "UUIDExpiredOrNotFound"
 // If access is allowed, insert a document in MongoDB "Users" collection, or update it. 
 // If success delete UUID record from MongoDB "SetPasswordLinks" collection (to block access to a link).
@@ -150,9 +149,6 @@ func webSetPassword(res http.ResponseWriter, req *http.Request) {
 	defer session.Close()
 	c := session.DB(DB).C("SetPasswordLinks")
 
-	// Remove all expired set-password-links
-	c.RemoveAll(bson.M{"expired" : bson.M{"$lte":time.Now().UTC()} })
-
 	// Try to find current set-password-link
 	var setPasswordLink typeSetPasswordLink
 	err = c.Find(bson.M{"uuid": request.UUID}).One(&setPasswordLink)
@@ -178,7 +174,7 @@ func webSetPassword(res http.ResponseWriter, req *http.Request) {
 		response.Result = "PasswordUpdated"
 	}
 
-	// Remove old set-password-links
+	// Remove old set-password-links of this user
 	c = session.DB(DB).C("SetPasswordLinks")
 	c.RemoveAll(bson.M{"email" : setPasswordLink.EMail })
 
@@ -189,7 +185,6 @@ func webSetPassword(res http.ResponseWriter, req *http.Request) {
 // ===========================================================================================================================
 // API: Try to login an user, returns session-UUID.
 // POST /LogIn
-// Remove expired sessions from the database.
 // If current session exist - then logout.
 // If the pair (EMail and PasswordMD5) is not present in the collection `Users`, return "UserAndPasswordPairNotFound".
 // Otherwise register new session in the `Sessions` database collection, and return its UUID to set cookie in browser.
@@ -239,9 +234,6 @@ func webLogIn(res http.ResponseWriter, req *http.Request) {
 	defer session.Close()
 	c := session.DB(DB).C("Sessions")
 
-	// Remove all expired sessions
-	c.RemoveAll(bson.M{"expired" : bson.M{"$lte":time.Now().UTC()} })
-
 	// Try to find user
 	c = session.DB(DB).C("Users")
 	var user typeUser
@@ -255,7 +247,7 @@ func webLogIn(res http.ResponseWriter, req *http.Request) {
     // Try to detect previous user session
 	sessionCookie, err := req.Cookie("User-Session")
 	if err == nil { 
-		// Remove old session from the database
+		// Remove previous session from the database
 		c := session.DB(DB).C("Sessions")
 		c.RemoveAll(bson.M{"uuid" : sessionCookie.Value })
 	}
@@ -318,7 +310,6 @@ func webLogOut(res http.ResponseWriter, req *http.Request) {
 // ===========================================================================================================================
 // API: Start an anonymous-session, returns session-UUID.
 // POST /GoAnonymous
-// Remove expired sessions from the database.
 // If current session exist - then logout.
 // Register new anonymous session in the `Sessions` database collection, and return its UUID to set cookie in browser.
 // Cookies: User-Session : string (UUID)
@@ -342,13 +333,10 @@ func webGoAnonymous(res http.ResponseWriter, req *http.Request) {
 	defer session.Close()
 	c := session.DB(DB).C("Sessions")
 
-	// Remove all expired sessions
-	c.RemoveAll(bson.M{"expired" : bson.M{"$lte":time.Now().UTC()} })
-
     // Try to detect previous user session
 	sessionCookie, err := req.Cookie("User-Session")
 	if err == nil { 
-		// Remove old session from the database
+		// Remove previous session from the database
 		c.RemoveAll(bson.M{"uuid" : sessionCookie.Value })
 	}
 
@@ -376,7 +364,6 @@ func webGoAnonymous(res http.ResponseWriter, req *http.Request) {
 // ===========================================================================================================================
 // API: Check session's UUID and get information of current user.
 // POST /UserInfo
-// Remove expired sessions from the database.
 // Checks the current session for validity.
 // If the session is valid, returns the Email (real or imaginary) of the current user. Returns flag: is the current user anonymous or not.
 // If the session is not valid, it returns "SessionNotFoundOrExpired" as a result.
@@ -400,9 +387,6 @@ func webUserInfo(res http.ResponseWriter, req *http.Request) {
 	session := GetMongoDBSession()
 	defer session.Close()
 	c := session.DB(DB).C("Sessions")
-
-	// Remove all expired sessions
-	c.RemoveAll(bson.M{"expired" : bson.M{"$lte":time.Now().UTC()} })
 
     // Try to detect previous user session
 	sessionCookie, err := req.Cookie("User-Session")
