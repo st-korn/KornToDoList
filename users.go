@@ -9,8 +9,8 @@ import (
 	"time"          // access to system date and time - to control uuid's expirations
 
 	"github.com/satori/go.uuid" // generate UUIDs
-	mgo "gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson" // to use BSON queries format
+	"gopkg.in/mgo.v2"           // to connect to MongoDB
+	"gopkg.in/mgo.v2/bson"      // to use BSON queries format
 )
 
 // ===========================================================================================================================
@@ -379,9 +379,8 @@ func webGoAnonymous(res http.ResponseWriter, req *http.Request) {
 // ===========================================================================================================================
 // API: Check session's UUID and get information of current user.
 // POST /UserInfo
-// Checks the current session for validity.
-// If the session is valid, returns the Email (real or imaginary) of the current user. Returns flag: is the current user anonymous or not.
-// If the session is not valid, it returns "SessionEmptyNotFoundOrExpired" as a result.
+// Checks the current session for validity. If the session is not valid, it returns "SessionEmptyNotFoundOrExpired" as a result.
+// Returns the Email (real or imaginary) of the current user. Returns flag: is the current user anonymous or not.
 // Cookies: User-Session : string (UUID)
 // IN: -
 // OUT: JSON: { Result : string ["ValidUserSession", "ValidAnonymousSession", "SessionEmptyNotFoundOrExpired"], EMail : string }

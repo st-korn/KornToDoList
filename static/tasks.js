@@ -41,6 +41,8 @@ function init() {
 		$("#help-close-div").show();
 		// Validate "User-Session" cookie
 		getUserInfo();
+		// Load list of todo-lists for current user
+		getLists();
 	}
 
 	// Start working with page
@@ -306,8 +308,7 @@ function getUserInfo() {
 		success: function (response) {
 			$("#task-spinner-div").hide();
 			switch(response.Result) {
-  				case "EmptySession" : break;
-  				case "SessionNotFoundOrExpired" :
+  				case "SessionEmptyNotFoundOrExpired" :
   					Cookies.remove('User-Session');
   					location.reload();
   					break;
@@ -324,6 +325,42 @@ function getUserInfo() {
   					$("#user-label").html(response.EMail);
   					$("#register-user-button").show();
   					Cookies.set('User-Session', Cookies.get('User-Session'), { expires: DefaultCookieLifetimeDays });
+  					break;
+				default : $("#operation-status-label").html(resultUnknown);
+			}
+		},
+		// if error returns
+		error: function(jqXHR,exception) { 
+			$("#task-spinner-div").hide();
+			showAjaxError("#operation-status-label",jqXHR,exception);
+		}
+	} );
+	return false;
+}
+
+// ===========================================================================
+// Fetch names lists of current user from server and put in in dropdown-list
+// ===========================================================================
+function getLists() {
+	// Send Ajax POST request
+	$("#task-spinner-div").show();
+	$.ajax( {
+		url : "/GetLists",
+		cache: false,
+		type : "post",
+		// if success
+		success: function (response) {
+			$("#task-spinner-div").hide();
+			switch(response.Result) {
+  				case "SessionEmptyNotFoundOrExpired" :
+  					Cookies.remove('User-Session');
+  					location.reload();
+  					break;
+				case "OK" :
+					var $dropdown = $("#task-lists-select");
+					$.each(response.Lists, function() {
+						$dropdown.append($("<option />").val(this).text(this));
+				  	});
   					break;
 				default : $("#operation-status-label").html(resultUnknown);
 			}

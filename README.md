@@ -111,9 +111,19 @@ Check session's UUID and get information of current user.
     IN: -
     OUT: JSON: { Result : string ["ValidUserSession", "ValidAnonymousSession", "SessionEmptyNotFoundOrExpired"], EMail : string }
 
-* Checks the current session for validity.
-* If the session is valid, returns the Email (real or imaginary) of the current user. Returns flag: is the current user anonymous or not.
-* If the session is not valid, it returns "SessionEmptyNotFoundOrExpired" as a result.
+* Checks the current session for validity. If the session is not valid, it returns "SessionEmptyNotFoundOrExpired" as a result.
+* Returns the Email (real or imaginary) of the current user. Returns flag: is the current user anonymous or not.
+
+### `POST /GetLists`
+
+Get list of user lists.
+
+    Cookies: User-Session : string (UUID)
+    IN: -
+    OUT: JSON: { Result : string ["OK", "SessionEmptyNotFoundOrExpired"], Lists : []string }
+
+* Checks the current session for validity. If the session is not valid, it returns "SessionEmptyNotFoundOrExpired" as a result.
+* Returns array of strings with names of saved users todo-lists.
 
 ## Database structure
 
@@ -126,7 +136,8 @@ Main collection, that contains task records.
         "text" : string // tasks title, for example "Peter - send invoice"
         "section" : string // the importance and urgency of the task: ["iu","in","nu","nn","ib"]
         "status" : string // task status: ["created", "done", "canceled", "moved"]
-        "list" : string // list name in format: "email:YYYY-MM-DD" or "IP@YYYY-MM-DD-hh-mm-ss:YYYY-MM-DD", for example "user@domain.com:2018-06-17",
+        "email" : string // username in format "user@domain.net" for registred users or "IP@YYYY-MM-DD-hh-mm-ss:YYYY-MM-DD" for anonymous user.
+        "list" : string // list name in format: "YYYY-MM-DD"
         "icon" : string // one of the icons: ["wait","remind","call","force","mail","prepare","manage","meet","visit","make","journey","think"]
         "length" : 0,
         "start" : 20
@@ -181,7 +192,7 @@ We use both: lowerCamelCase or UpperCamelCase:
 * Function and variables in JavaScript are named in **lowerCamelCase**.
 * All JSON filed names must be **UpperCamelCase**, same as fields of structures in Go. Do not forget to use correct case of JSON filed names in Javascript ajax-routines.
 
-### How we name identifiers in MongDB
+### How we name identifiers in MongoDB
 
 * MongoDB collections are **UpperCamelCase** (eg `SetPasswordLinks`)
 * All MongoDB field names must be **lowercase**, in contrast to the fields of structures in Go. Do not forget to use correct case of collection fileds in all Go-routines (eg. `passwordmd5`).

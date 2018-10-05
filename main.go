@@ -63,7 +63,6 @@ func TestSession(req *http.Request) (email string, session *mgo.Session) {
 
 	// Connect to database
 	session = GetMongoDBSession()
-	defer session.Close()
 	c := session.DB(DB).C("Sessions")
 
 	// Try to detect previous user session
@@ -287,6 +286,7 @@ func main() {
 	http.HandleFunc("/LogOut", webLogOut)
 	http.HandleFunc("/GoAnonymous", webGoAnonymous)
 	http.HandleFunc("/UserInfo", webUserInfo)
+	http.HandleFunc("/GetLists", webGetLists)
 	http.HandleFunc("/", webFormShow)
 
 	// Register a HTTP file server for delivery static files from the static directory
