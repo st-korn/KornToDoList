@@ -100,9 +100,9 @@
 
 "mailFrom" : "TODO.WORKS",
 "mailSignUpSubject" : "Account registration",
-"mailSignUpBody" : "<p>Someone from ip-address {{.RequestIP}} went to the site <a href=\"https://{{.HostName}}\">{{.HostName}}</a> and tried to register an account to your email address.<br>We hope that it was you - otherwise just ignore this letter.</p><p>To complete registration and set the password, click on the link: <a href=\"{{.SetPasswordLink}}\">{{.SetPasswordLink}}</a></p>",
+"mailSignUpBody" : "<p>Someone from ip-address {{.RequestIP}} went to the site <a href=\"{{.HTTPAddress}}\">{{.HostName}}</a> and tried to register an account to your email address.<br>We hope that it was you - otherwise just ignore this letter.</p><p>To complete registration and set the password, click on the link: <a href=\"{{.SetPasswordLink}}\">{{.SetPasswordLink}}</a></p>",
 "mailRestorePasswordSubject" : "Password recovery",
-"mailRestorePasswordBody" : "<p>Someone from ip-address {{.RequestIP}} went to the site <a href=\"https://{{.HostName}}\">{{.HostName}}</a> and tried to restore the password to the account registered to your email address.<br>We hope that it was you - otherwise just ignore this letter.</p><p>To change your the password, click on the link: <a href=\"{{.SetPasswordLink}}\">{{.SetPasswordLink}}</a><br>The link will be valid for 24 hours.</p>",
+"mailRestorePasswordBody" : "<p>Someone from ip-address {{.RequestIP}} went to the site <a href=\"{{.HTTPAddress}}\">{{.HostName}}</a> and tried to restore the password to the account registered to your email address.<br>We hope that it was you - otherwise just ignore this letter.</p><p>To change your the password, click on the link: <a href=\"{{.SetPasswordLink}}\">{{.SetPasswordLink}}</a><br>The link will be valid for 24 hours.</p>",
 
 "titleChangePassword" : "Set the password to the task list",
 "buttonReturn" : "Return back",

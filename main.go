@@ -1,34 +1,35 @@
 package main
 
 import (
-	"net/http" // for HTTP-server
-	"os" // to get OS environment variables
-	"text/template" // for use HTML-page templates
-	"io/ioutil" // for read text files from the server
-	"encoding/json" // to parse JSON (language strings-tables)
-	"net/mail" // to generate emails
+	"bytes"           // string buffer to use string-templates
 	"encoding/base64" // to use UTF-8 in emails bodys
-	"mime" // to use UTF-8 in emails headers
-	"net/smtp" // to send emails
-	"fmt" // to generate emails body
-	"bytes" // string buffer to use string-templates
-	"time" // to define MongoDB time type for structure elements, for timers
-	"golang.org/x/text/language" // to detect user-perferred language
+	"encoding/json"   // to parse JSON (language strings-tables)
+	"fmt"             // to generate emails body
+	"io/ioutil"       // for read text files from the server
+	"mime"            // to use UTF-8 in emails headers
+	"net/http"        // for HTTP-server
+	"net/mail"        // to generate emails
+	"net/smtp"        // to send emails
+	"os"              // to get OS environment variables
+	"text/template"   // for use HTML-page templates
+	"time"            // to define MongoDB time type for structure elements, for timers
+
+	"golang.org/x/text/language"         // to detect user-perferred language
 	"golang.org/x/text/language/display" // to output national names of languages
-	"gopkg.in/mgo.v2" // to connect to MongoDB
-	"gopkg.in/mgo.v2/bson" // to use BSON queries format
+	"gopkg.in/mgo.v2"                    // to connect to MongoDB
+	"gopkg.in/mgo.v2/bson"               // to use BSON queries format
 )
 
 // Global envirnment variables
-var URI string //URI MongoDB database
-var DB string //MongoDB database name
-var MAILHOST string //smtp-server hostname
-var MAILPORT string //smtp-server port number (usually 25)
-var MAILLOGIN string //login of smtp-server account
-var MAILPASSWORD string //password of smtp-server account
-var MAILFROM string //E-mail address, from which will be sent emails
+var URI string               //URI MongoDB database
+var DB string                //MongoDB database name
+var MAILHOST string          //smtp-server hostname
+var MAILPORT string          //smtp-server port number (usually 25)
+var MAILLOGIN string         //login of smtp-server account
+var MAILPASSWORD string      //password of smtp-server account
+var MAILFROM string          //E-mail address, from which will be sent emails
 var SERVERHTTPADDRESS string //HTTP-address for web-server with http or https prefix, and without any path: (eg. http://127.0.0.1:9000 or https://todo.works)
-var LISTENPORT string //port on which the web server listens
+var LISTENPORT string        //port on which the web server listens
 
 const DefaultSessionLifetimeDays = 365 // default user-session UUID lifetime in database (days)
 
@@ -44,10 +45,42 @@ func GetMongoDBSession() *mgo.Session {
 	if SESSION == nil {
 		var err error
 		SESSION, err = mgo.Dial(URI)
-		if err != nil { panic(err) }
-        SESSION.SetMode(mgo.Monotonic, true)
+		if err != nil {
+			panic(err)
+		}
+		SESSION.SetMode(mgo.Monotonic, true)
 	}
 	return SESSION.Clone()
+}
+
+// Connect to the database, test cookie and return EMail of active session's user.
+// Return "" if session UUID empty, expired or not found.
+// IN:	req : *http.Request - http request, from which the cookie is read from the UUID of the user session.
+// OUT:	email : string - email of current authenticated user, or "" if session UUID empty, session is expired or not found.
+//		session : *mgo.Session - session variable, cloned from global MongoDB session.
+//								 Returns for possible later use for new database queries.
+func TestSession(req *http.Request) (email string, session *mgo.Session) {
+
+	// Connect to database
+	session = GetMongoDBSession()
+	defer session.Close()
+	c := session.DB(DB).C("Sessions")
+
+	// Try to detect previous user session
+	sessionCookie, err := req.Cookie("User-Session")
+	if err != nil {
+		return "", session
+	}
+
+	// Try to find active session
+	var sid typeSession
+	err = c.Find(bson.M{"uuid": sessionCookie.Value}).One(&sid)
+	if err != nil {
+		return "", session
+	}
+
+	email = sid.EMail
+	return email, session
 }
 
 // Regularly clears the base of expired sessions
@@ -59,26 +92,29 @@ func ClearExpiredSessiond() {
 
 	// Remove all expired set-password-links
 	c := session.DB(DB).C("SetPasswordLinks")
-	c.RemoveAll(bson.M{"expired" : bson.M{"$lte":time.Now().UTC()} })
+	c.RemoveAll(bson.M{"expired": bson.M{"$lte": time.Now().UTC()}})
 
 	// Remove all expired sessions
 	c = session.DB(DB).C("Sessions")
-	c.RemoveAll(bson.M{"expired" : bson.M{"$lte":time.Now().UTC()} })
+	c.RemoveAll(bson.M{"expired": bson.M{"$lte": time.Now().UTC()}})
 
 	// Write log to STDOUT
-	fmt.Println(time.Now().Format("2006-01-02 15:04:05 MST")+" Expired sesions cleaned.")
+	fmt.Println(time.Now().Format("2006-01-02 15:04:05 MST") + " Expired sesions cleaned.")
 }
 
 // ===========================================================================================================================
 // Return JSON in response to a http-request
 // ===========================================================================================================================
-// IN: 
+// IN:	res - http.Responsewriter, in which the returned json is written
+// 		structJSON - structure to convert to JSON
 func ReturnJSON(res http.ResponseWriter, structJSON interface{}) {
-    // Create json response from struct
-    resJSON, err := json.Marshal(structJSON)
-    if err != nil { panic(err) }
-    res.Header().Set("Content-type", "application/json; charset=utf-8")
-    res.Write(resJSON)
+	// Create json response from struct
+	resJSON, err := json.Marshal(structJSON)
+	if err != nil {
+		panic(err)
+	}
+	res.Header().Set("Content-type", "application/json; charset=utf-8")
+	res.Write(resJSON)
 
 }
 
@@ -88,12 +124,12 @@ func ReturnJSON(res http.ResponseWriter, structJSON interface{}) {
 
 // All supported languages
 var SupportedLangs = []language.Tag{
-    language.English,   // The first language is used as default
-    language.Russian}
+	language.English, // The first language is used as default
+	language.Russian}
 
 // Language structure: english_name_of_language and national_name_of_language
 type typeLang struct {
-	EnglishName string
+	EnglishName  string
 	NationalName string
 }
 
@@ -103,7 +139,7 @@ type typeLabels map[string]string
 // Internal function: detect language from http-request, and load labels for detected language
 // IN:
 //		req *http.Request // http-request
-// OUT: 
+// OUT:
 //		langTag language.Tag // detected language
 //		langEnglishName string // english name of detected language
 //		labels typeLabels // labels of these language
@@ -113,26 +149,34 @@ func DetectLanguageAndLoadLabels(req *http.Request) (langTag language.Tag, langE
 	var langCookieEnglishName string
 	var langTagCode string
 	langCookie, err := req.Cookie("User-Language")
-	if err == nil { langCookieEnglishName = langCookie.Value }
+	if err == nil {
+		langCookieEnglishName = langCookie.Value
+	}
 
-    // Finduser-language from supported languages list
+	// Finduser-language from supported languages list
 	for _, tag := range SupportedLangs {
-		if display.English.Tags().Name(tag) == langCookieEnglishName {langTagCode = tag.String()}
+		if display.English.Tags().Name(tag) == langCookieEnglishName {
+			langTagCode = tag.String()
+		}
 	}
 
 	// Finish detect user-language
-    accept := req.Header.Get("Accept-Language")
-    matcher := language.NewMatcher(SupportedLangs)
-    langTag, _ = language.MatchStrings(matcher, langTagCode, accept)
+	accept := req.Header.Get("Accept-Language")
+	matcher := language.NewMatcher(SupportedLangs)
+	langTag, _ = language.MatchStrings(matcher, langTagCode, accept)
 
-    langEnglishName = display.English.Tags().Name(langTag);
+	langEnglishName = display.English.Tags().Name(langTag)
 
 	// Load strings-table for user-language
-	jsonFile, err := os.Open("templates/"+langEnglishName+".json")
-	if err != nil { panic(err) }
+	jsonFile, err := os.Open("templates/" + langEnglishName + ".json")
+	if err != nil {
+		panic(err)
+	}
 	defer jsonFile.Close()
 	jsonText, err := ioutil.ReadAll(jsonFile)
-	if err != nil { panic(err) }
+	if err != nil {
+		panic(err)
+	}
 	json.Unmarshal(jsonText, &labels)
 
 	return langTag, langEnglishName, labels
@@ -151,14 +195,14 @@ func DetectLanguageAndLoadLabels(req *http.Request) (langTag language.Tag, langE
 //		templateString string // template of the letter body
 //		dataForTemplate struct // struct of data, which is used to fill email-body template
 // OUT: nothing
-func SendEmail (fromName string, fromAddress string, toAddress string, subject string, templateString string, dataForTemplate interface{}) {
+func SendEmail(fromName string, fromAddress string, toAddress string, subject string, templateString string, dataForTemplate interface{}) {
 
 	// Set up smtp-authentication information.
-	auth := smtp.PlainAuth("",MAILLOGIN,MAILPASSWORD,MAILHOST)
+	auth := smtp.PlainAuth("", MAILLOGIN, MAILPASSWORD, MAILHOST)
 
 	// Collect mail headers
 	header := make(map[string]string)
-	from := mail.Address{fromName, fromAddress}
+	from := mail.Address{Name: fromName, Address: fromAddress}
 	header["From"] = from.String()
 	header["To"] = toAddress
 	header["Subject"] = mime.QEncoding.Encode("utf-8", subject)
@@ -169,14 +213,20 @@ func SendEmail (fromName string, fromAddress string, toAddress string, subject s
 	// Generate mail body from template string
 	t := template.New("eMailBody")
 	t, err := t.Parse(templateString)
-	if err != nil { panic(err) }
+	if err != nil {
+		panic(err)
+	}
 	var body bytes.Buffer
 	err = t.Execute(&body, dataForTemplate)
-	if err != nil { panic(err) }
+	if err != nil {
+		panic(err)
+	}
 
 	// Generate the whole mail message
 	message := ""
-	for k, v := range header { message += fmt.Sprintf("%s: %s\r\n", k, v) }
+	for k, v := range header {
+		message += fmt.Sprintf("%s: %s\r\n", k, v)
+	}
 	message += "\r\n" + base64.StdEncoding.EncodeToString([]byte(body.String()))
 
 	// Connect to the smtp-server, authenticate, set the sender and recipient,
@@ -186,8 +236,10 @@ func SendEmail (fromName string, fromAddress string, toAddress string, subject s
 		auth,
 		fromAddress,
 		[]string{toAddress},
-		[]byte(message) )
-	if err != nil { panic(err) }
+		[]byte(message))
+	if err != nil {
+		panic(err)
+	}
 }
 
 // ===========================================================================================================================
@@ -195,22 +247,21 @@ func SendEmail (fromName string, fromAddress string, toAddress string, subject s
 // ===========================================================================================================================
 
 type typeUser struct {
-	EMail string
+	EMail       string
 	PasswordMD5 string
 }
 
 type typeSetPasswordLink struct {
-	EMail string
-	UUID string
+	EMail   string
+	UUID    string
 	Expired time.Time
 }
 
 type typeSession struct {
-	UUID string
-	EMail string
+	UUID    string
+	EMail   string
 	Expired time.Time
 }
-
 
 // ===========================================================================================================================
 // Main program: start the web-server
@@ -229,28 +280,28 @@ func main() {
 	LISTENPORT := os.Getenv("LISTEN_PORT")
 
 	// Assign handlers for web requests
- 	http.HandleFunc("/SignUp",webSignUp)
- 	http.HandleFunc("/ChangePassword",webChangePasswordFormShow)
- 	http.HandleFunc("/SetPassword",webSetPassword)
- 	http.HandleFunc("/LogIn",webLogIn)
- 	http.HandleFunc("/LogOut",webLogOut)
- 	http.HandleFunc("/GoAnonymous",webGoAnonymous)
- 	http.HandleFunc("/UserInfo",webUserInfo)
-	http.HandleFunc("/",webFormShow)
-	
+	http.HandleFunc("/SignUp", webSignUp)
+	http.HandleFunc("/ChangePassword", webChangePasswordFormShow)
+	http.HandleFunc("/SetPassword", webSetPassword)
+	http.HandleFunc("/LogIn", webLogIn)
+	http.HandleFunc("/LogOut", webLogOut)
+	http.HandleFunc("/GoAnonymous", webGoAnonymous)
+	http.HandleFunc("/UserInfo", webUserInfo)
+	http.HandleFunc("/", webFormShow)
+
 	// Register a HTTP file server for delivery static files from the static directory
 	fs := http.FileServer(http.Dir("./static"))
- 	http.Handle("/static/", http.StripPrefix("/static/", fs))
+	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	// Start timer to clean expired session every hour
-    ticker := time.NewTicker(time.Hour)
-    defer ticker.Stop()
-    go func() {
-        for _ = range ticker.C {
-            ClearExpiredSessiond()
-        }
-    }()
+	ticker := time.NewTicker(time.Hour)
+	defer ticker.Stop()
+	go func() {
+		for _ = range ticker.C {
+			ClearExpiredSessiond()
+		}
+	}()
 
- 	// Launch the web server on all interfaces on the PORT port
-	http.ListenAndServe(":"+LISTENPORT,nil)
+	// Launch the web server on all interfaces on the PORT port
+	http.ListenAndServe(":"+LISTENPORT, nil)
 }
