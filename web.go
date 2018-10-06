@@ -57,15 +57,17 @@ func webFormShow(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	fmt.Println(formatRequest(req))
+	//fmt.Println(formatRequest(req))
+	fmt.Println(req.Header.Get("X-Forwarded-Proto"))
 	// Redirect http to https
-	/*if strings.ToLower(req.URL.Scheme) != "https" {
+	// https://www.clever-cloud.com/blog/engineering/2015/12/01/redirect-to-https-in-play/
+	if strings.ToLower(req.Header.Get("X-Forwarded-Proto")) == "http" {
 		target := "https://" + req.Host + req.URL.Path
 		if len(req.URL.RawQuery) > 0 {
 			target += "?" + req.URL.RawQuery
 		}
-		http.Redirect(res, req, target, http.StatusTemporaryRedirect)
-	}*/
+		http.Redirect(res, req, target, http.StatusMovedPermanently)
+	}
 
 	// Prepare main structure of HTML-template
 	var webFormData typeWebFormData
