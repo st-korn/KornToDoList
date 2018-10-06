@@ -23,6 +23,8 @@ function init() {
 	$("#filter-clear-button").bind('click', clickClearFilter);
 	$("#filter-input").keypress(onEnterFilterInput);
 	$("#task-lists-select").change(loadTasks);
+	$("#task-submit-button").bind('click', submitTask);
+	$("button.add").bind('click', newTask);
 
 	// Fill autocomplete with names of employees
 	$("#filter-input").autocomplete( {
@@ -61,7 +63,7 @@ function init() {
 		// Load list of todo-lists for current user
 		getLists();
 		// Start working with page
-		$("section.vh button").click();
+		$("#ib button").click();
 	}
 }
 
@@ -226,6 +228,7 @@ function clickForgotPassword() {
 // ===========================================================================
 function startAnonymously() {
 	// Send Ajax POST request
+	$("#operation-status-label").text("");
 	showSpinner("#task-spinner-div");
 	$.ajax( {
 		url : "/GoAnonymous",
@@ -282,6 +285,7 @@ function onLanguageChange() {
 // ===========================================================================
 function clickLogout() {
 	// Send Ajax POST request
+	$("#operation-status-label").text("");
 	showSpinner("#task-spinner-div");
 	$.ajax( {
 		url : "/LogOut",
@@ -313,6 +317,7 @@ function clickLogout() {
 // ===========================================================================
 function getUserInfo() {
 	// Send Ajax POST request
+	$("#operation-status-label").text("");
 	showSpinner("#task-spinner-div");
 	$.ajax( {
 		url : "/UserInfo",
@@ -357,6 +362,7 @@ function getUserInfo() {
 // ===========================================================================
 function getLists() {
 	// Send Ajax POST request
+	$("#operation-status-label").text("");
 	showSpinner("#task-spinner-div");
 	$.ajax( {
 		url : "/GetLists",
@@ -396,7 +402,7 @@ function getLists() {
 // ===========================================================================
 function htmlTask(task) {
 	var tooltips = {'created': statusCreated, 'moved': statusMoved, 'canceled': statusCanceled, 'done': statusDone};
-	var p = '<p class="' + task.Status + '" tooltip="' + tooltips[task.Status] + '">'
+	var p = '<p id="' + task.Id + '" class="' + task.Status + '" tooltip="' + tooltips[task.Status] + '">'
 	if (task.Icon != "") {
 		p = p + '<img class="'+task.Icon+'" src="/static/icons/'+task.Icon+'.svg">'
 	}
@@ -419,6 +425,7 @@ function loadTasks() {
 	// if no ToDo-list fount - then nothing to do
 	if ( !$("#task-lists-select").val() ) { return false };
 	// Send Ajax POST request
+	$("#operation-status-label").text("");
 	showSpinner("#task-spinner-div");
 	$.ajax( {
 		url : "/GetTasks",
@@ -523,6 +530,114 @@ function completeEmployeeNames(request, response) {
 }
 
 // ===========================================================================
+// Fill field of Task form values of clicked task. Prepare to task editing.
+// ===========================================================================
+function onTaskEdit() {
+	$("#task-status-select").val( $(this).attr("class") );
+	$("#task-icon-select").val( $(this).children("img").attr("class") );
+	$("#task-section-select").val( $(this).parents("section").attr("id") );
+	$("#task-text-input").val( $(this).text() );
+	$("#task-id-input").val( $(this).attr("id") );
+	$("#task-submit-button").html(buttonSaveTask);
+	$("#task-text-input").focus();
+}
+
+// ===========================================================================
+// Reset task form and prepare it to create new task.
+// ===========================================================================
+function newTask() {
+	$("#task-status-select").val("created");
+	$("#task-icon-select").val("");
+	$("#task-section-select").val( $(this).parents("section").attr("id") );
+	$("#task-text-input").val("");
+	$("#task-id-input").val("");
+	$("#task-submit-button").html(buttonAddTask);
+	$("#task-text-input").focus();
+}
+
+// ===========================================================================
+// Send current edited task (existing or new) to server and database
+// ===========================================================================
+function submitTask() {
+	// if no task text - then nothing to do
+	if ( !$("#task-text-input").val() ) { alert(alertEmptyTask); return false };
+	// Send Ajax POST request
+	$("#operation-status-label").text("");
+	showSpinner("#task-spinner-div");
+	$.ajax( {
+		url : "/SendTask",
+		cache: false,
+		type : "post",
+		dataType: "json",
+		contentType: "application/json; charset=utf-8",
+		data : JSON.stringify( {
+			List: $("#task-lists-select").val(),
+			Id: $("#task-id-input").val(),
+			Text: $("#task-text-input").val(),
+			Section: $("#task-section-select").val(),
+			Status: $("#task-status-select").val(),
+			Icon: $("#task-icon-select").val()
+		} ),
+		// if success
+		success: function (response) {
+			hideSpinner("#task-spinner-div");
+			switch(response.Result) {
+  				case "SessionEmptyNotFoundOrExpired" :
+  					Cookies.remove('User-Session');
+  					location.reload();
+					break;
+				case "TaskEmpty" :
+					$("#operation-status-label").html(resultTaskEmpty);
+					break;
+				case "InvalidListName" :
+					$("#operation-status-label").html(resultInvalidListName);
+					break;
+				case "UpdatedTaskNotFound" :
+					$("#operation-status-label").html(resultUpdatedTaskNotFound);
+					break;
+				case "UpdateFailed" :
+					$("#operation-status-label").html(resultUpdateFailed);
+					break;
+				case "InsertFailed" :
+					$("#operation-status-label").html(resultInsertFailed);
+					break;
+				case "TaskUpdated" :
+				case "TaskInserted" :
+					// Collect tasks
+					$.each(response.Tasks, function() {
+						if ( $("#"+this.Id).length == 0 ) {
+							$("#"+this.Section).append(htmlTask(this));
+						} else {
+							$("#"+this.Id).replaceWith(htmlTask(this));
+							if (this.Section != $("#"+this.Id).parents("section").attr("id")) {
+								$("#"+this.Id).appendTo($("#"+this.Section));
+							}
+						};
+					});
+					// Calculate page statistic
+					afterUpdate();
+					// Update status label
+					if (response.Result == "TaskUpdated") {
+						$("#operation-status-label").html(resultTaskUpdated);
+					} else if (response.Result == "TaskInserted") {
+						$("#operation-status-label").html(resultTaskInserted);
+					};
+					// Get ready to create a new task
+					$("#ib button").click();
+					break
+				default : $("#operation-status-label").html(resultUnknown);
+			}
+		},
+		// if error returns
+		error: function(jqXHR,exception) { 
+			hideSpinner("#task-spinner-div");
+			showAjaxError("#operation-status-label",jqXHR,exception);
+		}
+	} );
+	return false;
+}
+
+// ===========================================================================
 // Initializing page objects after updating the task table from the server
 // ===========================================================================
 function afterUpdate() {
@@ -542,9 +657,11 @@ function afterUpdate() {
 		cnt = $("p.canceled").length
 		$("#canceled-tasks-count-label").text(cnt+" ("+Math.round(cnt*100/total)+"%),");
 		cnt = $("img.wait, img.remind").closest("p.created").length
-		$("#wait-remind-tasks-count-label").text(cnt+" ("+Math.round(cnt*100/total)+"%), ");
+		$("#wait-remind-tasks-count-label").text(cnt+" ("+Math.round(cnt*100/total)+"%),");
 		cnt = $("p.created").length - cnt
 		$("#activity-tasks-count-label").text(cnt+" ("+Math.round(cnt*100/total)+"%)");
 	}
+	// Set events handlers
+	$("p").click(onTaskEdit)
 }
 

@@ -11,8 +11,9 @@ import (
 	"net/mail"        // to generate emails
 	"net/smtp"        // to send emails
 	"os"              // to get OS environment variables
-	"text/template"   // for use HTML-page templates
-	"time"            // to define MongoDB time type for structure elements, for timers
+	"strings"
+	"text/template" // for use HTML-page templates
+	"time"          // to define MongoDB time type for structure elements, for timers
 
 	"golang.org/x/text/language"         // to detect user-perferred language
 	"golang.org/x/text/language/display" // to output national names of languages
@@ -242,6 +243,54 @@ func SendEmail(fromName string, fromAddress string, toAddress string, subject st
 }
 
 // ===========================================================================================================================
+// Common Web-server routines
+// ===========================================================================================================================
+
+// Debug function: output to STDOUT all HTTP-headers, received in the HTTP-request
+// IN: *http.Request
+// OUT: -
+func formatRequest(r *http.Request) string {
+	// Create return string
+	var request []string
+	// Add the request string
+	url := fmt.Sprintf("%v %v %v", r.Method, r.URL, r.Proto)
+	request = append(request, url)
+	// Add the host
+	request = append(request, fmt.Sprintf("Host: %v", r.Host))
+	// Loop through headers
+	for name, headers := range r.Header {
+		name = strings.ToLower(name)
+		for _, h := range headers {
+			request = append(request, fmt.Sprintf("%v: %v", name, h))
+		}
+	}
+	// If this is a POST, add post data
+	if r.Method == "POST" {
+		r.ParseForm()
+		request = append(request, "\n")
+		request = append(request, r.Form.Encode())
+	}
+	// Return the request as a string
+	return strings.Join(request, "\n")
+}
+
+// If found incoming HTTP-request through cloud HTTPS-proxy - then redirect user's browser from http to https
+// IN: http.ResponseWriter, *http.Request
+// OUT: bool [true - redirect required, false - you can continue to serve the request]
+func RedirectIncomingHTTPtoHTTPS(res http.ResponseWriter, req *http.Request) bool {
+	if strings.ToLower(req.Header.Get("X-Forwarded-Proto")) == "http" {
+		target := "https://" + req.Host + req.URL.Path
+		if len(req.URL.RawQuery) > 0 {
+			target += "?" + req.URL.RawQuery
+		}
+		http.Redirect(res, req, target, http.StatusMovedPermanently)
+		return true
+	} else {
+		return false
+	}
+}
+
+// ===========================================================================================================================
 // Database collections defenition
 // ===========================================================================================================================
 
@@ -263,7 +312,9 @@ type typeSession struct {
 }
 
 type typeTask struct {
-	ID      string
+	Id      bson.ObjectId `json:"Id" bson:"_id"`
+	EMail   string
+	List    string
 	Text    string
 	Section string
 	Status  string
@@ -296,6 +347,7 @@ func main() {
 	http.HandleFunc("/UserInfo", webUserInfo)
 	http.HandleFunc("/GetLists", webGetLists)
 	http.HandleFunc("/GetTasks", webGetTasks)
+	http.HandleFunc("/SendTask", webSendTask)
 	http.HandleFunc("/", webFormShow)
 
 	// Register a HTTP file server for delivery static files from the static directory

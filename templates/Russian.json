@@ -123,5 +123,14 @@
 "buttonCancelLogin" : "Отмена",
 "labelForgotPassword" : "Забыли пароль?",
 "resultUserAndPasswordPairNotFound" : "Неверное имя пользователя или пароль",
-"resultLoggedIn" : "Успешно"
+"resultLoggedIn" : "Успешно",
+
+"alertEmptyTask" : "Укажите текст задачи",
+"resultTaskEmpty" : "Задача не должна быть пустой",
+"resultInvalidListName" : "Неверное имя списка",
+"resultUpdatedTaskNotFound" : "Задача не найдена",
+"resultUpdateFailed" : "Не удалось обновить задачу",
+"resultTaskUpdated" : "Задача обновлена",
+"resultInsertFailed" : "Не удалось добавить задачу",
+"resultTaskInserted" : "Задача добавлена"
 }

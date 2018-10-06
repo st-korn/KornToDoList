@@ -33,6 +33,7 @@ func webGetLists(res http.ResponseWriter, req *http.Request) {
 	if email == "" {
 		response.Result = "SessionEmptyNotFoundOrExpired"
 		ReturnJSON(res, response)
+		return
 	}
 
 	// Select user lists

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"encoding/json" // to parse JSON (language strings-tables)
+	"encoding/json" // to parse and generate JSON input and output parameters
 	"net"           // to split IP's and PORT's
 	"net/http"      // for HTTP-server
 	"net/url"       // to split HTTP/HTTPS prefix
@@ -403,6 +403,7 @@ func webUserInfo(res http.ResponseWriter, req *http.Request) {
 	if response.EMail == "" {
 		response.Result = "SessionEmptyNotFoundOrExpired"
 		ReturnJSON(res, response)
+		return
 	}
 
 	// Try to find registered user

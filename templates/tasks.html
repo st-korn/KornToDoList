@@ -18,7 +18,7 @@
 	<script src="/static/tasks.js?5"></script>
 	<script type="text/javascript">
 		{{- range $key, $value := .Labels}}
-		{{- if or ( or (eq (printf "%.4s" $key) "ajax") (eq (printf "%.6s" $key) "result") ) (eq (printf "%.6s" $key) "status") }}
+		{{- if or (or (or ( or (eq (printf "%.4s" $key) "ajax") (eq (printf "%.6s" $key) "result") ) (eq (printf "%.6s" $key) "status") ) (eq (printf "%.5s" $key) "alert") ) (eq (printf "%.6s" $key) "button") }}
 		var {{$key}} = "{{$value}}";
 		{{- end}}
 		{{- end}}
@@ -118,7 +118,6 @@
 		<form id="edit-task-form">
 			<label>{{.Labels.labelTask}}</label>
 			<input type="hidden" id="task-id-input" name="id">
-			<input type="hidden" id="task-list-input" name="list">
 			<input type="text" id="task-text-input" name="text" size="55">
 			<select title="{{.Labels.hintTaskSectionSelector}}" name="section" id="task-section-select">
 			 	<option value="iu">{{.Labels.sectionIU}}</option>

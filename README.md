@@ -2,7 +2,7 @@
 
 Experimental web-app ToDo-list by Stanislav Kornienko's conception. You can try it in the cloud <https://todo.works>
 
-<img src="https://github.com/st-korn/KornToDoList/raw/newplatform/static/favicon.png" width="64">
+<img src="https://github.com/st-korn/KornToDoList/raw/master/static/favicon.png" width="64">
 
 ## Project Files
 
@@ -142,11 +142,26 @@ Get tasks of selected user lists.
     Cookies: User-Session : string (UUID)
     IN: JSON: {List : string}
     OUT: JSON: { Result : string ["OK", "SessionEmptyNotFoundOrExpired"], Tasks : [] { Id : string, Text : string,
-    section : string ["iu","in","nu","nn","ib"], status : string ["created", "done", "canceled", "moved"],
-    icon : string ["wait","remind","call","force","mail","prepare","manage","meet","visit","make","journey","think"] } }
+    Section : string ["iu","in","nu","nn","ib"], status : string ["created", "done", "canceled", "moved"],
+    Icon : string ["wait","remind","call","force","mail","prepare","manage","meet","visit","make","journey","think"] } }
 
 * Checks the current session for validity. If the session is not valid, it returns "SessionEmptyNotFoundOrExpired" as a result.
 * Returns an array of structures that identify tasks from a selected list of the current user.
+
+### `POST /SendTask`
+
+Update existing task from the list or append new task to the list.
+
+    Cookies: User-Session : string (UUID)
+    IN: JSON: { List : string, Id : string (may be null or ""), Text : string,
+    Section : string ["iu","in","nu","nn","ib"], Status : string ["created", "done", "canceled", "moved"],
+    Icon : string ["wait","remind","call","force","mail","prepare","manage","meet","visit","make","journey","think"]}
+    OUT: JSON: { Result : string ["TaskEmpty", "InvalidListName", "SessionEmptyNotFoundOrExpired", "UpdatedTaskNotFound", "UpdateFailed", "TaskUpdated", "InsertFailed", "TaskInserted"],
+    Tasks : [] { Id : string, Text : string, Section : string, Status : string, Icon : string } }
+
+* Checks the current session for validity. If the session is not valid, it returns "SessionEmptyNotFoundOrExpired" as a result.
+* Update existing task or generate ID and ppend new task to the database.
+* Returns an array of a single element - an added or updated task with its ID.
 
 ## Database structure
 

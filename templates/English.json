@@ -123,5 +123,14 @@
 "buttonCancelLogin" : "Cancel",
 "labelForgotPassword" : "Forgot password?",
 "resultUserAndPasswordPairNotFound" : "Wrong username or password",
-"resultLoggedIn" : "Success"
+"resultLoggedIn" : "Success",
+
+"alertEmptyTask" : "Specify the text of the task",
+"resultTaskEmpty" : "The task should not be empty",
+"resultInvalidListName" : "Invalid list name",
+"resultUpdatedTaskNotFound" : "Task not found",
+"resultUpdateFailed" : "Failed to update task",
+"resultTaskUpdated" : "Task updated",
+"resultInsertFailed" : "Failed to add task",
+"resultTaskInserted" : "Task added"
 }
