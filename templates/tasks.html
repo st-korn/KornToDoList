@@ -6,9 +6,12 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
 	<link rel="stylesheet" type="text/css" href="/static/global.css?10">
 	<link rel="stylesheet" type="text/css" href="/static/tasks.css?15">
+	<link rel="stylesheet" type="text/css" href="/static/libs/jquery-ui.min.css">
 	<link rel="icon" type="image/png" href="/static/favicon.png">
 	<link rel="apple-touch-icon" type="image/png" href="/static/faviphone.png">
 	<script src="/static/libs/jquery-3.3.1.min.js"></script>
+	<script src="/static/libs/jquery-ui.min.js"></script>
+	<script src="/static/libs/jquery.ui.touch-punch.min.js"></script>
 	<script src="/static/libs/js.cookie.js"></script>
 	<script src="/static/libs/md5.min.js"></script>
 	<script src="/static/global.js?3"></script>
@@ -101,10 +104,11 @@
 			<button id="new-list-create-button">{{.Labels.buttonNewListCreate}}</button>
 		</form>
 	</nav>
-	<nav id="task-search-nav">
+	<nav id="task-filter-nav">
 		<form id="filter-form">
 			<img src="/static/icons/search.svg">
 			<input type="text" id="filter-input" name="filter" size="20" placeholder="{{.Labels.placeholderSearchInput}}">
+			<button id="filter-clear-button">x</button>
 			<select title="{{.Labels.hintFilterSelector}}" name="filter" id="filter-select">
 			 	<option value="all">{{.Labels.filterAll}}</option>
 			 	<option value="created-only">{{.Labels.filterCreatedOnly}}</option>

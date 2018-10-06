@@ -15,3 +15,17 @@ function showAjaxError(labelID, jqXHR, exception) {
 	else { msg = ajaxOther + ' ' + jqXHR.responseText; }
 	$(labelID).text(msg);
 }
+
+// ===========================================================================
+// Function for array unique sorting
+// ===========================================================================
+function onlyUnique(value, index, self) { 
+    return self.indexOf(value) === index;
+}
+
+// ===========================================================================
+// Function for array sorting by string length
+// ===========================================================================
+function sortByStringLength(a, b) {
+	return a.length - b.length || a.localeCompare(b);
+}

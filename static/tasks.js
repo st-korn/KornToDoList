@@ -19,7 +19,19 @@ function init() {
 	$("#cancel-login-button").bind('click', cancelLogin);
 	$("#logout-user-button").bind('click', clickLogout);
 	$("#forgot-password-label").bind('click', clickForgotPassword);
-	$("#filter-select").change(onFilterChange);
+	$("#filter-select").change(applyFilter);
+	$("#filter-input").change(applyFilter);
+	$("#filter-clear-button").bind('click', clickClearFilter);
+	$("#filter-input").keypress(onEnterFilterInput);
+
+	// Fill autocomplete with names of employees
+	$("#filter-input").autocomplete( {
+		source: completeEmployeeNames,
+		select: applyFilter,
+		open: function(event, ui) {
+			$('.ui-autocomplete').off('menufocus hover mouseover mouseenter');
+		}
+	  } );
 
 	// Analyze the presence of a saved session
 	if ( Cookies.get('User-Session') == null )
@@ -28,10 +40,10 @@ function init() {
 		$("#help-header").show();
 		$("#welcome-header").show();
 		// Hide and disable forms before user select one of the welcome-form buttons
-		$("#task-search-nav *").prop( "disabled", true );
+		$("#task-filter-nav *").prop( "disabled", true );
 		$("section button").prop( "disabled", true );
 		// Fade out main task table
-		$("#task-search-nav").fadeTo("slow",0.5);
+		$("#task-filter-nav").fadeTo("slow",0.5);
 		$("#tasks-main").fadeTo("slow",0.5);
 	}
 	else
@@ -380,13 +392,19 @@ function getLists() {
 // IN: struct {	ID : string, Text : string, Section : string, Status : string, Icon : string }
 // ===========================================================================
 function htmlTask(task) {
-	var tooltips = {'created': statusCreated, 'moved': statusMoved, 'canceled': statusCanceled, 'done': statusDone}
+	var tooltips = {'created': statusCreated, 'moved': statusMoved, 'canceled': statusCanceled, 'done': statusDone};
 	var p = '<p class="' + task.Status + '" tooltip="' + tooltips[task.Status] + '">'
 	if (task.Icon != "") {
 		p = p + '<img class="'+task.Icon+'" src="/static/icons/'+task.Icon+'.svg">'
 	}
-	p = p + task.Text + '</p>'
-	return p
+	var idx = task.Text.indexOf(" - ");
+	if (idx > 0) {
+		p = p + '<span class="employee">' + task.Text.substr(0,idx) + '</span>' + task.Text.substring(idx,task.Text.length);
+	} else {
+		p = p + task.Text;
+	}
+	p = p + '</p>';
+	return p;
 }
 
 // ===========================================================================
@@ -431,14 +449,16 @@ function loadTasks() {
 }
 
 // ===========================================================================
-// When the user selects a tasks display mode
+// When the user selects a tasks display mode or 
+// when the user enter any filter letters
 // ===========================================================================
-function onFilterChange() {
+function applyFilter() {
 	switch($("#filter-select").val()) {
 		case "all" :
 			$("p").show();
 			break;
 		case "created-only" :
+			$("p.created").show();
 			$("p.done").hide();
 			$("p.canceled").hide();
 			$("p.moved").hide();
@@ -447,9 +467,52 @@ function onFilterChange() {
 			$("p.done").hide();
 			$("p.canceled").hide();
 			$("p.moved").hide();
+			$("p.created").show();
 			$("img.wait, img.remind").closest("p.created").hide();
 			break;
 	}
+	if ( $("#filter-input").val() != "" ) {
+		$("p:not(:contains("+ $("#filter-input").val() +"))").hide(); 
+	}
+}
+
+// ===========================================================================
+// When the user enter any filter letters
+// ===========================================================================
+function clickClearFilter() {
+	$("#filter-input").val("");
+	applyFilter();
+	$("#filter-input").focus();
+	return false;
+}
+
+// ===========================================================================
+// Keyboard event handler on Filter Input field
+// ===========================================================================
+function onEnterFilterInput(event) {
+	if (event.keyCode == 13) {
+		event.preventDefault();
+		applyFilter();
+		$("#filter-clear-button").focus();
+	}
+}
+
+// ===========================================================================
+// Autocompletion function of search filter text input box - searches amog employees names
+// ===========================================================================
+function completeEmployeeNames(request, response) {
+
+	function onlyTerm(value) { 
+		return value.indexOf(request.term) > -1;
+	}
+
+	var employees = $("span.employee:contains("+request.term+")").toArray().map( 
+						function(elem) { return elem.textContent.split(",").map(
+							function(item) { return item.trim(); } )
+						} );
+	var ac = [].concat.apply([], employees);
+	ac = ac.filter(onlyTerm).filter(onlyUnique).sort(sortByStringLength);
+	response(ac);
 }
 
 // ===========================================================================
@@ -469,11 +532,11 @@ function afterUpdate() {
 		var total = $("p").length
 		var cnt = $("p.done").length
 		$("#done-tasks-count-label").text(cnt+" ("+Math.round(cnt*100/total)+"%),");
-		var cnt = $("p.canceled").length
+		cnt = $("p.canceled").length
 		$("#canceled-tasks-count-label").text(cnt+" ("+Math.round(cnt*100/total)+"%),");
-		var cnt = $("img.wait, img.remind").closest("p.created").length
+		cnt = $("img.wait, img.remind").closest("p.created").length
 		$("#wait-remind-tasks-count-label").text(cnt+" ("+Math.round(cnt*100/total)+"%), ");
-		var cnt = $("p.created").length - cnt
+		cnt = $("p.created").length - cnt
 		$("#activity-tasks-count-label").text(cnt+" ("+Math.round(cnt*100/total)+"%)");
 	}
 }
