@@ -512,7 +512,7 @@ function onEnterFilterInput(event) {
 }
 
 // ===========================================================================
-// Autocompletion function of search filter text input box - searches amog employees names
+// Autocompletion function of search filter text input box - searches among employees names
 // ===========================================================================
 function completeEmployeeNames(request, response) {
 
@@ -561,7 +561,7 @@ function newTask() {
 function submitTask() {
 	// if no task text - then nothing to do
 	if ( !$("#task-text-input").val() ) { 
-		$("#operation-status-label").html(alertEmptyTask); 
+		$("#operation-status-label").html(resultTaskEmpty); 
 		$("#task-text-input").focus();
 		return false 
 	};

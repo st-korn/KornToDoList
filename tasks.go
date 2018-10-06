@@ -17,9 +17,9 @@ import (
 // Returns an array of structures that identify tasks from a selected list of the current user.
 // Cookies: User-Session : string (UUID)
 // IN: JSON: {List : string}
-// OUT: JSON: { Result : string ["OK", "SessionEmptyNotFoundOrExpired"], Tasks : [] { Id : string, Text : string,
-//    Section : string ["iu","in","nu","nn","ib"], status : string ["created", "done", "canceled", "moved"],
-//    Icon : string ["wait","remind","call","force","mail","prepare","manage","meet","visit","make","journey","think"] } }
+// OUT: JSON: { Result : string ["OK", "SessionEmptyNotFoundOrExpired"], Tasks : [] { Id : string, EMail : string, List : string,
+//		Text : string, Section : string ["iu","in","nu","nn","ib"], status : string ["created", "done", "canceled", "moved"],
+//		Icon : string ["wait","remind","call","force","mail","prepare","manage","meet","visit","make","journey","think"] } }
 // ===========================================================================================================================
 
 // Structure JSON-request for getting tasks
@@ -74,7 +74,7 @@ func webGetTasks(res http.ResponseWriter, req *http.Request) {
 // 			Icon : string ["wait","remind","call","force","mail","prepare","manage","meet","visit","make","journey","think"]}
 // OUT: JSON: { Result : string ["TaskEmpty", "InvalidListName", "SessionEmptyNotFoundOrExpired", "UpdatedTaskNotFound",
 //			"UpdateFailed", "TaskUpdated", "InsertFailed", "TaskInserted"],
-//			Tasks : [] { Id : string, Text : string, Section : string, Status : string, Icon : string } }
+//			Tasks : [] { Id : string, EMail : string, List : string, Text : string, Section : string, Status : string, Icon : string } }
 // ===========================================================================================================================
 
 // Structure JSON-request for getting tasks
@@ -148,7 +148,7 @@ func webSendTask(res http.ResponseWriter, req *http.Request) {
 		task.Id = bson.ObjectIdHex(request.Id)
 
 		// Looking for an updated task
-		err = c.Find(bson.M{"email": email, "list": request.List, "_id": task.Id}).One(&task)
+		err = c.Find(bson.M{"email": email, "_id": task.Id}).One(&task)
 		if err != nil {
 			response.Result = "UpdatedTaskNotFound"
 			ReturnJSON(res, response)
@@ -156,8 +156,8 @@ func webSendTask(res http.ResponseWriter, req *http.Request) {
 		}
 
 		// Update existing task
-		err = c.Update(bson.M{"email": email, "list": request.List, "_id": task.Id},
-			bson.M{"$set": bson.M{"text": request.Text, "section": request.Section, "icon": request.Icon, "status": request.Status}})
+		err = c.Update(bson.M{"email": email, "_id": task.Id},
+			bson.M{"$set": bson.M{"list": request.List, "text": request.Text, "section": request.Section, "icon": request.Icon, "status": request.Status}})
 		if err != nil {
 			response.Result = "UpdateFailed"
 			ReturnJSON(res, response)
@@ -165,7 +165,7 @@ func webSendTask(res http.ResponseWriter, req *http.Request) {
 		}
 
 		// Obtain an updated task
-		err = c.Find(bson.M{"email": email, "list": request.List, "_id": task.Id}).One(&task)
+		err = c.Find(bson.M{"email": email, "_id": task.Id}).One(&task)
 		if err != nil {
 			response.Result = "UpdateFailed"
 			ReturnJSON(res, response)

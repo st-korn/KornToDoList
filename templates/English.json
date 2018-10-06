@@ -125,8 +125,7 @@
 "resultUserAndPasswordPairNotFound" : "Wrong username or password",
 "resultLoggedIn" : "Success",
 
-"alertEmptyTask" : "Specify the text of the task",
-"resultTaskEmpty" : "The task should not be empty",
+"resultTaskEmpty" : "Specify the text of the task",
 "resultInvalidListName" : "Invalid list name",
 "resultUpdatedTaskNotFound" : "Task not found",
 "resultUpdateFailed" : "Failed to update task",

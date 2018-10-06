@@ -141,8 +141,8 @@ Get tasks of selected user lists.
 
     Cookies: User-Session : string (UUID)
     IN: JSON: {List : string}
-    OUT: JSON: { Result : string ["OK", "SessionEmptyNotFoundOrExpired"], Tasks : [] { Id : string, Text : string,
-    Section : string ["iu","in","nu","nn","ib"], status : string ["created", "done", "canceled", "moved"],
+    OUT: JSON: { Result : string ["OK", "SessionEmptyNotFoundOrExpired"], Tasks : [] { Id : string, EMail : string, List : string,
+    Text : string, Section : string ["iu","in","nu","nn","ib"], status : string ["created", "done", "canceled", "moved"],
     Icon : string ["wait","remind","call","force","mail","prepare","manage","meet","visit","make","journey","think"] } }
 
 * Checks the current session for validity. If the session is not valid, it returns "SessionEmptyNotFoundOrExpired" as a result.
@@ -157,7 +157,7 @@ Update existing task from the list or append new task to the list.
     Section : string ["iu","in","nu","nn","ib"], Status : string ["created", "done", "canceled", "moved"],
     Icon : string ["wait","remind","call","force","mail","prepare","manage","meet","visit","make","journey","think"]}
     OUT: JSON: { Result : string ["TaskEmpty", "InvalidListName", "SessionEmptyNotFoundOrExpired", "UpdatedTaskNotFound", "UpdateFailed", "TaskUpdated", "InsertFailed", "TaskInserted"],
-    Tasks : [] { Id : string, Text : string, Section : string, Status : string, Icon : string } }
+    Tasks : [] { Id : string, EMail : string, List : string, Text : string, Section : string, Status : string, Icon : string } }
 
 * Checks the current session for validity. If the session is not valid, it returns "SessionEmptyNotFoundOrExpired" as a result.
 * Update existing task or generate ID and ppend new task to the database.
@@ -171,12 +171,12 @@ Main collection, that contains task records.
 
     {
         "_id" : ObjectId // unique object identifier
-        "text" : string // tasks title, for example "Peter - send invoice"
-        "section" : string // the importance and urgency of the task: ["iu","in","nu","nn","ib"]
-        "status" : string // task status: ["created", "done", "canceled", "moved"]
         "email" : string // username in format "user@domain.net" for registred users or "IP@YYYY-MM-DD-hh-mm-ss:YYYY-MM-DD" for anonymous user.
         "list" : string // list name in format: "YYYY-MM-DD"
+        "text" : string // tasks title, for example "Peter - send invoice"
+        "section" : string // the importance and urgency of the task: ["iu","in","nu","nn","ib"]
         "icon" : string // one of the icons: ["wait","remind","call","force","mail","prepare","manage","meet","visit","make","journey","think"]
+        "status" : string // task status: ["created", "done", "canceled", "moved"]
         "length" : 0,
         "start" : 20
     }

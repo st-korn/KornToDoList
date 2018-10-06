@@ -125,8 +125,7 @@
 "resultUserAndPasswordPairNotFound" : "Неверное имя пользователя или пароль",
 "resultLoggedIn" : "Успешно",
 
-"alertEmptyTask" : "Укажите текст задачи",
-"resultTaskEmpty" : "Задача не должна быть пустой",
+"resultTaskEmpty" : "Укажите текст задачи",
 "resultInvalidListName" : "Неверное имя списка",
 "resultUpdatedTaskNotFound" : "Задача не найдена",
 "resultUpdateFailed" : "Не удалось обновить задачу",
