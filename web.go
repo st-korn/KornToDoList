@@ -57,8 +57,6 @@ func webFormShow(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	//fmt.Println(formatRequest(req))
-	fmt.Println(req.Header.Get("X-Forwarded-Proto"))
 	// Redirect http to https
 	// https://www.clever-cloud.com/blog/engineering/2015/12/01/redirect-to-https-in-play/
 	if strings.ToLower(req.Header.Get("X-Forwarded-Proto")) == "http" {
