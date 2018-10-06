@@ -4,18 +4,18 @@
 	<title>{{.Labels.titleWebPage}}</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
-	<link rel="stylesheet" type="text/css" href="/static/global.css?9">
+	<link rel="stylesheet" type="text/css" href="/static/global.css?10">
 	<link rel="stylesheet" type="text/css" href="/static/tasks.css?15">
 	<link rel="icon" type="image/png" href="/static/favicon.png">
 	<link rel="apple-touch-icon" type="image/png" href="/static/faviphone.png">
 	<script src="/static/libs/jquery-3.3.1.min.js"></script>
 	<script src="/static/libs/js.cookie.js"></script>
 	<script src="/static/libs/md5.min.js"></script>
-	<script src="/static/global.js?2"></script>
+	<script src="/static/global.js?3"></script>
 	<script src="/static/tasks.js?5"></script>
 	<script type="text/javascript">
 		{{- range $key, $value := .Labels}}
-		{{- if or (eq (printf "%.4s" $key) "ajax") (eq (printf "%.6s" $key) "result") }}
+		{{- if or ( or (eq (printf "%.4s" $key) "ajax") (eq (printf "%.6s" $key) "result") ) (eq (printf "%.6s" $key) "status") }}
 		var {{$key}} = "{{$value}}";
 		{{- end}}
 		{{- end}}
@@ -154,7 +154,7 @@
 		</form>
 	</nav>
 	<main id="tasks-main">
-		<section class="td">
+		<section id="td">
 			<h3>
 				{{.Labels.labelToday}}
 				<button id="clear-done-button" title="{{.Labels.hintClearDone}}">x</button>
@@ -163,19 +163,19 @@
 			<ul id="today-tasks-ul">
 			</ul>
 		</section>
-		<section class="iu">
+		<section id="iu">
 			<h3>{{.Labels.sectionIU}}<button class="add" title="{{.Labels.hintAddTask}}">+</button></h3>
 		</section>
-		<section class="in">
+		<section id="in">
 			<h3>{{.Labels.sectionIN}}<button class="add" title="{{.Labels.hintAddTask}}">+</button></h3>
 		</section>
-		<section class="nu">
+		<section id="nu">
 			<h3>{{.Labels.sectionNU}}<button class="add" title="{{.Labels.hintAddTask}}">+</button></h3>
 		</section>
-		<section class="nn">
+		<section id="nn">
 			<h3>{{.Labels.sectionNN}}<button class="add" title="{{.Labels.hintAddTask}}">+</button></h3>
 		</section>
-		<section class="ib">
+		<section id="ib">
 			<h3>{{.Labels.sectionIB}}<button class="add" title="{{.Labels.hintAddTask}}">+</button></h3>
 		</section>
 	</main>

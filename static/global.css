@@ -3,7 +3,7 @@
    =============================================================== */
 html {
   -webkit-text-size-adjust: 100%; /* Prevent font scaling in landscape while allowing user zoom */
-	font: 9px Arial, Helvetica, sans-serif;
+	font: 12px Arial, Helvetica, sans-serif;
 }
 body {
 	background: linear-gradient( rgba(187,187,187,0.3), transparent 1px), linear-gradient( 90deg, rgba(187,187,187,0.3), transparent 1px);

@@ -1,3 +1,4 @@
+// Initialze
 $( init );
 
 // ===========================================================================
@@ -43,12 +44,9 @@ function init() {
 		getUserInfo();
 		// Load list of todo-lists for current user
 		getLists();
+		// Start working with page
+		$("section.vh button").click();
 	}
-
-	// Start working with page
-	afterUpdate();
-	$("section.vh button").click();
-	$("#task-spinner-div").hide();
 }
 
 // ===========================================================================
@@ -357,10 +355,67 @@ function getLists() {
   					location.reload();
   					break;
 				case "OK" :
-					var $dropdown = $("#task-lists-select");
+					// Collect lists names
 					$.each(response.Lists, function() {
-						$dropdown.append($("<option />").val(this).text(this));
-				  	});
+						$("#task-lists-select").append($("<option />").val(this).text(this));
+					});
+					// Load all tasks of current list
+					loadTasks();
+  					break;
+				default : $("#operation-status-label").html(resultUnknown);
+			}
+		},
+		// if error returns
+		error: function(jqXHR,exception) { 
+			$("#task-spinner-div").hide();
+			showAjaxError("#operation-status-label",jqXHR,exception);
+		}
+	} );
+	return false;
+}
+
+// ===========================================================================
+// Generate <p> HTML for the Task structure
+// IN: struct {	ID : string, Text : string, Section : string, Status : string, Icon : string }
+// ===========================================================================
+function htmlTask(task) {
+	var $tooltips = {'created': statusCreated, 'moved': statusMoved, 'canceled': statusCanceled, 'done': statusDone}
+	var $p = '<p class="' + task.Status + '" tooltip="' + $tooltips[task.Status] + '">'
+	if (task.Icon != "") {
+		$p = $p + '<img src="/static/icons/'+task.Icon+'.svg">'
+	}
+	$p = $p + task.Text + '</p>'
+	return $p
+}
+
+// ===========================================================================
+// Load from server all tasks of current selected list
+// ===========================================================================
+function loadTasks() {
+	// Send Ajax POST request
+	$("#task-spinner-div").show();
+	$.ajax( {
+		url : "/GetTasks",
+		cache: false,
+		type : "post",
+		dataType: "json",
+		contentType: "application/json; charset=utf-8",
+		data : JSON.stringify( { List: $("#task-lists-select").val()} ),
+		// if success
+		success: function (response) {
+			$("#task-spinner-div").hide();
+			switch(response.Result) {
+  				case "SessionEmptyNotFoundOrExpired" :
+  					Cookies.remove('User-Session');
+  					location.reload();
+  					break;
+				case "OK" :
+					// Collect tasks
+					$.each(response.Tasks, function() {
+						$("#"+this.Section).append(htmlTask(this));
+					});
+					// Calculate page statistic
+					afterUpdate();
   					break;
 				default : $("#operation-status-label").html(resultUnknown);
 			}

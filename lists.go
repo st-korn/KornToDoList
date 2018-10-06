@@ -4,7 +4,6 @@ import (
 	"net/http" // for HTTP-server
 	"sort"     // for sortings lists
 
-	// to connect to MongoDB
 	"gopkg.in/mgo.v2/bson" // to use BSON queries format
 )
 

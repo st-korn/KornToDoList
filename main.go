@@ -262,6 +262,14 @@ type typeSession struct {
 	Expired time.Time
 }
 
+type typeTask struct {
+	ID      string
+	Text    string
+	Section string
+	Status  string
+	Icon    string
+}
+
 // ===========================================================================================================================
 // Main program: start the web-server
 // ===========================================================================================================================
@@ -287,6 +295,7 @@ func main() {
 	http.HandleFunc("/GoAnonymous", webGoAnonymous)
 	http.HandleFunc("/UserInfo", webUserInfo)
 	http.HandleFunc("/GetLists", webGetLists)
+	http.HandleFunc("/GetTasks", webGetTasks)
 	http.HandleFunc("/", webFormShow)
 
 	// Register a HTTP file server for delivery static files from the static directory

@@ -125,6 +125,19 @@ Get list of user lists.
 * Checks the current session for validity. If the session is not valid, it returns "SessionEmptyNotFoundOrExpired" as a result.
 * Returns array of strings with names of saved users todo-lists.
 
+### `POST /GetTasks`
+
+Get tasks of selected user lists.
+
+    Cookies: User-Session : string (UUID)
+    IN: JSON: {List : string}
+    OUT: JSON: { Result : string ["OK", "SessionEmptyNotFoundOrExpired"], Tasks : [] { Id : string, Text : string,
+    section : string ["iu","in","nu","nn","ib"], status : string ["created", "done", "canceled", "moved"],
+    icon : string ["wait","remind","call","force","mail","prepare","manage","meet","visit","make","journey","think"] } }
+
+* Checks the current session for validity. If the session is not valid, it returns "SessionEmptyNotFoundOrExpired" as a result.
+* Returns an array of structures that identify tasks from a selected list of the current user.
+
 ## Database structure
 
 ### `Tasks`
@@ -191,6 +204,7 @@ We use both: lowerCamelCase or UpperCamelCase:
 
 * Function and variables in JavaScript are named in **lowerCamelCase**.
 * All JSON filed names must be **UpperCamelCase**, same as fields of structures in Go. Do not forget to use correct case of JSON filed names in Javascript ajax-routines.
+* All web API-calls must be **UpperCamelCase** too.
 
 ### How we name identifiers in MongoDB
 
