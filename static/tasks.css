@@ -4,13 +4,13 @@
 header,
 #user-form,
 #select-list-form,
-#help-label
-#help-close-div
-#user-img
-#anon-img
-#register-user-button
-#signup-spinner-div
-#login-spinner-div
+#help-label,
+#help-close-div,
+#user-img,
+#anon-img,
+#register-user-button,
+#signup-spinner-div,
+#login-spinner-div,
 #task-spinner-div
  {
   display: none;

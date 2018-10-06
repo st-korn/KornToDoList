@@ -45,6 +45,8 @@ function init() {
 		// Fade out main task table
 		$("#task-filter-nav").fadeTo("slow",0.5);
 		$("#tasks-main").fadeTo("slow",0.5);
+		// Hide loading spinner
+		$("#task-spinner-div").hide();
 	}
 	else
 	{
