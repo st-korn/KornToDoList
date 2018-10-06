@@ -1,355 +1,543 @@
-var resetTaskFormAfterUpdate = false;
-var oldBackgroundTop = 0;
+// Initialze
 $( init );
 
 // ===========================================================================
-// Инициализация страницы
+// Page initialization
 // ===========================================================================
 function init() {
-	$("select#ListSelect").change(onListChange);
-	$("button#ListCreate").bind('click', createList);
-	$("button#TaskSubmit").bind('click', sendTask);
-	$("button#TaskMove").bind('click', moveTask);
-	$("label#ListHelp").bind('click', startTour);
-	afterUpdate();
-	$("td.vh button").click();
-	$("#spinner").hide();
-	$(".tourplace").hide();
-	$(".tourplace-background").hide();
-}
+	// Bind event handling
+	$("#language-select").change(onLanguageChange);
+	$("#wellcome-register-user-button").bind('click', clickSignup);
+	$("#wellcome-login-user-button").bind('click', showLoginForm);
+	$("#wellcome-start-anonymously-button").bind('click', startAnonymously);
+	$("#help-label").bind('click', showHelp);
+	$("#help-close-button").bind('click', hideHelp);
+	$("#submit-signup-button").bind('click', submitSignup);
+	$("#submit-restore-button").bind('click', submitSignup);
+	$("#cancel-signup-button").bind('click', cancelSignup);
+	$("#submit-login-button").bind('click', submitLogin);
+	$("#cancel-login-button").bind('click', cancelLogin);
+	$("#logout-user-button").bind('click', clickLogout);
+	$("#forgot-password-label").bind('click', clickForgotPassword);
+	$("#filter-select").change(applyFilter);
+	$("#filter-input").change(applyFilter);
+	$("#filter-clear-button").bind('click', clickClearFilter);
+	$("#filter-input").keypress(onEnterFilterInput);
 
+	// Fill autocomplete with names of employees
+	$("#filter-input").autocomplete( {
+		source: completeEmployeeNames,
+		select: applyFilter,
+		open: function(event, ui) {
+			$('.ui-autocomplete').off('menufocus hover mouseover mouseenter');
+		}
+	  } );
 
-function startTour() {
-	// Скрываем таблицу
-	$(".workplace").css("position", "fixed");
-	$(".tourplace").show();
-	$(".tourplace-background").show();
-	oldBackgroundTop = $(".tourplace-background").offset().top;
-
-	$("div#tour5-cat").offset({ top: $("section#tour5").offset().top+$("select#TaskSection").offset().top-7, left: $("select#TaskSection").offset().left-7 });
-	$("div#tour5-cat").height( $("select#TaskSection").height() );
-	$("div#tour5-cat").width( $("select#TaskSection").width() );
-	$("div#tour5-vh").offset({ top: $("section#tour5").offset().top+$("td.vh .ColumnHeader").offset().top+$("td.vh .ColumnHeader").height()+5, left: $("td.vh").offset().left });
-
-	/*// init controller
-	var controller = new ScrollMagic.Controller();
-
-	// build scenes
-	new ScrollMagic.Scene({triggerElement: "#tour1", duration: window.innerHeight})
-					.setClassToggle("#high1", "active") // add class toggle
-					.addIndicators() // add indicators (requires plugin)
-					.addTo(controller);
-	new ScrollMagic.Scene({triggerElement: "#tour2"})
-					.setClassToggle("#high2", "active") // add class toggle
-					.addIndicators() // add indicators (requires plugin)
-					.addTo(controller);*/
-
-	/*		$('.tour').fullpage({
-				anchors: ['firstPage', 'secondPage', '3rdPage'],
-				sectionsColor: ['#C63D0F', '#1BBC9B', '#7E8F7C'],
-				scrollBar: true});*/
-
-	$("div.tour-background").each( function (index, element) {
-		var backgroundID = element.id;
-		$(this).height( $("section#tour"+backgroundID[backgroundID.length-1]).height()*1.25 );
-	} );
-
-	$.scrollify({
-            section : ".tour",
-            updateHash: false,
-    		touchScroll: true
-          });
-
-$(window).bind('scroll',function(e){
-    parallaxScroll();
-});
- 
-
-}
-
-function parallaxScroll(){
-    var scrolled = $(window).scrollTop();
-    //console.log("s=",scrolled);
-	//$(".tourplace-background").offset({ top: scrolled*1.25 });
-	//console.log("o=", oldBackgroundTop);
-	 $('.tourplace-background').css('top',(0-(scrolled*1.25))+'px');
-}
-
-// ===========================================================================
-// Инициализация объектов страницы после обновления таблицы задач с сервера
-// ===========================================================================
-function afterUpdate() {
-	$('button.add').bind('click', addNewTask);
-	$("button#ClearDone").bind('click', clearDoneTodayTasks);
-	$("button#ClearAll").bind('click', clearAllTodayTasks);
-	$('p').bind('click', editTask);
-	$("ul#TodayTasks").sortable({
-		cursor: "move",
-    	placeholder: "ui-state-highlight",
-    	cancel: ".TodayRelax",
-    	//scroll: true,
-    	update: function(event,ui) { sendToday() }
-    });
-    $("ul#TodayTasks").disableSelection();
-    $("li.TodayTask").resizable({
-    	grid: 20,
-    	handles: 's',
-    	distance: 3,
-    	start: function(event,ui) { $("li.TodayTask").css("cursor", "s-resize") }, 
-    	stop: function(event,ui) { $("li.TodayTask").css("cursor", ""); sendToday() }
-    });
-	$("li.TodayTask").bind('click', editTodayTask);
-	// Подсчитываем статистику
-	$("label#TaskStats").text("Задач "+$("p").length+": выполнено "+$("p.done").length+" ("+Math.round($("p.done").length*100/$("p").length)+"%), отменено "+$("p.canceled").length+" ("+Math.round($("p.canceled").length*100/$("p").length)+"%)");
-}
-
-// ===========================================================================
-// При щелчке на любую из кнопок "+", расположенных в колонках таблицы
-// Подготавливает форму ввода #TaskForm для добавления новой задачи
-// ===========================================================================
-function addNewTask() {
-	resetTaskFormAfterUpdate = false;
-	$("input#TaskId").val( "" );
-	$("input#TaskList").val(  $("select#ListSelect").val() );
-	$("input#TaskText").val( "" );
-	$("select#TaskSection").val( $(this).closest('td').prop('class') );
-	$("select#TaskStatus").val( "created" );
-	$("select#TaskIcon").val( "" );
-	$("button#TaskSubmit").text("Добавить");
-	$("button#TaskMove").hide();
-	$("input#CheckToday").prop('checked',false);
-	$("label#TaskResult").text("");
-	$("input#TaskText").focus();
-}
-
-// ===========================================================================
-// При щелчке на задаче - загружает её для редактирования в форму #TaskForm
-// ===========================================================================
-function editTask() {
-	resetTaskFormAfterUpdate = false;
-	$("input#TaskId").val( $(this).prop('id') );
-	$("input#TaskList").val(  $("select#ListSelect").val() );
-	$("input#TaskText").val( $(this).text() );
-	$("select#TaskSection").val( $(this).closest('td').prop('class') );
-	$("select#TaskStatus").val( $(this).prop('class') );
-	$("select#TaskIcon").val( $(this).find("img").prop('class') );
-	$("button#TaskSubmit").text("Изменить");
-	if ( ($("button#TaskMove").prop('title') != $("select#ListSelect").val()) && 
-		($("select#TaskStatus").val() == "created") ) 
-		{ $("button#TaskMove").show() }
-	else
-		{ $("button#TaskMove").hide() };
-	if( ($("select#TaskStatus").val() == "created") &&
-		($('li[id="'+$(this).prop('id')+'"]').length == 0) ) {
-		$("button#TaskToday").show() }
-	else {
-		$("button#TaskToday").hide() };
-	if ($('li[id="'+$(this).prop('id')+'"]').length > 0) {
-		$("input#CheckToday").prop('checked',true) }
-	else {
-		$("input#CheckToday").prop('checked',false) };
-	$("label#TaskResult").text("");
-	$("input#TaskText").focus();
-}
-
-// ===========================================================================
-// При щелчке на блоке запланированной на сегодня задачи - срабатывает
-// так же, как если бы щёлкнули на задаче в одной из колонок таблицы
-// ===========================================================================
-function editTodayTask() {
-	var id = $(this).prop('id')
-	var pp = $('p[id="'+id+'"]') // поиск с # не срабатывает, оказывается на странице нельзя иметь элементы с одинаковым id, пусть даже разных типов
-	editTask.call(pp)
-}
-
-// ===========================================================================
-// При щелчке на кнопке #TaskSubmit в форме создания/редактирования задач
-// Отправляет на сервер команду, обновляющую задачу (если её id задан),
-// или создающую новую задачу (если id пустой)
-// ===========================================================================
-function sendTask() {
-	$("#spinner").show();
-	resetTaskFormAfterUpdate = true;
-	if (!$("input#TaskText").val())
+	// Analyze the presence of a saved session
+	if ( Cookies.get('User-Session') == null )
 	{
-		alert('Введите задачу!');
-		$("input#TaskText").focus();
+		// Show welcome-headers
+		$("#help-header").show();
+		$("#welcome-header").show();
+		// Hide and disable forms before user select one of the welcome-form buttons
+		$("#task-filter-nav *").prop( "disabled", true );
+		$("section button").prop( "disabled", true );
+		// Fade out main task table
+		$("#task-filter-nav").fadeTo("slow",0.5);
+		$("#tasks-main").fadeTo("slow",0.5);
+	}
+	else
+	{
+		// show severals hidden forms
+		$("#user-form").show();
+		$("#select-list-form").show();
+		$("#help-label").show();
+		$("#help-close-div").show();
+		// Validate "User-Session" cookie
+		getUserInfo();
+		// Load list of todo-lists for current user
+		getLists();
+		// Start working with page
+		$("section.vh button").click();
+	}
+}
+
+// ===========================================================================
+// Show sign-up form
+// ===========================================================================
+function showSignupForm() {
+	// Close login <div> if necessary
+	if ( $("#login-header").is(":visible") ) {
+		$("#login-header").animate({height: "hide"}, 100);
+	};
+	// Show sign-up <div>
+	$("#signup-spinner-div").hide();
+	$("#signup-result-label").text("");
+	$("#signup-header").animate({height: "show"}, 100);
+	$("#email-signup-input").focus();
+	return false;
+}
+
+// ===========================================================================
+// Submit sign-up form
+// ===========================================================================
+function submitSignup() {
+	// Validate fields
+	if ( $("#email-signup-input").val() == "" ) {
+		$("#signup-result-label").text(resultEmptyEMail);
 		return false;
 	}
+	// Send Ajax POST request
+	$("#signup-result-label").text("");
+	$("#signup-spinner-div").show();
 	$.ajax( {
-		url : "/sendTask",
-		cache: false,
-		type : "post",
-		dataType: "text",
-		data : $("#TaskForm").serialize(),
-		// В случае успешного получения ответа от сервера
-		success: function (response) {
-			// После того, как задача будет успешно отправлена на сервер
-			$("label#TaskResult").html("Готово");
-			reloadTasks();
-		},
-		// В случае возвращение сервером ошибки, или недоступности сервера
-		error: function(jqXHR,exception) { 
-			showAjaxError(jqXHR,exception);
-			$("#spinner").hide();
-		}
-	} );
-	return false;
-}
-
-function clearDoneTodayTasks() {
-	$("li.done").remove();
-	$("li.moved").remove();
-	$("li.canceled").remove();
-	sendToday();
-	return false;
-}
-
-function clearAllTodayTasks() {
-	$("li.TodayTask").remove();
-	sendToday();
-	return false;
-}
-
-function sendToday() {
-	$("#spinner").show();
-	resetTaskFormAfterUpdate = true;
-	var TodayTasksOffset = $("ul#TodayTasks").offset().top;
-	var TodayTasks = [];
-	$("li.TodayTask").each( function (index, element) {
-		var TodayTask = {};
-		TodayTask.id = element.id;
-		TodayTask.start = Math.round(($(this).offset().top-TodayTasksOffset)/20);
-		TodayTask.length = Math.round($(this).outerHeight()/20);
-		TodayTasks.push( TodayTask );
-	} )
-	$.ajax( {
-		url : "/arrangeTodayTasks",
+		url : "/SignUp",
 		cache: false,
 		type : "post",
 		dataType: "json",
-		data : JSON.stringify( { TodayTasks: TodayTasks, List: $("select#ListSelect").val() } ),
-		// В случае успешного получения ответа от сервера
+		contentType: "application/json; charset=utf-8",
+		data : JSON.stringify( { EMail: $("#email-signup-input").val() } ),
+		// if success
 		success: function (response) {
-			// После того, как задача будет успешно отправлена на сервер
-			$("label#TaskResult").html("Расписание обновлено");
-			reloadTasks();
+			$("#signup-spinner-div").hide();
+			switch(response.Result) {
+  				case "EmptyEMail" : $("#signup-result-label").html(resultEmptyEMail); break;
+  				case "UserJustExistsButEmailSent" : $("#signup-result-label").html(resultAllreadyExist); break;
+  				case "UserSignedUpAndEmailSent" : $("#signup-result-label").html(resultSignupOK); break;
+				default : $("#signup-result-label").html(resultUnknown);
+			}
 		},
-		// В случае возвращение сервером ошибки, или недоступности сервера
+		// if error returns
 		error: function(jqXHR,exception) { 
-			showAjaxError(jqXHR,exception);
-			$("#spinner").hide();
+			$("#signup-spinner-div").hide();
+			showAjaxError("#signup-result-label",jqXHR,exception);
 		}
 	} );
-}
-
-function reloadTasks() {
-	// Обновляем таблицу задач
-	$("#TasksTable").load(location.href+" #TasksTable",
-		"", function() { 
-			// Восстанавливаем функциональность кнопок "+" и кликабельность задач
-			afterUpdate();
-			// Подготавливаемся ко вводу новой задачи
-			if (resetTaskFormAfterUpdate) { $("td.vh button").click(); }
-			// Выключаем спиннер
-			$("#spinner").hide();
-		}
-	);
-
-}
-
-function showAjaxError(jqXHR, exception) {
-	var msg = '';
-	if (jqXHR.status === 0) { msg = 'Not connect.\n Verify Network.'; } 
-	else if (jqXHR.status == 404) { msg = 'Requested page not found. [404]'; }
-	else if (jqXHR.status == 500) { msg = 'Internal Server Error [500].'+jqXHR.responseText; }
-	else if (exception === 'parsererror') { msg = 'Requested JSON parse failed.'; } 
-	else if (exception === 'timeout') { msg = 'Time out error.'; } 
-	else if (exception === 'abort') { msg = 'Ajax request aborted.'; }
-	else { msg = 'Uncaught Error.\n' + jqXHR.responseText; }
-	$("label#TaskResult").html(msg);
-}
-
-function onListChange() {
-	if ($("select#ListSelect").prop('selectedIndex') == 0) {
-		window.location.href = "/";
-	}
-	else {
-		window.location.href = "/?list="+$("select#ListSelect").val();	
-	}
-}
-
-Date.prototype.yyyymmdd = function() {
-  var mm = this.getMonth() + 1; // январь=0
-  var dd = this.getDate();
-  return [this.getFullYear(),
-          (mm>9 ? '' : '0') + mm,
-          (dd>9 ? '' : '0') + dd
-         ].join('-');
-};
-
-function createList() {
-	var now = new Date();
-	var formated_now = now.yyyymmdd();
-	var str = $("select#ListSelect").val();
-	var username = str.substring(0, str.indexOf(":"));
-	$("button#TaskMove").prop('title', username+":"+formated_now);
-	$("button#TaskMove").text("Перенести в список "+formated_now);
-	if ($("input#TaskId").val() != "") {
-		if ( $("button#TaskMove").prop('title') != $("select#ListSelect").val() ) { $("button#TaskMove").show() };
-	}
 	return false;
 }
 
-function moveTask() {
-	$("#spinner").show();
-	resetTaskFormAfterUpdate = true;
-	var old_id = $("input#TaskId").val();
+// ===========================================================================
+// Cancel signup form
+// ===========================================================================
+function cancelSignup() {
+	// Close sign-up <div>
+	$("#signup-header").animate({height: "hide"}, 100);
+	return false;
+}
 
-	$("input#TaskId").val( "" );
-	$("input#TaskList").val(  $("button#TaskMove").prop('title') );	
+// ===========================================================================
+// Let user try to sign up
+// ===========================================================================
+function clickSignup() {
+	$("#submit-signup-button").show();
+	$("#submit-restore-button").hide();
+	showSignupForm();
+	return false;
+}
+
+// ===========================================================================
+// Show login form
+// ===========================================================================
+function showLoginForm() {
+	// Close sign-up <div> if necessary
+	if ( $("#signup-header").is(":visible") ) {
+		$("#signup-header").animate({height: "hide"}, 100);
+	};
+	// Show login <div>
+	$("#login-spinner-div").hide();
+	$("#login-result-label").text("");
+	$("#login-header").animate({height: "show"}, 100);
+	$("#email-login-input").focus();
+	return false;
+}
+
+// ===========================================================================
+// Submit login form
+// ===========================================================================
+function submitLogin() {
+	// Validate fields
+	if ( $("#email-login-input").val() == "" ) {
+		$("#login-result-label").text(resultEmptyEMail);
+		return false;
+	}
+	if ( $("#password-login-input").val() == "" ) {
+		$("#login-result-label").text(resultEmptyPassword);
+		return false;
+	}
+	// Calculate password's hash
+	var hash = md5($("#password-login-input").val());
+	// Send Ajax POST request
+	$("#login-result-label").text("");
+	$("#login-spinner-div").show();
 	$.ajax( {
-		url : "/sendTask",
+		url : "/LogIn",
 		cache: false,
 		type : "post",
-		dataType: "text",
-		data : $("#TaskForm").serialize(),
-		// В случае успешного получения ответа от сервера
+		dataType: "json",
+		contentType: "application/json; charset=utf-8",
+		data : JSON.stringify( { EMail: $("#email-login-input").val(), PasswordMD5: hash } ),
+		// if success
 		success: function (response) {
-			editTask.call($('p[id="'+old_id+'"]'));
-			$("select#TaskStatus").val( "moved" );
-			resetTaskFormAfterUpdate = true;
-			$.ajax( {
-				url : "/sendTask",
-				cache: false,
-				type : "post",
-				dataType: "text",
-				data : $("#TaskForm").serialize(),
-				// В случае успешного получения ответа от сервера
-				success: function (response) {
-					// Проверяем, если список только создаётся - обновляем текущую страницу
-					if ($('select#ListSelect option[value="'+$("button#TaskMove").prop('title')+'"]').length == 0)
-					{
-						location.reload();
-					}
-					else 
-					{
-						$("label#TaskResult").html("Задача перенесена");
-						reloadTasks();
-					}
-				},
-				// В случае возвращение сервером ошибки, или недоступности сервера
-				error: function(jqXHR,exception) { 
-					showAjaxError(jqXHR,exception);
-					$("#spinner").hide();
-				}
-			} );
+			$("#login-spinner-div").hide();
+			switch(response.Result) {
+  				case "EmptyEMail" : $("#login-result-label").html(resultEmptyEMail); break;
+  				case "EmptyPassword" : $("#login-result-label").html(resultEmptyPassword); break;
+  				case "UserAndPasswordPairNotFound" : $("#login-result-label").html(resultUserAndPasswordPairNotFound); break;
+  				case "LoggedIn" : 
+  					$("#login-result-label").html(resultLoggedIn); 
+  					Cookies.set('User-Session', response.UUID, { expires: DefaultCookieLifetimeDays });
+  					location.reload();
+  					break;
+				default : $("#login-result-label").html(resultUnknown);
+			}
 		},
-		// В случае возвращение сервером ошибки, или недоступности сервера
+		// if error returns
 		error: function(jqXHR,exception) { 
-			showAjaxError(jqXHR,exception);
-			$("#spinner").hide();
+			$("#login-spinner-div").hide();
+			showAjaxError("#login-result-label",jqXHR,exception);
 		}
 	} );
 	return false;
 }
+
+// ===========================================================================
+// Cancel login form
+// ===========================================================================
+function cancelLogin() {
+	// Close sign-up <div>
+	$("#login-header").animate({height: "hide"}, 100);
+	return false;
+}
+
+// ===========================================================================
+// Restore forgotten password
+// ===========================================================================
+function clickForgotPassword() {
+	$("#submit-signup-button").hide();
+	$("#submit-restore-button").show();
+	showSignupForm();
+}
+
+// ===========================================================================
+// Start to work anonymously
+// ===========================================================================
+function startAnonymously() {
+	// Send Ajax POST request
+	$("#task-spinner-div").show();
+	$.ajax( {
+		url : "/GoAnonymous",
+		cache: false,
+		type : "post",
+		// if success
+		success: function (response) {
+			$("#task-spinner-div").hide();
+			switch(response.Result) {
+  				case "SuccessAnonymous" : 
+  					Cookies.set('User-Session', response.UUID, { expires: DefaultCookieLifetimeDays });
+  					location.reload();
+  					break;
+				default : $("#operation-status-label").html(resultUnknown);
+			}
+		},
+		// if error returns
+		error: function(jqXHR,exception) { 
+			$("#task-spinner-div").hide();
+			showAjaxError("#operation-status-label",jqXHR,exception);
+		}
+	} );
+	return false;
+}
+
+// ===========================================================================
+// Show to user Help <div>
+// ===========================================================================
+function showHelp() {
+	$("#help-close-div").show();
+	$("#help-header").animate({height: "show"}, 100);
+	$("#help-label").hide();
+}
+
+// ===========================================================================
+// Show from user Help <div>
+// ===========================================================================
+function hideHelp() {
+	$("#help-header").animate({height: "hide"}, 100);
+	$("#help-label").show();
+	return false;
+}
+
+// ===========================================================================
+// When the user selects a language from the list
+// ===========================================================================
+function onLanguageChange() {
+	Cookies.set('User-Language', $("#language-select").val(), { expires: DefaultCookieLifetimeDays });
+	location.reload();
+}
+
+// ===========================================================================
+// Click logout button
+// ===========================================================================
+function clickLogout() {
+	// Send Ajax POST request
+	$("#task-spinner-div").show();
+	$.ajax( {
+		url : "/LogOut",
+		cache: false,
+		type : "post",
+		// if success
+		success: function (response) {
+			$("#task-spinner-div").hide();
+			switch(response.Result) {
+  				case "EmptySession" : break;
+  				case "LoggedOut" : 
+  					Cookies.remove('User-Session');
+  					location.reload();
+  					break;
+				default : $("#operation-status-label").html(resultUnknown);
+			}
+		},
+		// if error returns
+		error: function(jqXHR,exception) { 
+			$("#task-spinner-div").hide();
+			showAjaxError("#operation-status-label",jqXHR,exception);
+		}
+	} );
+	return false;
+}
+
+// ===========================================================================
+// Fetch user info from server and put in on page
+// ===========================================================================
+function getUserInfo() {
+	// Send Ajax POST request
+	$("#task-spinner-div").show();
+	$.ajax( {
+		url : "/UserInfo",
+		cache: false,
+		type : "post",
+		// if success
+		success: function (response) {
+			$("#task-spinner-div").hide();
+			switch(response.Result) {
+  				case "SessionEmptyNotFoundOrExpired" :
+  					Cookies.remove('User-Session');
+  					location.reload();
+  					break;
+  				case "ValidUserSession" :
+  					$("#user-img").show();
+  					$("#anon-img").hide();
+  					$("#user-label").html(response.EMail);
+  					$("#register-user-button").hide();
+  					Cookies.set('User-Session', Cookies.get('User-Session'), { expires: DefaultCookieLifetimeDays });
+  					break;
+  				case "ValidAnonymousSession" : 
+  					$("#user-img").hide();
+  					$("#anon-img").show();
+  					$("#user-label").html(response.EMail);
+  					$("#register-user-button").show();
+  					Cookies.set('User-Session', Cookies.get('User-Session'), { expires: DefaultCookieLifetimeDays });
+  					break;
+				default : $("#operation-status-label").html(resultUnknown);
+			}
+		},
+		// if error returns
+		error: function(jqXHR,exception) { 
+			$("#task-spinner-div").hide();
+			showAjaxError("#operation-status-label",jqXHR,exception);
+		}
+	} );
+	return false;
+}
+
+// ===========================================================================
+// Fetch names lists of current user from server and put in in dropdown-list
+// ===========================================================================
+function getLists() {
+	// Send Ajax POST request
+	$("#task-spinner-div").show();
+	$.ajax( {
+		url : "/GetLists",
+		cache: false,
+		type : "post",
+		// if success
+		success: function (response) {
+			$("#task-spinner-div").hide();
+			switch(response.Result) {
+  				case "SessionEmptyNotFoundOrExpired" :
+  					Cookies.remove('User-Session');
+  					location.reload();
+  					break;
+				case "OK" :
+					// Collect lists names
+					$.each(response.Lists, function() {
+						$("#task-lists-select").append($("<option />").val(this).text(this));
+					});
+					// Load all tasks of current list
+					loadTasks();
+  					break;
+				default : $("#operation-status-label").html(resultUnknown);
+			}
+		},
+		// if error returns
+		error: function(jqXHR,exception) { 
+			$("#task-spinner-div").hide();
+			showAjaxError("#operation-status-label",jqXHR,exception);
+		}
+	} );
+	return false;
+}
+
+// ===========================================================================
+// Generate <p> HTML for the Task structure
+// IN: struct {	ID : string, Text : string, Section : string, Status : string, Icon : string }
+// ===========================================================================
+function htmlTask(task) {
+	var tooltips = {'created': statusCreated, 'moved': statusMoved, 'canceled': statusCanceled, 'done': statusDone};
+	var p = '<p class="' + task.Status + '" tooltip="' + tooltips[task.Status] + '">'
+	if (task.Icon != "") {
+		p = p + '<img class="'+task.Icon+'" src="/static/icons/'+task.Icon+'.svg">'
+	}
+	var idx = task.Text.indexOf(" - ");
+	if (idx > 0) {
+		p = p + '<span class="employee">' + task.Text.substr(0,idx) + '</span>' + task.Text.substring(idx,task.Text.length);
+	} else {
+		p = p + task.Text;
+	}
+	p = p + '</p>';
+	return p;
+}
+
+// ===========================================================================
+// Load from server all tasks of current selected list
+// ===========================================================================
+function loadTasks() {
+	// Send Ajax POST request
+	$("#task-spinner-div").show();
+	$.ajax( {
+		url : "/GetTasks",
+		cache: false,
+		type : "post",
+		dataType: "json",
+		contentType: "application/json; charset=utf-8",
+		data : JSON.stringify( { List: $("#task-lists-select").val()} ),
+		// if success
+		success: function (response) {
+			$("#task-spinner-div").hide();
+			switch(response.Result) {
+  				case "SessionEmptyNotFoundOrExpired" :
+  					Cookies.remove('User-Session');
+  					location.reload();
+  					break;
+				case "OK" :
+					// Collect tasks
+					$.each(response.Tasks, function() {
+						$("#"+this.Section).append(htmlTask(this));
+					});
+					// Calculate page statistic
+					afterUpdate();
+  					break;
+				default : $("#operation-status-label").html(resultUnknown);
+			}
+		},
+		// if error returns
+		error: function(jqXHR,exception) { 
+			$("#task-spinner-div").hide();
+			showAjaxError("#operation-status-label",jqXHR,exception);
+		}
+	} );
+	return false;
+}
+
+// ===========================================================================
+// When the user selects a tasks display mode or 
+// when the user enter any filter letters
+// ===========================================================================
+function applyFilter() {
+	switch($("#filter-select").val()) {
+		case "all" :
+			$("p").show();
+			break;
+		case "created-only" :
+			$("p.created").show();
+			$("p.done").hide();
+			$("p.canceled").hide();
+			$("p.moved").hide();
+			break;
+		case "created-not-wait-not-remind" :
+			$("p.done").hide();
+			$("p.canceled").hide();
+			$("p.moved").hide();
+			$("p.created").show();
+			$("img.wait, img.remind").closest("p.created").hide();
+			break;
+	}
+	if ( $("#filter-input").val() != "" ) {
+		$("p:not(:contains("+ $("#filter-input").val() +"))").hide(); 
+	}
+}
+
+// ===========================================================================
+// When the user enter any filter letters
+// ===========================================================================
+function clickClearFilter() {
+	$("#filter-input").val("");
+	applyFilter();
+	$("#filter-input").focus();
+	return false;
+}
+
+// ===========================================================================
+// Keyboard event handler on Filter Input field
+// ===========================================================================
+function onEnterFilterInput(event) {
+	if (event.keyCode == 13) {
+		event.preventDefault();
+		applyFilter();
+		$("#filter-clear-button").focus();
+	}
+}
+
+// ===========================================================================
+// Autocompletion function of search filter text input box - searches amog employees names
+// ===========================================================================
+function completeEmployeeNames(request, response) {
+
+	function onlyTerm(value) { 
+		return value.indexOf(request.term) > -1;
+	}
+
+	var employees = $("span.employee:contains("+request.term+")").toArray().map( 
+						function(elem) { return elem.textContent.split(",").map(
+							function(item) { return item.trim(); } )
+						} );
+	var ac = [].concat.apply([], employees);
+	ac = ac.filter(onlyTerm).filter(onlyUnique).sort(sortByStringLength);
+	response(ac);
+}
+
+// ===========================================================================
+// Initializing page objects after updating the task table from the server
+// ===========================================================================
+function afterUpdate() {
+	// Calculate statistics
+	$("#total-tasks-count-label").text($("p").length+":");
+	if ( $("p").length == 0 )
+	{
+		$("#done-tasks-count-label").text("0,");
+		$("#canceled-tasks-count-label").text("0");
+		$("#remaining-tasks-count-label").text("0");
+	}
+	else
+	{
+		var total = $("p").length
+		var cnt = $("p.done").length
+		$("#done-tasks-count-label").text(cnt+" ("+Math.round(cnt*100/total)+"%),");
+		cnt = $("p.canceled").length
+		$("#canceled-tasks-count-label").text(cnt+" ("+Math.round(cnt*100/total)+"%),");
+		cnt = $("img.wait, img.remind").closest("p.created").length
+		$("#wait-remind-tasks-count-label").text(cnt+" ("+Math.round(cnt*100/total)+"%), ");
+		cnt = $("p.created").length - cnt
+		$("#activity-tasks-count-label").text(cnt+" ("+Math.round(cnt*100/total)+"%)");
+	}
+}
+
