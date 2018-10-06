@@ -24,8 +24,18 @@ To run .go server-application you need to set these environment variables:
     SET MAIL_LOGIN=login of smtp-server account
     SET MAIL_PASSWORD=password of smtp-server account
     SET MAIL_FROM=E-mail address, from which will be sent emails
-    SET SERVER_HTTP_ADDRESS=http-server hostname with http or https prefix, and without any path. User in email sent. (eg. https://todo.works)
+    SET SERVER_HTTP_ADDRESS=http-server hostname with http or https prefix, and without any path. User in email sent. (eg. <https://todo.works>)
     SET LISTEN_PORT=port on which the web-server listens HTTP-requests (for example 8080 for golang applications, hosted on clever-cloud.com)
+
+## WEB-server conception
+
+* The application accepts incoming only **HTTP**-requests on the port `LISTEN_PORT`. The application does not listen or open any HTTPS connections.
+
+* Internal cloud HTTPS-proxy servers usually take over SSL encryption and translate to the application only HTTP-requests inside the cloud infrastructure. For example, <https://www.clever-cloud.com>. When translating requests, a cloud proxy usually sets a header `X-Forwarded-Proto`. Using this header, you can determine how the initial request from the user's browser arrived: over HTTP or HTTPS? <https://www.clever-cloud.com/blog/engineering/2015/12/01/redirect-to-https-in-play/>
+
+* If the request from the browser came over the HTTP-protocol, the system returns the `301 (Moved Permanently)` redirection to the corresponding HTTPS page.
+
+* The application allows the receipt of requests directly without a cloud proxy (for example, for debugging). The application processes such requests only via the **HTTP**-protocol, and they are not redirected to HTTPS.
 
 ## WEB-server API
 

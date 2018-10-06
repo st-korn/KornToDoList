@@ -22,6 +22,7 @@ function init() {
 	$("#filter-select").change(applyFilter);
 	$("#filter-clear-button").bind('click', clickClearFilter);
 	$("#filter-input").keypress(onEnterFilterInput);
+	$("#task-lists-select").change(loadTasks);
 
 	// Fill autocomplete with names of employees
 	$("#filter-input").autocomplete( {
@@ -413,6 +414,10 @@ function htmlTask(task) {
 // Load from server all tasks of current selected list
 // ===========================================================================
 function loadTasks() {
+	// purge current tasks
+	$("p").remove();
+	// if no ToDo-list fount - then nothing to do
+	if ( !$("#task-lists-select").val() ) { return false };
 	// Send Ajax POST request
 	showSpinner("#task-spinner-div");
 	$.ajax( {
