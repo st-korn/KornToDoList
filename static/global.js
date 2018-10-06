@@ -17,6 +17,14 @@ function showAjaxError(labelID, jqXHR, exception) {
 }
 
 // ===========================================================================
+// New jquery selector for case-insesitive comparison
+// ===========================================================================
+jQuery.expr[':'].Contains = function(a, i, m) {
+	return jQuery(a).text().toLowerCase()
+		.indexOf(m[3].toLowerCase()) >= 0;
+  };
+
+// ===========================================================================
 // Function for array unique sorting
 // ===========================================================================
 function onlyUnique(value, index, self) { 
@@ -24,8 +32,21 @@ function onlyUnique(value, index, self) {
 }
 
 // ===========================================================================
-// Function for array sorting by string length
+// Function for sorting array of strings alphabetically
 // ===========================================================================
-function sortByStringLength(a, b) {
-	return a.length - b.length || a.localeCompare(b);
+function sortStringsAlphabetically(a, b) {
+    if(a.toLowerCase() < b.toLowerCase()) return -1;
+    if(a.toLowerCase() > b.toLowerCase()) return 1;
+	return 0;
+}
+
+// ===========================================================================
+// Function for hiding and showing spinners by its jquery-selector
+// ===========================================================================
+function hideSpinner(selector) {
+	$(selector).css('display', 'none');
+}
+
+function showSpinner(selector) {
+	$(selector).css('display', 'inline-block');
 }

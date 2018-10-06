@@ -39,7 +39,7 @@ function submitPasswords() {
 
 	// Send Ajax POST request
 	$("#result-label").text("");
-	$("#spinner-div").show();
+	showSpinner("#spinner-div");
 	$.ajax( {
 		url : "/SetPassword",
 		cache: false,
@@ -49,7 +49,7 @@ function submitPasswords() {
 		data : JSON.stringify( { UUID: uuid, PasswordMD5: hash } ),
 		// if success
 		success: function (response) {
-			$("#spinner-div").hide();
+			hideSpinner("#spinner-div");
 			switch(response.Result) {
 				case "UUIDExpiredOrNotFound" : $("#result-label").html(resultUUIDExpiredOrNotFound); break;
   				case "EmptyPassword" : $("#result-label").html(resultEmptyPassword); break;
@@ -60,7 +60,7 @@ function submitPasswords() {
 		},
 		// if error returns
 		error: function(jqXHR,exception) { 
-			$("#spinner-div").hide();
+			hideSpinner("#spinner-div");
 			showAjaxError("#result-label",jqXHR,exception);
 		}
 	} );

@@ -3,6 +3,5 @@
 		"MD013": false,
 		"MD033": false
 	  },
-	"css.lint.propertyIgnoredDueToDisplay": "ignore",
 	"go.lintOnSave": "off"
 }

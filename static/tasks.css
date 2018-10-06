@@ -12,7 +12,7 @@ header,
 #signup-spinner-div,
 #login-spinner-div,
 #task-spinner-div
- {
+{
   display: none;
 }
 
@@ -83,6 +83,7 @@ code span {
   color: blue;
 }
 #help-close-div {
+  margin: 10px 0 10px 0;
   text-align: center;
 }
 
@@ -98,7 +99,7 @@ form {
   margin: 0 0 3px 0;
 }
 form img {
-  display: inline;
+  display: inline-block;
   vertical-align: text-top;
   height: 16px;
   margin: -1px -2px 0 0;

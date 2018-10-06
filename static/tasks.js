@@ -20,14 +20,14 @@ function init() {
 	$("#logout-user-button").bind('click', clickLogout);
 	$("#forgot-password-label").bind('click', clickForgotPassword);
 	$("#filter-select").change(applyFilter);
-	$("#filter-input").change(applyFilter);
 	$("#filter-clear-button").bind('click', clickClearFilter);
 	$("#filter-input").keypress(onEnterFilterInput);
 
 	// Fill autocomplete with names of employees
 	$("#filter-input").autocomplete( {
 		source: completeEmployeeNames,
-		select: applyFilter,
+		select: function (e, ui) { applyFilter(ui.item.value);  },
+		change: function (e, ui) { applyFilter(this.value); },
 		open: function(event, ui) {
 			$('.ui-autocomplete').off('menufocus hover mouseover mouseenter');
 		}
@@ -46,7 +46,7 @@ function init() {
 		$("#task-filter-nav").fadeTo("slow",0.5);
 		$("#tasks-main").fadeTo("slow",0.5);
 		// Hide loading spinner
-		$("#task-spinner-div").hide();
+		hideSpinner("#task-spinner-div");
 	}
 	else
 	{
@@ -73,7 +73,7 @@ function showSignupForm() {
 		$("#login-header").animate({height: "hide"}, 100);
 	};
 	// Show sign-up <div>
-	$("#signup-spinner-div").hide();
+	hideSpinner("#signup-spinner-div");
 	$("#signup-result-label").text("");
 	$("#signup-header").animate({height: "show"}, 100);
 	$("#email-signup-input").focus();
@@ -91,7 +91,7 @@ function submitSignup() {
 	}
 	// Send Ajax POST request
 	$("#signup-result-label").text("");
-	$("#signup-spinner-div").show();
+	showSpinner("#signup-spinner-div");
 	$.ajax( {
 		url : "/SignUp",
 		cache: false,
@@ -101,7 +101,7 @@ function submitSignup() {
 		data : JSON.stringify( { EMail: $("#email-signup-input").val() } ),
 		// if success
 		success: function (response) {
-			$("#signup-spinner-div").hide();
+			hideSpinner("#signup-spinner-div");
 			switch(response.Result) {
   				case "EmptyEMail" : $("#signup-result-label").html(resultEmptyEMail); break;
   				case "UserJustExistsButEmailSent" : $("#signup-result-label").html(resultAllreadyExist); break;
@@ -111,7 +111,7 @@ function submitSignup() {
 		},
 		// if error returns
 		error: function(jqXHR,exception) { 
-			$("#signup-spinner-div").hide();
+			hideSpinner("#signup-spinner-div");
 			showAjaxError("#signup-result-label",jqXHR,exception);
 		}
 	} );
@@ -146,7 +146,7 @@ function showLoginForm() {
 		$("#signup-header").animate({height: "hide"}, 100);
 	};
 	// Show login <div>
-	$("#login-spinner-div").hide();
+	hideSpinner("#login-spinner-div");
 	$("#login-result-label").text("");
 	$("#login-header").animate({height: "show"}, 100);
 	$("#email-login-input").focus();
@@ -170,7 +170,7 @@ function submitLogin() {
 	var hash = md5($("#password-login-input").val());
 	// Send Ajax POST request
 	$("#login-result-label").text("");
-	$("#login-spinner-div").show();
+	showSpinner("#login-spinner-div");
 	$.ajax( {
 		url : "/LogIn",
 		cache: false,
@@ -180,7 +180,7 @@ function submitLogin() {
 		data : JSON.stringify( { EMail: $("#email-login-input").val(), PasswordMD5: hash } ),
 		// if success
 		success: function (response) {
-			$("#login-spinner-div").hide();
+			hideSpinner("#login-spinner-div");
 			switch(response.Result) {
   				case "EmptyEMail" : $("#login-result-label").html(resultEmptyEMail); break;
   				case "EmptyPassword" : $("#login-result-label").html(resultEmptyPassword); break;
@@ -195,7 +195,7 @@ function submitLogin() {
 		},
 		// if error returns
 		error: function(jqXHR,exception) { 
-			$("#login-spinner-div").hide();
+			hideSpinner("#login-spinner-div");
 			showAjaxError("#login-result-label",jqXHR,exception);
 		}
 	} );
@@ -225,14 +225,14 @@ function clickForgotPassword() {
 // ===========================================================================
 function startAnonymously() {
 	// Send Ajax POST request
-	$("#task-spinner-div").show();
+	showSpinner("#task-spinner-div");
 	$.ajax( {
 		url : "/GoAnonymous",
 		cache: false,
 		type : "post",
 		// if success
 		success: function (response) {
-			$("#task-spinner-div").hide();
+			hideSpinner("#task-spinner-div");
 			switch(response.Result) {
   				case "SuccessAnonymous" : 
   					Cookies.set('User-Session', response.UUID, { expires: DefaultCookieLifetimeDays });
@@ -243,7 +243,7 @@ function startAnonymously() {
 		},
 		// if error returns
 		error: function(jqXHR,exception) { 
-			$("#task-spinner-div").hide();
+			hideSpinner("#task-spinner-div");
 			showAjaxError("#operation-status-label",jqXHR,exception);
 		}
 	} );
@@ -281,14 +281,14 @@ function onLanguageChange() {
 // ===========================================================================
 function clickLogout() {
 	// Send Ajax POST request
-	$("#task-spinner-div").show();
+	showSpinner("#task-spinner-div");
 	$.ajax( {
 		url : "/LogOut",
 		cache: false,
 		type : "post",
 		// if success
 		success: function (response) {
-			$("#task-spinner-div").hide();
+			hideSpinner("#task-spinner-div");
 			switch(response.Result) {
   				case "EmptySession" : break;
   				case "LoggedOut" : 
@@ -300,7 +300,7 @@ function clickLogout() {
 		},
 		// if error returns
 		error: function(jqXHR,exception) { 
-			$("#task-spinner-div").hide();
+			hideSpinner("#task-spinner-div");
 			showAjaxError("#operation-status-label",jqXHR,exception);
 		}
 	} );
@@ -312,14 +312,14 @@ function clickLogout() {
 // ===========================================================================
 function getUserInfo() {
 	// Send Ajax POST request
-	$("#task-spinner-div").show();
+	showSpinner("#task-spinner-div");
 	$.ajax( {
 		url : "/UserInfo",
 		cache: false,
 		type : "post",
 		// if success
 		success: function (response) {
-			$("#task-spinner-div").hide();
+			hideSpinner("#task-spinner-div");
 			switch(response.Result) {
   				case "SessionEmptyNotFoundOrExpired" :
   					Cookies.remove('User-Session');
@@ -344,7 +344,7 @@ function getUserInfo() {
 		},
 		// if error returns
 		error: function(jqXHR,exception) { 
-			$("#task-spinner-div").hide();
+			hideSpinner("#task-spinner-div");
 			showAjaxError("#operation-status-label",jqXHR,exception);
 		}
 	} );
@@ -356,14 +356,14 @@ function getUserInfo() {
 // ===========================================================================
 function getLists() {
 	// Send Ajax POST request
-	$("#task-spinner-div").show();
+	showSpinner("#task-spinner-div");
 	$.ajax( {
 		url : "/GetLists",
 		cache: false,
 		type : "post",
 		// if success
 		success: function (response) {
-			$("#task-spinner-div").hide();
+			hideSpinner("#task-spinner-div");
 			switch(response.Result) {
   				case "SessionEmptyNotFoundOrExpired" :
   					Cookies.remove('User-Session');
@@ -382,7 +382,7 @@ function getLists() {
 		},
 		// if error returns
 		error: function(jqXHR,exception) { 
-			$("#task-spinner-div").hide();
+			hideSpinner("#task-spinner-div");
 			showAjaxError("#operation-status-label",jqXHR,exception);
 		}
 	} );
@@ -414,7 +414,7 @@ function htmlTask(task) {
 // ===========================================================================
 function loadTasks() {
 	// Send Ajax POST request
-	$("#task-spinner-div").show();
+	showSpinner("#task-spinner-div");
 	$.ajax( {
 		url : "/GetTasks",
 		cache: false,
@@ -424,7 +424,7 @@ function loadTasks() {
 		data : JSON.stringify( { List: $("#task-lists-select").val()} ),
 		// if success
 		success: function (response) {
-			$("#task-spinner-div").hide();
+			hideSpinner("#task-spinner-div");
 			switch(response.Result) {
   				case "SessionEmptyNotFoundOrExpired" :
   					Cookies.remove('User-Session');
@@ -443,7 +443,7 @@ function loadTasks() {
 		},
 		// if error returns
 		error: function(jqXHR,exception) { 
-			$("#task-spinner-div").hide();
+			hideSpinner("#task-spinner-div");
 			showAjaxError("#operation-status-label",jqXHR,exception);
 		}
 	} );
@@ -454,7 +454,7 @@ function loadTasks() {
 // When the user selects a tasks display mode or 
 // when the user enter any filter letters
 // ===========================================================================
-function applyFilter() {
+function applyFilter(filter) {
 	switch($("#filter-select").val()) {
 		case "all" :
 			$("p").show();
@@ -473,8 +473,8 @@ function applyFilter() {
 			$("img.wait, img.remind").closest("p.created").hide();
 			break;
 	}
-	if ( $("#filter-input").val() != "" ) {
-		$("p:not(:contains("+ $("#filter-input").val() +"))").hide(); 
+	if ( filter != "" ) {
+		$("p:not(:Contains("+ filter +"))").hide(); 
 	}
 }
 
@@ -482,9 +482,9 @@ function applyFilter() {
 // When the user enter any filter letters
 // ===========================================================================
 function clickClearFilter() {
+	$('#filter-input').autocomplete('close');
 	$("#filter-input").val("");
-	applyFilter();
-	$("#filter-input").focus();
+	applyFilter("");
 	return false;
 }
 
@@ -505,15 +505,15 @@ function onEnterFilterInput(event) {
 function completeEmployeeNames(request, response) {
 
 	function onlyTerm(value) { 
-		return value.indexOf(request.term) > -1;
+		return value.toLowerCase().indexOf(request.term.toLowerCase()) > -1;
 	}
 
-	var employees = $("span.employee:contains("+request.term+")").toArray().map( 
+	var employees = $("span.employee:Contains("+request.term+")").toArray().map( 
 						function(elem) { return elem.textContent.split(",").map(
-							function(item) { return item.trim(); } )
+							function(item) { return item.trim() } )
 						} );
 	var ac = [].concat.apply([], employees);
-	ac = ac.filter(onlyTerm).filter(onlyUnique).sort(sortByStringLength);
+	ac = ac.filter(onlyTerm).filter(onlyUnique).sort(sortStringsAlphabetically);
 	response(ac);
 }
 
