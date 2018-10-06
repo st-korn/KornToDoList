@@ -19,7 +19,7 @@ function init() {
 	$("#cancel-login-button").bind('click', cancelLogin);
 	$("#logout-user-button").bind('click', clickLogout);
 	$("#forgot-password-label").bind('click', clickForgotPassword);
-	$("#filter-select").change(applyFilter);
+	$("#filter-select").change( function() { applyFilter($("#filter-input").val()) } );
 	$("#filter-clear-button").bind('click', clickClearFilter);
 	$("#filter-input").keypress(onEnterFilterInput);
 	$("#task-lists-select").change(loadTasks);
