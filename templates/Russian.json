@@ -62,6 +62,8 @@
 "labelStatisticTasks" : "Задач",
 "labelStatisticDone" : "выполнено",
 "labelStatisticCanceled" : "отменено",
+"labelStatisticActivity" : "требуют активности",
+"labelStatisticWaitRemind" : "требуют контроля",
 
 "buttonWelcomeRegister" : "Зарегистрируйтесь",
 "labelWelcomeRegister" : "Понадобится e-mail, регистрация занимает 30 секунд.",

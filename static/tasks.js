@@ -19,6 +19,7 @@ function init() {
 	$("#cancel-login-button").bind('click', cancelLogin);
 	$("#logout-user-button").bind('click', clickLogout);
 	$("#forgot-password-label").bind('click', clickForgotPassword);
+	$("#filter-select").change(onFilterChange);
 
 	// Analyze the presence of a saved session
 	if ( Cookies.get('User-Session') == null )
@@ -379,13 +380,13 @@ function getLists() {
 // IN: struct {	ID : string, Text : string, Section : string, Status : string, Icon : string }
 // ===========================================================================
 function htmlTask(task) {
-	var $tooltips = {'created': statusCreated, 'moved': statusMoved, 'canceled': statusCanceled, 'done': statusDone}
-	var $p = '<p class="' + task.Status + '" tooltip="' + $tooltips[task.Status] + '">'
+	var tooltips = {'created': statusCreated, 'moved': statusMoved, 'canceled': statusCanceled, 'done': statusDone}
+	var p = '<p class="' + task.Status + '" tooltip="' + tooltips[task.Status] + '">'
 	if (task.Icon != "") {
-		$p = $p + '<img src="/static/icons/'+task.Icon+'.svg">'
+		p = p + '<img class="'+task.Icon+'" src="/static/icons/'+task.Icon+'.svg">'
 	}
-	$p = $p + task.Text + '</p>'
-	return $p
+	p = p + task.Text + '</p>'
+	return p
 }
 
 // ===========================================================================
@@ -430,6 +431,28 @@ function loadTasks() {
 }
 
 // ===========================================================================
+// When the user selects a tasks display mode
+// ===========================================================================
+function onFilterChange() {
+	switch($("#filter-select").val()) {
+		case "all" :
+			$("p").show();
+			break;
+		case "created-only" :
+			$("p.done").hide();
+			$("p.canceled").hide();
+			$("p.moved").hide();
+			break;
+		case "created-not-wait-not-remind" :
+			$("p.done").hide();
+			$("p.canceled").hide();
+			$("p.moved").hide();
+			$("img.wait, img.remind").closest("p.created").hide();
+			break;
+	}
+}
+
+// ===========================================================================
 // Initializing page objects after updating the task table from the server
 // ===========================================================================
 function afterUpdate() {
@@ -439,11 +462,19 @@ function afterUpdate() {
 	{
 		$("#done-tasks-count-label").text("0,");
 		$("#canceled-tasks-count-label").text("0");
+		$("#remaining-tasks-count-label").text("0");
 	}
 	else
 	{
-		$("#done-tasks-count-label").text($("p.done").length+" ("+Math.round($("p.done").length*100/$("p").length)+"%),");
-		$("#canceled-tasks-count-label").text($("p.canceled").length+" ("+Math.round($("p.canceled").length*100/$("p").length)+"%)");
+		var total = $("p").length
+		var cnt = $("p.done").length
+		$("#done-tasks-count-label").text(cnt+" ("+Math.round(cnt*100/total)+"%),");
+		var cnt = $("p.canceled").length
+		$("#canceled-tasks-count-label").text(cnt+" ("+Math.round(cnt*100/total)+"%),");
+		var cnt = $("img.wait, img.remind").closest("p.created").length
+		$("#wait-remind-tasks-count-label").text(cnt+" ("+Math.round(cnt*100/total)+"%), ");
+		var cnt = $("p.created").length - cnt
+		$("#activity-tasks-count-label").text(cnt+" ("+Math.round(cnt*100/total)+"%)");
 	}
 }
 

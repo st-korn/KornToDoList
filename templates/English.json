@@ -62,6 +62,8 @@
 "labelStatisticTasks" : "Tasks",
 "labelStatisticDone" : "done",
 "labelStatisticCanceled" : "canceled",
+"labelStatisticActivity" : "need activity",
+"labelStatisticWaitRemind" : "need control",
 
 "buttonWelcomeRegister" : "Sign up",
 "labelWelcomeRegister" : "Need e-mail, registration takes 30 seconds.",
