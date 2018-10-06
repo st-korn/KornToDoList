@@ -642,6 +642,14 @@ function submitTask() {
 }
 
 // ===========================================================================
+// Manage visibility and availability of buttons "Create new task list" and "Move task to new list"
+// ===========================================================================
+function manageListsButtons() {
+	// Determines the ability to create a new task list
+	
+}
+
+// ===========================================================================
 // Initializing page objects after updating the task table from the server
 // ===========================================================================
 function afterUpdate() {
