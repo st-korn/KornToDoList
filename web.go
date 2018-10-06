@@ -1,7 +1,9 @@
 package main
 
 import (
-	"net/http"      // for HTTP-server
+	"fmt"
+	"net/http" // for HTTP-server
+	"strings"
 	"text/template" // for use HTML-page templates
 
 	"golang.org/x/text/language/display" // to output national names of languages
@@ -22,6 +24,24 @@ type typeWebFormData struct {
 }
 
 func webFormShow(res http.ResponseWriter, req *http.Request) {
+
+	// All calls to unknown url paths should return 404
+	if req.URL.Path != "/" {
+		http.NotFound(res, req)
+		return
+	}
+
+	fmt.Println(req.RequestURI)
+	fmt.Println(req.TLS)
+	fmt.Println(req.Host)
+	// Redirect http to https
+	if strings.ToLower(req.URL.Scheme) != "https" {
+		target := "https://" + req.Host + req.URL.Path
+		if len(req.URL.RawQuery) > 0 {
+			target += "?" + req.URL.RawQuery
+		}
+		http.Redirect(res, req, target, http.StatusTemporaryRedirect)
+	}
 
 	// Prepare main structure of HTML-template
 	var webFormData typeWebFormData

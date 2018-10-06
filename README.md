@@ -24,7 +24,7 @@ To run .go server-application you need to set these environment variables:
     SET MAIL_LOGIN=login of smtp-server account
     SET MAIL_PASSWORD=password of smtp-server account
     SET MAIL_FROM=E-mail address, from which will be sent emails
-    SET SERVER_HTTP_ADDRESS=http-server hostname with http or https prefix, and without any path: (eg. http://127.0.0.1:9000 or https://todo.works)
+    SET SERVER_HTTP_ADDRESS=http-server hostname with http or https prefix, and without any path. User in email sent. (eg. https://todo.works)
     SET LISTEN_PORT=port on which the web-server listens HTTP-requests (for example 8080 for golang applications, hosted on clever-cloud.com)
 
 ## WEB-server API
