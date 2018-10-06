@@ -560,7 +560,11 @@ function newTask() {
 // ===========================================================================
 function submitTask() {
 	// if no task text - then nothing to do
-	if ( !$("#task-text-input").val() ) { alert(alertEmptyTask); return false };
+	if ( !$("#task-text-input").val() ) { 
+		$("#operation-status-label").html(alertEmptyTask); 
+		$("#task-text-input").focus();
+		return false 
+	};
 	// Send Ajax POST request
 	$("#operation-status-label").text("");
 	showSpinner("#task-spinner-div");
