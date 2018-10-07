@@ -81,7 +81,7 @@ func webGetTasks(res http.ResponseWriter, req *http.Request) {
 // 			   Section : string ["iu","in","nu","nn","ib"],
 //			   Status : string ["created", "done", "canceled", "moved"],
 // 			   Icon : string ["wait","remind","call","force","mail","prepare","manage","meet","visit","make","journey","think"],
-//			   Timestamp : datetime (cann't be null or "") }
+//			   Timestamp : datetime (can't be null or "") }
 // OUT: JSON: { Result : string ["TaskEmpty", "InvalidListName", "SessionEmptyNotFoundOrExpired", "UpdatedTaskNotFound",
 //								 "UpdateFailed", "TaskJustUpdated", "TaskUpdated", "InsertFailed", "TaskInserted"],
 //				Tasks : [] { Id : string,

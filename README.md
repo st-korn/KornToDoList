@@ -11,6 +11,7 @@ Experimental web-app ToDo-list by Stanislav Kornienko's conception. You can try 
 * `users.go` - implements JSON-api of users-routines (such as SignIn, LogIn, LogOut, etc..) for javascript and mobile applications.
 * `lists.go` - implements JSON-api of lists-routines (such as GetLists, CreateList) for javascript and mobile applications.
 * `tasks.go` - implements JSON-api of tasks-routines (such as GetTasks, SendTask) for javascript and mobile applications.
+* `today.go` - implements JSON-api of today's task list routines (such as SaveTodayTasks) for javascript and mobile applications.
 * `templates/` - here are HTML-templates and JSON language packages. A file from this folder is used by the main server application, but not transmitted to clients directly via HTTP requests.
 * `static/` - here are the static files that clients should receive via http requests: javascripts, CSSs, icons, etc.
 * `.graphics/` - in this folder the original images and the results of their processing are saved. All images received from third-party sites and services must necessarily contain a license, which allows their public commercial use.
@@ -191,7 +192,7 @@ Update existing task from the list or append new task to the list.
                 Section : string ["iu","in","nu","nn","ib"], 
                 Status : string ["created", "done", "canceled", "moved"],
                 Icon : string ["wait","remind","call","force","mail","prepare","manage","meet","visit","make","journey","think"], 
-                Timestamp : datetime (cann't be null or "") }
+                Timestamp : datetime (updated task timestamp, can't be null or "") }
     OUT: JSON: { Result : string ["TaskEmpty", "InvalidListName", "SessionEmptyNotFoundOrExpired", "UpdatedTaskNotFound", 
                                   "UpdateFailed", "TaskJustUpdated", "TaskUpdated", "InsertFailed", "TaskInserted"],
                  Tasks : [] { Id : string, 
@@ -207,6 +208,22 @@ Update existing task from the list or append new task to the list.
 * If updated task exist in database, and its timestamp is greater than timestamp of updated task, recieved from users-application, return `"TaskJustUpdated"` error.
 * Update existing task or generate ID and append new task to the database.
 * Returns an array of a single element - an added or updated task with its ID.
+
+### `POST /SaveTodayTasks`
+
+Save today's task list in database.
+
+    Cookies: User-Session : string (UUID)
+    IN: JSON: { List string,
+                TodayTasks []string (_id task or "" for delimiter),
+                Timestamp : datetime (updated task timestamp, can't be null or "") }
+    OUT: JSON: { Result : string ["InvalidListName", "SessionEmptyNotFoundOrExpired", "TodaysTaskListJustUpdated", "TodaysTaskListUpdated",
+                 TodayTasks []string (_id task or "" for delimiter) }
+
+* Checks the current session for validity. If the session is not valid, it returns `"SessionEmptyNotFoundOrExpired"` as a result.
+* If today's task-list exist in database, and its timestamp is greater than timestamp of updated task-list, recieved from users-application, return `"TodaysTaskListJustUpdated"` error.
+* Update today's task-list of current list in the database.
+* Returns an array of updated today's task-list.
 
 ## Database structure
 
@@ -254,6 +271,17 @@ Collection, that contains active cookies sessions for users.
         "uuid" : string // UUID cookie of the session
         "email" : string // email address of the session user
         "expired" : datetime UTC // UTC-datetime to which the session is valid
+    }
+
+### `TodaysTasks`
+
+Collection, that contains todays task-lists.
+
+    {
+        "email" : string // email address of the session user
+        "list" : string // list name in format: "YYYY-MM-DD"
+        "tasks" : []string //_id task or "" for delimiter
+        "timestamp" : datetime // server date and time last modification of today's task-list
     }
 
 ## Identifiers naming

@@ -419,9 +419,9 @@ function getLists() {
 
 // ===========================================================================
 // Generate <p> HTML for the Task structure
-// IN: struct {	ID : string, Text : string, Section : string, Status : string, Icon : string }
+// IN: task struct {	ID : string, Text : string, Section : string, Status : string, Icon : string, Timestamp : string }
 // ===========================================================================
-function htmlTask(task) {
+function htmlPTask(task) {
 	var tooltips = {'created': statusCreated, 'moved': statusMoved, 'canceled': statusCanceled, 'done': statusDone};
 	var p = '<p id="' + task.Id + '" class="' + task.Status + '" data-tooltip="' + tooltips[task.Status] + '" data-timestamp="'+task.Timestamp+'">'
 	if (task.Icon != "") {
@@ -434,6 +434,26 @@ function htmlTask(task) {
 		p = p + task.Text;
 	}
 	p = p + '</p>';
+	return p;
+}
+
+// ===========================================================================
+// Generate <li> HTML for the Task structure
+// IN: task struct {	ID : string, Text : string, Section : string, Status : string, Icon : string, Timestamp : string }
+// ===========================================================================
+function htmlLiTask(task) {
+	var tooltips = {'created': statusCreated, 'moved': statusMoved, 'canceled': statusCanceled, 'done': statusDone};
+	var p = '<li id="li-' + task.Id + '" class="' + task.Status + '" data-tooltip="' + tooltips[task.Status] + '" data-timestamp="'+task.Timestamp+'">'
+	if (task.Icon != "") {
+		p = p + '<img class="'+task.Icon+'" src="/static/icons/'+task.Icon+'.svg">'
+	}
+	var idx = task.Text.indexOf(" - ");
+	if (idx > 0) {
+		p = p + '<span class="employee">' + task.Text.substr(0,idx) + '</span>' + task.Text.substring(idx,task.Text.length);
+	} else {
+		p = p + task.Text;
+	}
+	p = p + '</li>';
 	return p;
 }
 
@@ -474,7 +494,7 @@ function loadTasks() {
 				case "OK" :
 					// Collect tasks
 					$.each(response.Tasks, function() {
-						$("#"+this.Section).append(htmlTask(this));
+						$("#"+this.Section).append(htmlPTask(this));
 					});
 					// Calculate page statistic
 					afterUpdate();
@@ -564,12 +584,26 @@ function completeEmployeeNames(request, response) {
 // Fill field of Task form values of clicked task. Prepare to task editing.
 // ===========================================================================
 function onTaskEdit() {
+	var id
+	switch ($(this).prop("tagName")) {
+		case "P" :
+			id = $(this).attr("id")
+			break;
+		case "LI" :
+			id = $(this).attr("id").substr(3);
+			break;
+	}
 	$("#task-status-select").val( $(this).attr("class") );
 	$("#task-icon-select").val( $(this).children("img").attr("class") );
-	$("#task-section-select").val( $(this).parents("section").attr("id") );
+	$("#task-section-select").val( $("p#"+id).parents("section").attr("id") );
 	$("#task-text-input").val( $(this).text() );
-	$("#task-id-input").val( $(this).attr("id") );
+	$("#task-id-input").val( id );
 	$("#task-timestamp-input").val( $(this).attr("data-timestamp") )
+	if ($("li#li-"+id).length > 0) {
+		$("#checkbox-today-input").prop('checked', true);
+	} else {
+		$("#checkbox-today-input").prop('checked', false);
+	};
 	$("#task-submit-button").html(buttonSaveTask);
 	manageListsButtons();
 	$("#task-text-input").focus();
@@ -586,6 +620,7 @@ function newTask() {
 	$("#task-id-input").val("");
 	var now = new Date();
 	$("#task-timestamp-input").val(now.toJSON());
+	$("#checkbox-today-input").prop('checked', false);
 	$("#task-submit-button").html(buttonAddTask);
 	manageListsButtons();
 	$("#task-text-input").focus();
@@ -648,18 +683,31 @@ function submitTask(list) {
 					// Collect tasks
 					$.each(response.Tasks, function() {
 						if ( $("#"+this.Id).length == 0 ) {
-							$("#"+this.Section).append(htmlTask(this));
+							$("#"+this.Section).append(htmlPTask(this));
 						} else {
-							$("#"+this.Id).replaceWith(htmlTask(this));
+							$("#"+this.Id).replaceWith(htmlPTask(this));
 							if (this.Section != $("#"+this.Id).parents("section").attr("id")) {
 								$("#"+this.Id).appendTo($("#"+this.Section));
 							}
 						};
 					});
-					// Re-apply filter
-					applyFilter($("#filter-input").val());
-					// Calculate page statistic
-					afterUpdate();
+					// Include or exclude task to the today's task-list
+					if ($("#checkbox-today-input").prop('checked')) {
+						// Try to include task to the today's task-list
+						var task = response.Tasks.find(obj => { return obj.Id === $("#task-id-input").val() });
+						if (task != undefined) {
+							if ($("li#li-"+$("#task-id-input").val()).length == 0) {
+								$("#today-tasks-ul").append(htmlLiTask(task));
+								saveToday();
+							}
+						}
+					} else {
+						// Try to exclude task from the today's task-list
+						if ($("li#li-"+$("#task-id-input").val()).length == 0) {
+							$("li#li-"+$("#task-id-input").val()).remove();
+							saveToday();
+						}
+					};
 					// Update status label
 					if (response.Result == "TaskUpdated") {
 						$("#operation-status-label").html(resultTaskUpdated);
@@ -667,7 +715,11 @@ function submitTask(list) {
 						$("#operation-status-label").html(resultTaskInserted);
 					} else if (response.Result == "TaskJustUpdated") {
 						$("#operation-status-label").html(resultTaskJustUpdated);
-					}
+					};
+					// Re-apply filter
+					applyFilter($("#filter-input").val());
+					// Calculate page statistic
+					afterUpdate();
 					// Get ready to create a new task
 					$("#ib button").click();
 					break
@@ -787,6 +839,13 @@ function moveTaskToNewList() {
 }
 
 // ===========================================================================
+// Send today's task list on server, to remember it in database
+// ===========================================================================
+function saveToday() {
+
+}
+
+// ===========================================================================
 // Initializing page objects after updating the task table from the server
 // ===========================================================================
 function afterUpdate() {
@@ -814,5 +873,6 @@ function afterUpdate() {
 	}
 	// Set events handlers
 	$("p").click(onTaskEdit)
+	$("li").click(onTaskEdit)
 }
 

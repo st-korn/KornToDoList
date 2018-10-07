@@ -232,17 +232,18 @@ p {
 span.employee {
 	color: rgba(0,0,255,1.0);
 }
-p.done span.employee, 
-p.canceled span.employee, 
-p.moved span.employee {
+.done span.employee, 
+.canceled span.employee, 
+.moved span.employee {
 	color: rgba(0,0,255,0.3);
 }
-p:hover {
+p:hover,
+li:hover {
 	cursor: pointer;
 }
-p.done:hover::after, 
-p.canceled:hover::after, 
-p.moved:hover::after {
+.done:hover::after, 
+.canceled:hover::after, 
+.moved:hover::after {
 	content: attr(data-tooltip); /* Use the attribute "tooltip" as the text of the hint */
 	position: absolute; /* Use absolute position */
 	z-index: 1; /* Display a hint on top of all other items */
@@ -253,10 +254,25 @@ p.moved:hover::after {
 }
 
 /* ===============================================================
+   Styles of today's task list
+   =============================================================== */
+#today-tasks-ul { 
+  list-style-type: none; 
+  margin: 0; 
+  padding: 0; 
+}
+li { 
+  margin: 0 5px 5px 5px; 
+  padding: 5px; 
+  border: dotted rgba(0,0,0,1) 1px;
+  border-radius: 5px;
+}
+
+/* ===============================================================
    Styles of icons
    =============================================================== */
-li img, 
-p img{
+p img,
+li img {
 	display: inline-block;
 	vertical-align: text-top;
 	height: 16px;
