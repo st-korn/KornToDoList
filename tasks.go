@@ -55,7 +55,7 @@ func webGetTasks(res http.ResponseWriter, req *http.Request) {
 
 	// Select tasks of user list
 	c := session.DB(DB).C("Tasks")
-	c.Find(bson.M{"email": email, "list": request.List}).All(&response.Tasks)
+	c.Find(bson.M{"email": email, "list": request.List, "text": bson.M{"$ne": ""}}).All(&response.Tasks)
 	response.Result = "OK"
 
 	// Return JSON response

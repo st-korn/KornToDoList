@@ -131,5 +131,9 @@
 "resultUpdateFailed" : "Не удалось обновить задачу",
 "resultTaskUpdated" : "Задача обновлена",
 "resultInsertFailed" : "Не удалось добавить задачу",
-"resultTaskInserted" : "Задача добавлена"
+"resultTaskInserted" : "Задача добавлена",
+
+"resultListCreated" : "Список создан",
+"resultDateTooFar" : "Название списка должно содержать текущую дату. Проверьте часы и календарь на вашем на устройстве.",
+"resultCreateListFailed" : "Не удалось создать список"
 }

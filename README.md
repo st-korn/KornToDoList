@@ -163,6 +163,18 @@ Update existing task from the list or append new task to the list.
 * Update existing task or generate ID and ppend new task to the database.
 * Returns an array of a single element - an added or updated task with its ID.
 
+### `POST /CreateList`
+
+Create new todo-list for current user.
+
+    Cookies: User-Session : string (UUID)
+    IN: JSON: {List : string "YYYY-MM-DD"}
+    OUT: JSON: { Result : string ["ListCreated", "InvalidListName", "DateTooFar", "CreateListFailed", "SessionEmptyNotFoundOrExpired"], Lists : []string }
+
+* Checks the current session for validity. If the session is not valid, it returns "SessionEmptyNotFoundOrExpired" as a result.
+* Verifies that the desired list name does not differ by more than 24 hours from the current server date.
+* Returns array of strings with names of saved users todo-lists.
+
 ## Database structure
 
 ### `Tasks`

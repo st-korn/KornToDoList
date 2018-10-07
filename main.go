@@ -103,22 +103,6 @@ func ClearExpiredSessiond() {
 }
 
 // ===========================================================================================================================
-// Return JSON in response to a http-request
-// ===========================================================================================================================
-// IN:	res - http.Responsewriter, in which the returned json is written
-// 		structJSON - structure to convert to JSON
-func ReturnJSON(res http.ResponseWriter, structJSON interface{}) {
-	// Create json response from struct
-	resJSON, err := json.Marshal(structJSON)
-	if err != nil {
-		panic(err)
-	}
-	res.Header().Set("Content-type", "application/json; charset=utf-8")
-	res.Write(resJSON)
-
-}
-
-// ===========================================================================================================================
 // Language defenition and detection
 // ===========================================================================================================================
 
@@ -290,6 +274,20 @@ func RedirectIncomingHTTPtoHTTPS(res http.ResponseWriter, req *http.Request) boo
 	}
 }
 
+// Return JSON in response to a http-request
+// IN:	res - http.Responsewriter, in which the returned json is written
+// 		structJSON - structure to convert to JSON
+func ReturnJSON(res http.ResponseWriter, structJSON interface{}) {
+	// Create json response from struct
+	resJSON, err := json.Marshal(structJSON)
+	if err != nil {
+		panic(err)
+	}
+	res.Header().Set("Content-type", "application/json; charset=utf-8")
+	res.Write(resJSON)
+
+}
+
 // ===========================================================================================================================
 // Database collections defenition
 // ===========================================================================================================================
@@ -348,6 +346,7 @@ func main() {
 	http.HandleFunc("/GetLists", webGetLists)
 	http.HandleFunc("/GetTasks", webGetTasks)
 	http.HandleFunc("/SendTask", webSendTask)
+	http.HandleFunc("/CreateList", webCreateList)
 	http.HandleFunc("/", webFormShow)
 
 	// Register a HTTP file server for delivery static files from the static directory

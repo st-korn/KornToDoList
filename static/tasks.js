@@ -25,6 +25,8 @@ function init() {
 	$("#task-lists-select").change(loadTasks);
 	$("#task-submit-button").bind('click', submitTask);
 	$("button.add").bind('click', newTask);
+	$("#new-list-create-button").bind('click', newList);
+	$("#task-move-button").bind('click', moveTask);
 
 	// Fill autocomplete with names of employees
 	$("#filter-input").autocomplete( {
@@ -676,6 +678,67 @@ function manageListsButtons() {
 }
 
 // ===========================================================================
+// Create new todo-list named by current date
+// ===========================================================================
+function newList() {
+	// Send Ajax POST request
+	$("#operation-status-label").text("");
+	showSpinner("#task-spinner-div");
+	$.ajax( {
+		url : "/CreateList",
+		cache: false,
+		type : "post",
+		dataType: "json",
+		contentType: "application/json; charset=utf-8",
+		data : JSON.stringify( { List: getCurrentDate() } ),
+		// if success
+		success: function (response) {
+			hideSpinner("#task-spinner-div");
+			switch(response.Result) {
+  				case "SessionEmptyNotFoundOrExpired" :
+  					Cookies.remove('User-Session');
+  					location.reload();
+					break;
+				case "InvalidListName" :
+					$("#operation-status-label").html(resultInvalidListName);
+					break;
+				case "DateTooFar" :
+					$("#operation-status-label").html(resultDateTooFar);
+					break;
+				case "CreateListFailed" :
+					$("#operation-status-label").html(resultCreateListFailed);
+					break;
+				case "ListCreated" :
+					// Collect lists names
+					$("#task-lists-select option").remove();
+					$.each(response.Lists, function() {
+						$("#task-lists-select").append($("<option />").val(this).text(this));
+					});
+					// Select first list
+					$("#task-lists-select").prop("selectedIndex",0)
+					// Load all tasks of current list
+					loadTasks();
+					break;
+				default : $("#operation-status-label").html(resultUnknown);
+			}
+		},
+		// if error returns
+		error: function(jqXHR,exception) { 
+			hideSpinner("#task-spinner-div");
+			showAjaxError("#operation-status-label",jqXHR,exception);
+		}
+	} );
+	return false;
+}
+
+// ===========================================================================
+// Move selected task to the most recent todo-list
+// ===========================================================================
+function moveTask() {
+
+}
+
+// ===========================================================================
 // Initializing page objects after updating the task table from the server
 // ===========================================================================
 function afterUpdate() {
@@ -686,6 +749,8 @@ function afterUpdate() {
 		$("#done-tasks-count-label").text("0,");
 		$("#canceled-tasks-count-label").text("0");
 		$("#remaining-tasks-count-label").text("0");
+		$("#wait-remind-tasks-count-label").text("0");
+		$("#activity-tasks-count-label").text("0");
 	}
 	else
 	{

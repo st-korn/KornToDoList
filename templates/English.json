@@ -131,5 +131,9 @@
 "resultUpdateFailed" : "Failed to update task",
 "resultTaskUpdated" : "Task updated",
 "resultInsertFailed" : "Failed to add task",
-"resultTaskInserted" : "Task added"
+"resultTaskInserted" : "Task added",
+
+"resultListCreated" : "List created",
+"resultDateTooFar" : "The list name must contain the current date. Check the clock and calendar on your device.",
+"resultCreateListFailed" : "Failed to create list"
 }
