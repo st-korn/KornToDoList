@@ -178,7 +178,7 @@ func DetectLanguageAndLoadLabels(req *http.Request) (langTag language.Tag, langE
 //		subject string // subject of the letter
 //		templateString string // template of the letter body
 //		dataForTemplate struct // struct of data, which is used to fill email-body template
-// OUT: nothing
+// OUT: -
 func SendEmail(fromName string, fromAddress string, toAddress string, subject string, templateString string, dataForTemplate interface{}) {
 
 	// Set up smtp-authentication information.
@@ -277,6 +277,7 @@ func RedirectIncomingHTTPtoHTTPS(res http.ResponseWriter, req *http.Request) boo
 // Return JSON in response to a http-request
 // IN:	res - http.Responsewriter, in which the returned json is written
 // 		structJSON - structure to convert to JSON
+// OUT: -
 func ReturnJSON(res http.ResponseWriter, structJSON interface{}) {
 	// Create json response from struct
 	resJSON, err := json.Marshal(structJSON)
