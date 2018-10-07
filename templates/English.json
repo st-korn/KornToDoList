@@ -128,6 +128,7 @@
 "resultTaskEmpty" : "Specify the text of the task",
 "resultInvalidListName" : "Invalid list name",
 "resultUpdatedTaskNotFound" : "Task not found",
+"resultTaskJustUpdated" : "The task has been updated previously from another device",
 "resultUpdateFailed" : "Failed to update task",
 "resultTaskUpdated" : "Task updated",
 "resultInsertFailed" : "Failed to add task",
@@ -135,6 +136,5 @@
 
 "resultListCreated" : "List created",
 "resultDateTooFar" : "The list name must contain the current date. Check the clock and calendar on your device.",
-"resultCreateListFailed" : "Failed to create list",
-"resultTaskJustUpdated" : "The task has been updated previously from another device"
+"resultCreateListFailed" : "Failed to create list"
 }
