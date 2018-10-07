@@ -34,7 +34,7 @@ To run .go server-application you need to set these environment variables:
 
 * The application accepts incoming only **HTTP**-requests on the port `LISTEN_PORT`. The application does not listen or open any HTTPS connections.
 
-* Internal cloud HTTPS-proxy servers usually take over SSL encryption and translate to the application only HTTP-requests inside the cloud infrastructure. For example, <https://www.clever-cloud.com>. When translating requests, a cloud proxy usually sets a header `X-Forwarded-Proto`. Using this header, you can determine how the initial request from the user's browser arrived: over HTTP or HTTPS? <https://www.clever-cloud.com/blog/engineering/2015/12/01/redirect-to-https-in-play/>
+* Internal cloud HTTPS-proxy servers usually take over SSL encryption and translate to the application only HTTP-requests inside the cloud infrastructure. For example, <https://www.clever-cloud.com>. When translating requests, a cloud proxy usually sets a header `X-Forwarded-Proto`. Using this header, you can determine how the initial request from the user's browser arrived: over HTTP or HTTPS. <https://www.clever-cloud.com/blog/engineering/2015/12/01/redirect-to-https-in-play/>
 
 * If the request from the browser came over the HTTP-protocol, the system returns the `301 (Moved Permanently)` redirection to the corresponding HTTPS page.
 
@@ -42,11 +42,13 @@ To run .go server-application you need to set these environment variables:
 
 ## WEB-server API
 
-### `GET /`
+### `GET /`, `GET /YYYY-MM-DD`
 
 Returns main html-page. The page is returned empty, without working information, such as tasks, lists or current user. Only list of languages and current-language value are included. Instead, the page contains javascript for authorization and further work with tasks.
 
     Cookies: User-Language : string
+
+If the name of the list in the format `YYYY-MM-DD` is present in the URL, then if the authorization is successful, the web application tries to open the list with that name. If the authorized user does not have a list with the same name, or the name of the list is not specified, the most recent uf users list opens.
 
 ### `GET /static/...`
 
