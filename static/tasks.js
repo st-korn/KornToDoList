@@ -416,7 +416,7 @@ function getLists() {
 // ===========================================================================
 function htmlTask(task) {
 	var tooltips = {'created': statusCreated, 'moved': statusMoved, 'canceled': statusCanceled, 'done': statusDone};
-	var p = '<p id="' + task.Id + '" class="' + task.Status + '" tooltip="' + tooltips[task.Status] + '">'
+	var p = '<p id="' + task.Id + '" class="' + task.Status + '" data-tooltip="' + tooltips[task.Status] + '" data-timestamp="'+task.Timestamp+'">'
 	if (task.Icon != "") {
 		p = p + '<img class="'+task.Icon+'" src="/static/icons/'+task.Icon+'.svg">'
 	}
@@ -562,6 +562,7 @@ function onTaskEdit() {
 	$("#task-section-select").val( $(this).parents("section").attr("id") );
 	$("#task-text-input").val( $(this).text() );
 	$("#task-id-input").val( $(this).attr("id") );
+	$("#task-timestamp-input").val( $(this).attr("data-timestamp") )
 	$("#task-submit-button").html(buttonSaveTask);
 	manageListsButtons();
 	$("#task-text-input").focus();
@@ -576,6 +577,7 @@ function newTask() {
 	$("#task-section-select").val( $(this).parents("section").attr("id") );
 	$("#task-text-input").val("");
 	$("#task-id-input").val("");
+	$("#task-timestamp-input").val("");
 	$("#task-submit-button").html(buttonAddTask);
 	manageListsButtons();
 	$("#task-text-input").focus();
@@ -606,7 +608,8 @@ function submitTask(list) {
 			Text: $("#task-text-input").val(),
 			Section: $("#task-section-select").val(),
 			Status: $("#task-status-select").val(),
-			Icon: $("#task-icon-select").val()
+			Icon: $("#task-icon-select").val(),
+			Timestamp: $("#task-timestamp-input").val()
 		} ),
 		// if success
 		success: function (response) {
@@ -633,6 +636,7 @@ function submitTask(list) {
 					break;
 				case "TaskUpdated" :
 				case "TaskInserted" :
+				case "TaskJustUpdated" :
 					// Collect tasks
 					$.each(response.Tasks, function() {
 						if ( $("#"+this.Id).length == 0 ) {
@@ -651,7 +655,9 @@ function submitTask(list) {
 						$("#operation-status-label").html(resultTaskUpdated);
 					} else if (response.Result == "TaskInserted") {
 						$("#operation-status-label").html(resultTaskInserted);
-					};
+					} else if (response.Result == "TaskJustUpdated") {
+						$("#operation-status-label").html(resultTaskJustUpdated);
+					}
 					// Get ready to create a new task
 					$("#ib button").click();
 					break

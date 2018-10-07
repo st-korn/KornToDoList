@@ -135,5 +135,6 @@
 
 "resultListCreated" : "List created",
 "resultDateTooFar" : "The list name must contain the current date. Check the clock and calendar on your device.",
-"resultCreateListFailed" : "Failed to create list"
+"resultCreateListFailed" : "Failed to create list",
+"resultTaskJustUpdated" : "The task has been updated previously from another device"
 }

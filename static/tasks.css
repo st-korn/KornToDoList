@@ -243,7 +243,7 @@ p:hover {
 p.done:hover::after, 
 p.canceled:hover::after, 
 p.moved:hover::after {
-	content: attr(tooltip); /* Use the attribute "tooltip" as the text of the hint */
+	content: attr(data-tooltip); /* Use the attribute "tooltip" as the text of the hint */
 	position: absolute; /* Use absolute position */
 	z-index: 1; /* Display a hint on top of all other items */
 	color: rgba(0,0,0,1.0);

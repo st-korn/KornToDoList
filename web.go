@@ -1,10 +1,10 @@
 package main
 
 import (
-	"net/http" // for HTTP-server
-	"regexp"
+	"net/http"      // for HTTP-server
+	"regexp"        // to validation todo-list name
 	"text/template" // for use HTML-page templates
-	"time"
+	"time"          // to validation todo-list name
 
 	"golang.org/x/text/language/display" // to output national names of languages
 	"gopkg.in/mgo.v2/bson"               // to use BSON queries format

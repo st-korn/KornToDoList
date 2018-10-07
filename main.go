@@ -11,9 +11,9 @@ import (
 	"net/mail"        // to generate emails
 	"net/smtp"        // to send emails
 	"os"              // to get OS environment variables
-	"strings"
-	"text/template" // for use HTML-page templates
-	"time"          // to define MongoDB time type for structure elements, for timers
+	"strings"         // to parse http-request headers
+	"text/template"   // for use HTML-page templates
+	"time"            // to define MongoDB time type for structure elements, for timers
 
 	"golang.org/x/text/language"         // to detect user-perferred language
 	"golang.org/x/text/language/display" // to output national names of languages
@@ -310,13 +310,14 @@ type typeSession struct {
 }
 
 type typeTask struct {
-	Id      bson.ObjectId `json:"Id" bson:"_id"`
-	EMail   string
-	List    string
-	Text    string
-	Section string
-	Status  string
-	Icon    string
+	Id        bson.ObjectId `json:"Id" bson:"_id"`
+	EMail     string
+	List      string
+	Text      string
+	Section   string
+	Status    string
+	Icon      string
+	Timestamp time.Time
 }
 
 // ===========================================================================================================================

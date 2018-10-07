@@ -95,7 +95,7 @@ func webCreateList(res http.ResponseWriter, req *http.Request) {
 		ReturnJSON(res, response)
 		return
 	}
-	durationHours := time.Now().Sub(dateList).Hours()
+	durationHours := time.Now().UTC().Sub(dateList).Hours()
 	if (durationHours > 24) || (durationHours < -24) {
 		response.Result = "DateTooFar"
 		ReturnJSON(res, response)

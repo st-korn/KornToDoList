@@ -5,7 +5,7 @@ import (
 	"net/http"      // for HTTP-server
 	"regexp"        // to validation todo-list name
 	"strings"       // TrimSpace function
-	"time"          // to validation todo-list name
+	"time"          // to validation todo-list name, for timestamps
 
 	"gopkg.in/mgo.v2/bson" // to use BSON queries format
 )
@@ -73,18 +73,19 @@ func webGetTasks(res http.ResponseWriter, req *http.Request) {
 // 			Section : string ["iu","in","nu","nn","ib"], Status : string ["created", "done", "canceled", "moved"],
 // 			Icon : string ["wait","remind","call","force","mail","prepare","manage","meet","visit","make","journey","think"]}
 // OUT: JSON: { Result : string ["TaskEmpty", "InvalidListName", "SessionEmptyNotFoundOrExpired", "UpdatedTaskNotFound",
-//			"UpdateFailed", "TaskUpdated", "InsertFailed", "TaskInserted"],
+//			"UpdateFailed", "TaskJustUpdated", "TaskUpdated", "InsertFailed", "TaskInserted"],
 //			Tasks : [] { Id : string, EMail : string, List : string, Text : string, Section : string, Status : string, Icon : string } }
 // ===========================================================================================================================
 
 // Structure JSON-request for getting tasks
 type typeSendTaskJSONRequest struct {
-	List    string
-	Id      string
-	Text    string
-	Section string
-	Icon    string
-	Status  string
+	List      string
+	Id        string
+	Text      string
+	Section   string
+	Icon      string
+	Status    string
+	Timestamp time.Time
 }
 
 // Structure JSON-response for getting tasks
@@ -155,9 +156,19 @@ func webSendTask(res http.ResponseWriter, req *http.Request) {
 			return
 		}
 
+		// Compare timestamps
+		durationSeconds := task.Timestamp.Sub(request.Timestamp).Seconds()
+		if durationSeconds > 0 {
+			response.Result = "TaskJustUpdated"
+			response.Tasks = append(response.Tasks, task)
+			ReturnJSON(res, response)
+			return
+		}
+
 		// Update existing task
 		err = c.Update(bson.M{"email": email, "_id": task.Id},
-			bson.M{"$set": bson.M{"list": request.List, "text": request.Text, "section": request.Section, "icon": request.Icon, "status": request.Status}})
+			bson.M{"$set": bson.M{"list": request.List, "text": request.Text, "section": request.Section,
+				"icon": request.Icon, "status": request.Status, "timestamp": time.Now().UTC()}})
 		if err != nil {
 			response.Result = "UpdateFailed"
 			ReturnJSON(res, response)
@@ -185,6 +196,7 @@ func webSendTask(res http.ResponseWriter, req *http.Request) {
 		task.Section = request.Section
 		task.Icon = request.Icon
 		task.Status = request.Status
+		task.Timestamp = time.Now().UTC()
 
 		// Insert new task
 		err = c.Insert(&task)
