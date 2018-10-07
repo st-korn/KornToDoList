@@ -656,6 +656,8 @@ function submitTask(list) {
 							}
 						};
 					});
+					// Re-apply filter
+					applyFilter($("#filter-input").val());
 					// Calculate page statistic
 					afterUpdate();
 					// Update status label
