@@ -48,7 +48,7 @@ Returns main html-page. The page is returned empty, without working information,
 
     Cookies: User-Language : string
 
-If the name of the list in the format `YYYY-MM-DD` is present in the URL, then if the authorization is successful, the web application tries to open the list with that name. If the authorized user does not have a list with the same name, or the name of the list is not specified, the most recent uf users list opens.
+If the name of the list in the format `YYYY-MM-DD` is present in the URL, then if the authorization is successful, the web application tries to open the list with that name. If the authorized user does not have a list with the same name, or the name of the list is not specified, the most recent of users list opens.
 
 ### `GET /static/...`
 

@@ -362,6 +362,7 @@ function getUserInfo() {
 
 // ===========================================================================
 // Fetch names lists of current user from server and put in in dropdown-list
+// Called once during page loading and initialization.
 // ===========================================================================
 function getLists() {
 	// Send Ajax POST request
@@ -381,9 +382,14 @@ function getLists() {
   					break;
 				case "OK" :
 					// Collect lists names
+					$("#task-lists-select option").remove();
 					$.each(response.Lists, function() {
 						$("#task-lists-select").append($("<option />").val(this).text(this));
 					});
+					// If no task-list is found, create a new task-list.
+					if ($("#task-lists-select option").length == 0) {
+						newList();
+					 };
 					// Select list from the form URL
 					if (openList) {
 						$("#task-lists-select").val(openList);
