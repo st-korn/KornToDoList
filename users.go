@@ -18,6 +18,9 @@ import (
 // POST /SignUp
 // In case of success, a link is sent to the user, after which he can set password and complete the registration.
 // Without opening the link, the account is not valid.
+// If a User-Session is specified and it is anonymous, it remembers the identifier of the anonymous user. To complete the registration
+// (setting the password by link from the email) to transfer the todo-lists of the anonymous user to the newly registered user.
+// Cookies: User-Session : string (UUID)
 // IN: JSON: { EMail : string }
 // OUT: JSON: { Result : string ["EmptyEMail", "UserJustExistsButEmailSent", "UserSignedUpAndEmailSent"] }
 // ===========================================================================================================================
@@ -65,14 +68,33 @@ func webSignUp(res http.ResponseWriter, req *http.Request) {
 	// Connect to database
 	session := GetMongoDBSession()
 	defer session.Close()
-	c := session.DB(DB).C("Users")
+	c := session.DB(DB).C("Sessions")
+
+	// Try to detect current user session
+	var anonymous string
+	var user typeUser
+	sessionCookie, err := req.Cookie("User-Session")
+	if err == nil {
+		// Try to find active session
+		var sid typeSession
+		err = c.Find(bson.M{"uuid": sessionCookie.Value}).One(&sid)
+		if err == nil {
+			// Check if the current session is anonymous
+			c = session.DB(DB).C("Users")
+			err = c.Find(bson.M{"email": sid.EMail}).One(&user)
+			if err != nil {
+				// Remember login of anonymous session
+				anonymous = sid.EMail
+			}
+		}
+	}
 
 	// Detect user-language and load it labels
 	_, _, labels := DetectLanguageAndLoadLabels(req)
 
 	// Serarch for this user exist
-	var user typeUser
 	var subject, bodyTemplate string
+	c = session.DB(DB).C("Users")
 	err = c.Find(bson.M{"email": request.EMail}).One(&user)
 	if err != nil {
 		response.Result = "UserSignedUpAndEmailSent"
@@ -102,9 +124,10 @@ func webSignUp(res http.ResponseWriter, req *http.Request) {
 	c = session.DB(DB).C("SetPasswordLinks")
 	u := uuid.Must(uuid.NewV4())
 	c.Insert(bson.M{
-		"email":   request.EMail,
-		"uuid":    u.String(),
-		"expired": time.Now().UTC().AddDate(0, 0, 1)})
+		"email":     request.EMail,
+		"uuid":      u.String(),
+		"expired":   time.Now().UTC().AddDate(0, 0, 1),
+		"anonymous": anonymous})
 	eMailBodyData.SetPasswordLink = SERVERHTTPADDRESS + "/ChangePassword?uuid=" + u.String()
 
 	// Send email
@@ -121,7 +144,8 @@ func webSignUp(res http.ResponseWriter, req *http.Request) {
 // If access is allowed, insert a document in MongoDB "Users" collection, or update it.
 // If success delete UUID record from MongoDB "SetPasswordLinks" collection (to block access to a link).
 // Then return "UserAdded" or "PasswordUpdated".
-// IN: JSON: { UUID : string, PasswordMD5 : string }
+// IN: JSON: { UUID : string,
+//			   PasswordMD5 : string }
 // OUT: JSON: { Result : string ["UUIDExpiredOrNotFound", "EmptyPassword", "PasswordUpdated"] }
 // ===========================================================================================================================
 
@@ -184,6 +208,15 @@ func webSetPassword(res http.ResponseWriter, req *http.Request) {
 		response.Result = "PasswordUpdated"
 	}
 
+	// Move anonymous todo-lists to created/updated user
+	if setPasswordLink.Anonymous != "" {
+		c = session.DB(DB).C("Tasks")
+		c.UpdateAll(bson.M{"email": setPasswordLink.Anonymous}, bson.M{"$set": bson.M{"email": setPasswordLink.EMail}})
+		// Remove anonymous session
+		c = session.DB(DB).C("Sessions")
+		c.RemoveAll(bson.M{"email": setPasswordLink.Anonymous})
+	}
+
 	// Remove old set-password-links of this user
 	c = session.DB(DB).C("SetPasswordLinks")
 	c.RemoveAll(bson.M{"email": setPasswordLink.EMail})
@@ -199,8 +232,10 @@ func webSetPassword(res http.ResponseWriter, req *http.Request) {
 // If the pair (EMail and PasswordMD5) is not present in the collection `Users`, return "UserAndPasswordPairNotFound".
 // Otherwise register new session in the `Sessions` database collection, and return its UUID to set cookie in browser.
 // Cookies: User-Session : string (UUID)
-// IN: JSON: { EMail : string, PasswordMD5 : string }
-// OUT: JSON: { Result : string ["EmptyEMail", "EmptyPassword", "UserAndPasswordPairNotFound", "LoggedIn"], UUID : string }
+// IN: JSON: { EMail : string,
+//			   PasswordMD5 : string }
+// OUT: JSON: { Result : string ["EmptyEMail", "EmptyPassword", "UserAndPasswordPairNotFound", "LoggedIn"],
+//				UUID : string }
 // ===========================================================================================================================
 
 // Structure JSON-request for Log In
@@ -327,7 +362,8 @@ func webLogOut(res http.ResponseWriter, req *http.Request) {
 // Register new anonymous session in the `Sessions` database collection, and return its UUID to set cookie in browser.
 // Cookies: User-Session : string (UUID)
 // IN: -
-// OUT: JSON: { Result : string ["SuccessAnonymous"], UUID : string }
+// OUT: JSON: { Result : string ["SuccessAnonymous"],
+//				UUID : string }
 // ===========================================================================================================================
 
 // Structure JSON-response for Go Anonymous
@@ -383,7 +419,8 @@ func webGoAnonymous(res http.ResponseWriter, req *http.Request) {
 // Returns the Email (real or imaginary) of the current user. Returns flag: is the current user anonymous or not.
 // Cookies: User-Session : string (UUID)
 // IN: -
-// OUT: JSON: { Result : string ["ValidUserSession", "ValidAnonymousSession", "SessionEmptyNotFoundOrExpired"], EMail : string }
+// OUT: JSON: { Result : string ["ValidUserSession", "ValidAnonymousSession", "SessionEmptyNotFoundOrExpired"],
+//				EMail : string }
 // ===========================================================================================================================
 
 // Structure JSON-response for User Info

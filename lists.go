@@ -17,7 +17,8 @@ import (
 // Returns array of strings with names of saved users todo-lists.
 // Cookies: User-Session : string (UUID)
 // IN: -
-// OUT: JSON: { Result : string ["OK", "SessionEmptyNotFoundOrExpired"], Lists : []string }
+// OUT: JSON: { Result : string ["OK", "SessionEmptyNotFoundOrExpired"],
+//				Lists : []string }
 // ===========================================================================================================================
 
 // Structure JSON-response for User Lists
@@ -57,7 +58,8 @@ func webGetLists(res http.ResponseWriter, req *http.Request) {
 // Returns array of strings with names of saved users todo-lists.
 // Cookies: User-Session : string (UUID)
 // IN: JSON: {List : string "YYYY-MM-DD"}
-// OUT: JSON: { Result : string ["ListCreated", "InvalidListName", "DateTooFar", "CreateListFailed", "SessionEmptyNotFoundOrExpired"], Lists : []string }
+// OUT: JSON: { Result : string ["ListCreated", "InvalidListName", "DateTooFar", "CreateListFailed", "SessionEmptyNotFoundOrExpired"],
+//				Lists : []string }
 // ===========================================================================================================================
 
 // Structure JSON-request for getting tasks

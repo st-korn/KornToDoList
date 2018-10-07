@@ -17,9 +17,15 @@ import (
 // Returns an array of structures that identify tasks from a selected list of the current user.
 // Cookies: User-Session : string (UUID)
 // IN: JSON: {List : string}
-// OUT: JSON: { Result : string ["OK", "SessionEmptyNotFoundOrExpired"], Tasks : [] { Id : string, EMail : string, List : string,
-//		Text : string, Section : string ["iu","in","nu","nn","ib"], status : string ["created", "done", "canceled", "moved"],
-//		Icon : string ["wait","remind","call","force","mail","prepare","manage","meet","visit","make","journey","think"] } }
+// OUT: JSON: { Result : string ["OK", "SessionEmptyNotFoundOrExpired"],
+//				Tasks : [] { Id : string,
+//							 EMail : string,
+//							 List : string,
+//							 Text : string,
+//							 Section : string ["iu","in","nu","nn","ib"],
+//							 Status : string ["created", "done", "canceled", "moved"],
+//							 Icon : string ["wait","remind","call","force","mail","prepare","manage","meet","visit","make","journey","think"],
+//							 Timestamp : datetime } }
 // ===========================================================================================================================
 
 // Structure JSON-request for getting tasks
@@ -69,12 +75,23 @@ func webGetTasks(res http.ResponseWriter, req *http.Request) {
 // Update existing task or generate ID and ppend new task to the database.
 // Returns an array of a single element - an added or updated task with its ID.
 // Cookies: User-Session : string (UUID)
-// IN: JSON: { List : string, Id : string (may be null or ""), Text : string,
-// 			Section : string ["iu","in","nu","nn","ib"], Status : string ["created", "done", "canceled", "moved"],
-// 			Icon : string ["wait","remind","call","force","mail","prepare","manage","meet","visit","make","journey","think"]}
+// IN: JSON: { List : string,
+//			   Id : string (may be null or ""),
+//			   Text : string,
+// 			   Section : string ["iu","in","nu","nn","ib"],
+//			   Status : string ["created", "done", "canceled", "moved"],
+// 			   Icon : string ["wait","remind","call","force","mail","prepare","manage","meet","visit","make","journey","think"],
+//			   Timestamp : datetime (cann't be null or "") }
 // OUT: JSON: { Result : string ["TaskEmpty", "InvalidListName", "SessionEmptyNotFoundOrExpired", "UpdatedTaskNotFound",
-//			"UpdateFailed", "TaskJustUpdated", "TaskUpdated", "InsertFailed", "TaskInserted"],
-//			Tasks : [] { Id : string, EMail : string, List : string, Text : string, Section : string, Status : string, Icon : string } }
+//								 "UpdateFailed", "TaskJustUpdated", "TaskUpdated", "InsertFailed", "TaskInserted"],
+//				Tasks : [] { Id : string,
+//							 EMail : string,
+//							 List : string,
+//							 Text : string,
+//							 Section : string,
+//							 Status : string,
+//							 Icon : string,
+//							 Timestamp : datetime } }
 // ===========================================================================================================================
 
 // Structure JSON-request for getting tasks

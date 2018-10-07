@@ -7,9 +7,9 @@ $( init );
 function init() {
 	// Bind event handling
 	$("#language-select").change(onLanguageChange);
-	$("#wellcome-register-user-button").bind('click', clickSignup);
-	$("#wellcome-login-user-button").bind('click', showLoginForm);
-	$("#wellcome-start-anonymously-button").bind('click', startAnonymously);
+	$("#welcome-register-user-button").bind('click', clickSignup);
+	$("#welcome-login-user-button").bind('click', showLoginForm);
+	$("#welcome-start-anonymously-button").bind('click', startAnonymously);
 	$("#help-label").bind('click', showHelp);
 	$("#help-close-button").bind('click', hideHelp);
 	$("#submit-signup-button").bind('click', submitSignup);
@@ -27,6 +27,7 @@ function init() {
 	$("button.add").bind('click', newTask);
 	$("#new-list-create-button").bind('click', newList);
 	$("#task-move-button").bind('click', moveTaskToNewList);
+	$("#register-user-button").bind('click', clickSignup);
 
 	// Fill autocomplete with names of employees
 	$("#filter-input").autocomplete( {

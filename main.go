@@ -66,7 +66,7 @@ func TestSession(req *http.Request) (email string, session *mgo.Session) {
 	session = GetMongoDBSession()
 	c := session.DB(DB).C("Sessions")
 
-	// Try to detect previous user session
+	// Try to detect current user session
 	sessionCookie, err := req.Cookie("User-Session")
 	if err != nil {
 		return "", session
@@ -298,9 +298,10 @@ type typeUser struct {
 }
 
 type typeSetPasswordLink struct {
-	EMail   string
-	UUID    string
-	Expired time.Time
+	EMail     string
+	UUID      string
+	Expired   time.Time
+	Anonymous string
 }
 
 type typeSession struct {

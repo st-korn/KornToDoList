@@ -59,7 +59,9 @@ Returns static files: icons, javascripts libs, css stylesheets, etc.
 Try to sign-up a new user.
 In case of success, a link is sent to the user, after which he can set password and complete the registration.
 Without opening the link, the account is not valid.
+If a User-Session is specified and it is anonymous, it remembers the identifier of the anonymous user. To complete the registration (setting the password by link from the email) to transfer the todo-lists of the anonymous user to the newly registered user.
 
+    Cookies: User-Session : string (UUID)
     IN: JSON: { EMail : string }
     OUT: JSON: { Result : string ["EmptyEMail", "UserJustExistsButEmailSent", "UserSignedUpAndEmailSent"] }
 
@@ -79,7 +81,8 @@ Returns html-page to set users-password.
 
 Add new user with password or change password for existing user.
 
-    IN: JSON: { UUID : string, PasswordMD5 : string }
+    IN: JSON: { UUID : string, 
+                PasswordMD5 : string }
     OUT: JSON: { Result : string ["UUIDExpiredOrNotFound", "EmptyPassword", "UserCreated", "PasswordUpdated"] }
 
 * Try to find current set-password-link. If not found - return `"UUIDExpiredOrNotFound"`
@@ -92,8 +95,10 @@ Add new user with password or change password for existing user.
 Try to login an user, returns session-UUID.
 
     Cookies: User-Session : string (UUID)
-    IN: JSON: { EMail : string, PasswordMD5 : string }
-    OUT: JSON: { Result : string ["EmptyEMail", "EmptyPassword", "UserAndPasswordPairNotFound", "LoggedIn"], UUID : string }
+    IN: JSON: { EMail : string, 
+                PasswordMD5 : string }
+    OUT: JSON: { Result : string ["EmptyEMail", "EmptyPassword", "UserAndPasswordPairNotFound", "LoggedIn"], 
+                 UUID : string }
 
 * If current session exist - then logout.
 * If the pair (EMail and PasswordMD5) is not present in the collection `Users`, return "UserAndPasswordPairNotFound".
@@ -113,7 +118,8 @@ Start an anonymous-session, returns session-UUID.
 
     Cookies: User-Session : string (UUID)
     IN: -
-    OUT: JSON: { Result : string ["SuccessAnonymous"], UUID : string }
+    OUT: JSON: { Result : string ["SuccessAnonymous"], 
+                 UUID : string }
 
 * If current session exist - then logout.
 * Register new anonymous session in the `Sessions` database collection, and return its UUID to set cookie in browser.
@@ -124,7 +130,8 @@ Check session's UUID and get information of current user.
 
     Cookies: User-Session : string (UUID)
     IN: -
-    OUT: JSON: { Result : string ["ValidUserSession", "ValidAnonymousSession", "SessionEmptyNotFoundOrExpired"], EMail : string }
+    OUT: JSON: { Result : string ["ValidUserSession", "ValidAnonymousSession", "SessionEmptyNotFoundOrExpired"], 
+                 EMail : string }
 
 * Checks the current session for validity. If the session is not valid, it returns `"SessionEmptyNotFoundOrExpired"` as a result.
 * Returns the Email (real or imaginary) of the current user. Returns flag: is the current user anonymous or not.
@@ -135,9 +142,23 @@ Get list of user lists.
 
     Cookies: User-Session : string (UUID)
     IN: -
-    OUT: JSON: { Result : string ["OK", "SessionEmptyNotFoundOrExpired"], Lists : []string }
+    OUT: JSON: { Result : string ["OK", "SessionEmptyNotFoundOrExpired"], 
+                 Lists : []string }
 
 * Checks the current session for validity. If the session is not valid, it returns `"SessionEmptyNotFoundOrExpired"` as a result.
+* Returns array of strings with names of saved users todo-lists.
+
+### `POST /CreateList`
+
+Create new todo-list for current user.
+
+    Cookies: User-Session : string (UUID)
+    IN: JSON: {List : string "YYYY-MM-DD"}
+    OUT: JSON: { Result : string ["ListCreated", "InvalidListName", "DateTooFar", "CreateListFailed", "SessionEmptyNotFoundOrExpired"], 
+                 Lists : []string }
+
+* Checks the current session for validity. If the session is not valid, it returns `"SessionEmptyNotFoundOrExpired"` as a result.
+* Verifies that the desired list name does not differ by more than 24 hours from the current server date.
 * Returns array of strings with names of saved users todo-lists.
 
 ### `POST /GetTasks`
@@ -146,9 +167,15 @@ Get tasks of selected user lists.
 
     Cookies: User-Session : string (UUID)
     IN: JSON: {List : string}
-    OUT: JSON: { Result : string ["OK", "SessionEmptyNotFoundOrExpired"], Tasks : [] { Id : string, EMail : string, List : string,
-    Text : string, Section : string ["iu","in","nu","nn","ib"], status : string ["created", "done", "canceled", "moved"],
-    Icon : string ["wait","remind","call","force","mail","prepare","manage","meet","visit","make","journey","think"], Timestamp : datetime } }
+    OUT: JSON: { Result : string ["OK", "SessionEmptyNotFoundOrExpired"], 
+                 Tasks : [] { Id : string, 
+                              EMail : string, 
+                              List : string,
+                              Text : string, 
+                              Section : string ["iu","in","nu","nn","ib"], 
+                              Status : string ["created", "done", "canceled", "moved"],
+                              Icon : string ["wait","remind","call","force","mail","prepare","manage","meet","visit","make","journey","think"], 
+                              Timestamp : datetime } }
 
 * Checks the current session for validity. If the session is not valid, it returns `"SessionEmptyNotFoundOrExpired"` as a result.
 * Returns an array of structures that identify tasks from a selected list of the current user.
@@ -158,28 +185,28 @@ Get tasks of selected user lists.
 Update existing task from the list or append new task to the list.
 
     Cookies: User-Session : string (UUID)
-    IN: JSON: { List : string, Id : string (may be null or ""), Text : string,
-    Section : string ["iu","in","nu","nn","ib"], Status : string ["created", "done", "canceled", "moved"],
-    Icon : string ["wait","remind","call","force","mail","prepare","manage","meet","visit","make","journey","think"], Timestamp : datetime }
-    OUT: JSON: { Result : string ["TaskEmpty", "InvalidListName", "SessionEmptyNotFoundOrExpired", "UpdatedTaskNotFound", "UpdateFailed", "TaskJustUpdated", "TaskUpdated", "InsertFailed", "TaskInserted"],
-    Tasks : [] { Id : string, EMail : string, List : string, Text : string, Section : string, Status : string, Icon : string, Timestamp : datetime } }
+    IN: JSON: { List : string, 
+                Id : string (may be null or ""), 
+                Text : string,
+                Section : string ["iu","in","nu","nn","ib"], 
+                Status : string ["created", "done", "canceled", "moved"],
+                Icon : string ["wait","remind","call","force","mail","prepare","manage","meet","visit","make","journey","think"], 
+                Timestamp : datetime (cann't be null or "") }
+    OUT: JSON: { Result : string ["TaskEmpty", "InvalidListName", "SessionEmptyNotFoundOrExpired", "UpdatedTaskNotFound", 
+                                  "UpdateFailed", "TaskJustUpdated", "TaskUpdated", "InsertFailed", "TaskInserted"],
+                 Tasks : [] { Id : string, 
+                              EMail : string, 
+                              List : string, 
+                              Text : string, 
+                              Section : string, 
+                              Status : string, 
+                              Icon : string, 
+                              Timestamp : datetime } }
 
 * Checks the current session for validity. If the session is not valid, it returns `"SessionEmptyNotFoundOrExpired"` as a result.
 * If updated task exist in database, and its timestamp is greater than timestamp of updated task, recieved from users-application, return `"TaskJustUpdated"` error.
 * Update existing task or generate ID and append new task to the database.
 * Returns an array of a single element - an added or updated task with its ID.
-
-### `POST /CreateList`
-
-Create new todo-list for current user.
-
-    Cookies: User-Session : string (UUID)
-    IN: JSON: {List : string "YYYY-MM-DD"}
-    OUT: JSON: { Result : string ["ListCreated", "InvalidListName", "DateTooFar", "CreateListFailed", "SessionEmptyNotFoundOrExpired"], Lists : []string }
-
-* Checks the current session for validity. If the session is not valid, it returns `"SessionEmptyNotFoundOrExpired"` as a result.
-* Verifies that the desired list name does not differ by more than 24 hours from the current server date.
-* Returns array of strings with names of saved users todo-lists.
 
 ## Database structure
 
@@ -189,7 +216,7 @@ Main collection, that contains task records.
 
     {
         "_id" : ObjectId // unique object identifier
-        "email" : string // username in format "user@domain.net" for registred users or "IP@YYYY-MM-DD-hh-mm-ss:YYYY-MM-DD" for anonymous user.
+        "email" : string // username in format "user@domain.net" for registred users or "IP@YYYY-MM-DD-hh-mm-ss" for anonymous user.
         "list" : string // list name in format: "YYYY-MM-DD"
         "text" : string // tasks title, for example "Peter - send invoice"
         "section" : string // the importance and urgency of the task: ["iu","in","nu","nn","ib"]
@@ -206,6 +233,8 @@ Collection, that contains links for changing user passwords.
         "email" : string // email address for password change
         "uuid" : string // UUID to access password changing
         "expired" : datetime UTC // UTC-datetime to which the link will be valid
+        "anonymous" : string // login of anonymous session in format  "IP@YYYY-MM-DD-hh-mm-ss". 
+                             // To transfer task lists from an anonymous to a newly registered user.
     }
 
 ### `Users`
