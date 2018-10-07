@@ -1,8 +1,10 @@
 package main
 
 import (
-	"net/http"      // for HTTP-server
+	"net/http" // for HTTP-server
+	"regexp"
 	"text/template" // for use HTML-page templates
+	"time"
 
 	"golang.org/x/text/language/display" // to output national names of languages
 	"gopkg.in/mgo.v2/bson"               // to use BSON queries format
@@ -16,18 +18,13 @@ import (
 
 // Structure to fill HTML-template of main web-page
 type typeWebFormData struct {
-	UserLang string     // english_name of current language, on which to display the page
-	Langs    []typeLang // global list of supported languages
-	Labels   typeLabels // strings-table of current language for HTML
+	UserLang   string     // english_name of current language, on which to display the page
+	Langs      []typeLang // global list of supported languages
+	Labels     typeLabels // strings-table of current language for HTML
+	ListToOpen string     // selected list name (by URL path)
 }
 
 func webFormShow(res http.ResponseWriter, req *http.Request) {
-
-	// All calls to unknown url paths should return 404
-	if req.URL.Path != "/" {
-		http.NotFound(res, req)
-		return
-	}
 
 	// If necessary, we redirect requests received via the unprotected HTTP protocol to HTTPS
 	if RedirectIncomingHTTPtoHTTPS(res, req) {
@@ -36,6 +33,22 @@ func webFormShow(res http.ResponseWriter, req *http.Request) {
 
 	// Prepare main structure of HTML-template
 	var webFormData typeWebFormData
+
+	// All calls to unknown url paths should return 404
+	if req.URL.Path != "/" {
+		// Check incoming parameters
+		webFormData.ListToOpen = req.URL.Path[1:]
+		regexp, _ := regexp.Compile(`\d\d\d\d-\d\d-\d\d`)
+		if !regexp.MatchString(webFormData.ListToOpen) {
+			http.NotFound(res, req)
+			return
+		}
+		_, err := time.Parse("2006-01-02", webFormData.ListToOpen)
+		if err != nil {
+			http.NotFound(res, req)
+			return
+		}
+	}
 
 	// Load supported languages list
 	webFormData.Langs = make([]typeLang, len(SupportedLangs))

@@ -383,6 +383,18 @@ function getLists() {
 					$.each(response.Lists, function() {
 						$("#task-lists-select").append($("<option />").val(this).text(this));
 					});
+					// Select list from the form URL
+					if (openList) {
+						$("#task-lists-select").val(openList);
+						if (!$("#task-lists-select").val()) {
+							// List not found - select first list
+							$("#task-lists-select").prop("selectedIndex",0);
+						}
+						openList = "";
+					} else {
+						// Select first list
+						$("#task-lists-select").prop("selectedIndex",0);
+					};
 					// Load all tasks of current list
 					loadTasks();
 					break;
@@ -426,8 +438,14 @@ function loadTasks() {
 	manageListsButtons();
 	// Purge current tasks
 	$("p").remove();
-	// If no ToDo-list fount - then nothing to do
+	// If no ToDo-list found - then nothing to do
 	if ( !$("#task-lists-select").val() ) { return false };
+	// Check selected list: if it isn't first - change current URL
+	if ($("#task-lists-select").prop("selectedIndex") == 0) {
+		window.history.replaceState("", "", '/');
+	} else {
+		window.history.replaceState("", "", '/'+$("#task-lists-select").val());
+	}
 	// Send Ajax POST request
 	$("#operation-status-label").text("");
 	showSpinner("#task-spinner-div");
