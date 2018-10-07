@@ -383,7 +383,7 @@ function getLists() {
 					});
 					// Load all tasks of current list
 					loadTasks();
-  					break;
+					break;
 				default : $("#operation-status-label").html(resultUnknown);
 			}
 		},
@@ -420,9 +420,11 @@ function htmlTask(task) {
 // Load from server all tasks of current selected list
 // ===========================================================================
 function loadTasks() {
-	// purge current tasks
+	// Manage visibility and availability of list buttons
+	manageListsButtons();
+	// Purge current tasks
 	$("p").remove();
-	// if no ToDo-list fount - then nothing to do
+	// If no ToDo-list fount - then nothing to do
 	if ( !$("#task-lists-select").val() ) { return false };
 	// Send Ajax POST request
 	$("#operation-status-label").text("");
@@ -449,7 +451,9 @@ function loadTasks() {
 					});
 					// Calculate page statistic
 					afterUpdate();
-  					break;
+					// Get ready to create a new task
+					$("#ib button").click();
+ 					break;
 				default : $("#operation-status-label").html(resultUnknown);
 			}
 		},
@@ -539,6 +543,7 @@ function onTaskEdit() {
 	$("#task-text-input").val( $(this).text() );
 	$("#task-id-input").val( $(this).attr("id") );
 	$("#task-submit-button").html(buttonSaveTask);
+	manageListsButtons();
 	$("#task-text-input").focus();
 }
 
@@ -552,6 +557,7 @@ function newTask() {
 	$("#task-text-input").val("");
 	$("#task-id-input").val("");
 	$("#task-submit-button").html(buttonAddTask);
+	manageListsButtons();
 	$("#task-text-input").focus();
 }
 
@@ -646,7 +652,27 @@ function submitTask() {
 // ===========================================================================
 function manageListsButtons() {
 	// Determines the ability to create a new task list
-	
+	var dateYYYYMMDD = getCurrentDate();
+	if ($('#task-lists-select option[value="'+dateYYYYMMDD+'"]').length == 0)
+	{
+		$("#new-list-create-button").show();
+	} else {
+		$("#new-list-create-button").hide();
+	};
+	// Determines the ability to move a task to another task list
+	if ($("#task-lists-select").prop("selectedIndex") == 0) {
+		$("#task-move-button").hide();
+	} else {
+		if ($("#task-id-input").val() != "") {
+			if ($("#task-status-select").val() == "created") {
+				$("#task-move-button").show();
+			} else {
+				$("#task-move-button").hide();
+			}
+		} else	{
+			$("#task-move-button").hide();
+		}
+	};
 }
 
 // ===========================================================================
