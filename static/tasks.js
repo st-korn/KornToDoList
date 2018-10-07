@@ -577,7 +577,8 @@ function newTask() {
 	$("#task-section-select").val( $(this).parents("section").attr("id") );
 	$("#task-text-input").val("");
 	$("#task-id-input").val("");
-	$("#task-timestamp-input").val("");
+	var now = new Date();
+	$("#task-timestamp-input").val(now.toJSON());
 	$("#task-submit-button").html(buttonAddTask);
 	manageListsButtons();
 	$("#task-text-input").focus();

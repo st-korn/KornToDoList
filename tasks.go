@@ -85,7 +85,7 @@ type typeSendTaskJSONRequest struct {
 	Section   string
 	Icon      string
 	Status    string
-	Timestamp time.Time
+	Timestamp time.Time `json:",omitempty"`
 }
 
 // Structure JSON-response for getting tasks
