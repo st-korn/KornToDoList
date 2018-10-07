@@ -39,6 +39,11 @@ function init() {
 		}
 	  } );
 
+	// Initialize sortable today's task-list
+	$("#today-tasks-ul").sortable( {
+		placeholder: "ui-state-highlight"
+	});
+
 	// Analyze the presence of a saved session
 	if ( Cookies.get('User-Session') == null )
 	{
@@ -703,7 +708,7 @@ function submitTask(list) {
 						}
 					} else {
 						// Try to exclude task from the today's task-list
-						if ($("li#li-"+$("#task-id-input").val()).length == 0) {
+						if ($("li#li-"+$("#task-id-input").val()).length > 0) {
 							$("li#li-"+$("#task-id-input").val()).remove();
 							saveToday();
 						}
