@@ -9,9 +9,12 @@ Experimental web-app ToDo-list by Stanislav Kornienko's conception. You can try 
 * `main.go` - main part of backend server application, that implements common functions, global variables and constants, Go-types of database collections, starts web-server with HTTP static-files transfer.
 * `web.go` - implements interfaces for HTML-generation
 * `users.go` - implements JSON-api of users-routines (such as SignIn, LogIn, LogOut, etc..) for javascript and mobile applications.
+* `lists.go` - implements JSON-api of lists-routines (such as GetLists, CreateList) for javascript and mobile applications.
+* `tasks.go` - implements JSON-api of tasks-routines (such as GetTasks, SendTask) for javascript and mobile applications.
 * `templates/` - here are HTML-templates and JSON language packages. A file from this folder is used by the main server application, but not transmitted to clients directly via HTTP requests.
 * `static/` - here are the static files that clients should receive via http requests: javascripts, CSSs, icons, etc.
 * `.graphics/` - in this folder the original images and the results of their processing are saved. All images received from third-party sites and services must necessarily contain a license, which allows their public commercial use.
+* `.vscode/` - here the Visual Studio Code settings are saved.
 
 ## Environment variables
 
