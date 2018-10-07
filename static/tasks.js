@@ -23,10 +23,10 @@ function init() {
 	$("#filter-clear-button").bind('click', clickClearFilter);
 	$("#filter-input").keypress(onEnterFilterInput);
 	$("#task-lists-select").change(loadTasks);
-	$("#task-submit-button").bind('click', submitTask);
+	$("#task-submit-button").bind('click', submitTaskOnCurrentList);
 	$("button.add").bind('click', newTask);
 	$("#new-list-create-button").bind('click', newList);
-	$("#task-move-button").bind('click', moveTask);
+	$("#task-move-button").bind('click', moveTaskToNewList);
 
 	// Fill autocomplete with names of employees
 	$("#filter-input").autocomplete( {
@@ -564,9 +564,9 @@ function newTask() {
 }
 
 // ===========================================================================
-// Send current edited task (existing or new) to server and database
+// Send current edited task (existing or new) to server and database in the specified list
 // ===========================================================================
-function submitTask() {
+function submitTask(list) {
 	// if no task text - then nothing to do
 	if ( !$("#task-text-input").val() ) { 
 		$("#operation-status-label").html(resultTaskEmpty); 
@@ -583,7 +583,7 @@ function submitTask() {
 		dataType: "json",
 		contentType: "application/json; charset=utf-8",
 		data : JSON.stringify( {
-			List: $("#task-lists-select").val(),
+			List: list,
 			Id: $("#task-id-input").val(),
 			Text: $("#task-text-input").val(),
 			Section: $("#task-section-select").val(),
@@ -646,6 +646,14 @@ function submitTask() {
 			showAjaxError("#operation-status-label",jqXHR,exception);
 		}
 	} );
+	return false;
+}
+
+// ===========================================================================
+// Send current edited task (existing or new) to server and database in current list
+// ===========================================================================
+function submitTaskOnCurrentList() {
+	submitTask($("#task-lists-select").val());
 	return false;
 }
 
@@ -734,8 +742,14 @@ function newList() {
 // ===========================================================================
 // Move selected task to the most recent todo-list
 // ===========================================================================
-function moveTask() {
-
+function moveTaskToNewList() {
+	var oldID = $("#task-id-input").val();
+	$("#task-id-input").val("");
+	submitTask($("#task-lists-select").find("option:first-child").val())
+	$("#"+oldID).click();
+	$("#task-status-select").val("moved");
+	submitTask($("#task-lists-select").val());
+	return false;
 }
 
 // ===========================================================================
