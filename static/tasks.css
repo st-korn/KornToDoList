@@ -255,6 +255,22 @@ div.today-task:hover {
 }
 
 /* ===============================================================
+   Styles of icons
+   =============================================================== */
+img.icon {
+  display: inline-block;
+  vertical-align: text-top;
+  height: 16px;
+  margin: -1px 2px 0 0;
+  padding: 0 0 0 2px;
+}
+img.icon.done, 
+img.icon.canceled,
+img.icon.moved {
+  opacity: 0.3;
+}
+  
+  /* ===============================================================
    Styles of today's task list
    =============================================================== */
 #today-tasks-ul { 
@@ -264,7 +280,7 @@ div.today-task:hover {
 }
 li { 
   margin: 1px; 
-  padding: 2px; 
+  padding: 2px 2px 2px 0; 
   border: dotted rgba(0,0,0,1) 1px;
   border-radius: 3px;
   display: flex;
@@ -276,15 +292,15 @@ li {
 li img {
 	display: inline-block;
   flex-grow: 1;
-	height: 16px;
-}
-img.icon {
-  padding: 0 0 0 2px;
-  margin: -1px 2px 0 0;
 }
 img.handle {
   height: 16px;
-  margin-left: -3px;
+}
+img.handle:hover {
+  cursor: move;
+}
+div.today-task {
+  flex-grow: 100;
 }
 img.insert-delimiter {
   height: 12px;
@@ -294,50 +310,19 @@ img.delete-delimiter {
   height: 10px;
   margin-left: 3px;
 }
-img.handle:hover {
-  cursor: move;
-}
 img.insert-delimiter:hover,
 img.delete-delimiter:hover {
   cursor: pointer;
-}
-div.today-task {
-  flex-grow: 100;
 }
 li.delimiter {
   height: 14px;
   background-image: linear-gradient(135deg, rgba(204,204,204,0.3) 25%, rgba(176,176,176,0.3) 25%, rgba(176,176,176,0.3) 50%, rgba(204,204,204,0.3) 50%, rgba(204,204,204,0.3) 75%, rgba(176,176,176,0.3) 75%, rgba(176,176,176,0.3) 100%),
                     linear-gradient(45deg, rgba(204,204,204,0.3) 25%, rgba(176,176,176,0.3) 25%, rgba(176,176,176,0.3) 50%, rgba(204,204,204,0.3) 50%, rgba(204,204,204,0.3) 75%, rgba(176,176,176,0.3) 75%, rgba(176,176,176,0.3) 100%);
-  /*background-size: 8.49px 8.49px;*/
   background-size: 6px 6px;
-
-                    /**/
-	/*background: linear-gradient( rgba(187,187,187,0.3), transparent 1px), linear-gradient( 90deg, rgba(187,187,187,0.3), transparent 1px);
-	background-size: 4px 4px;
-	background-position: center center;*/
   border: none;
 }
 div.delimiter {
   flex-grow: 100;
-}
-
-/* ===============================================================
-   Styles of icons
-   =============================================================== */
-p img {
-	display: inline-block;
-	vertical-align: text-top;
-	height: 16px;
-  margin: -1px 2px 0 0;
-  padding: 0 0 0 2px;
-}
-.done img,
-img.done, 
-.canceled img,
-img .canceled,
-.moved img,
-img.moved {
-	opacity: 0.3;
 }
 
 /* ===============================================================

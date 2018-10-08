@@ -431,7 +431,7 @@ function htmlPTask(task) {
 	var tooltips = {'created': statusCreated, 'moved': statusMoved, 'canceled': statusCanceled, 'done': statusDone};
 	var p = '<p id="' + task.Id + '" class="' + task.Status + '" data-tooltip="' + tooltips[task.Status] + '" data-timestamp="'+task.Timestamp+'">'
 	if (task.Icon != "") {
-		p = p + '<img class="'+task.Icon+'" src="/static/icons/'+task.Icon+'.svg">'
+		p = p + '<img class="icon '+task.Icon+' '+task.Status+'" src="/static/icons/'+task.Icon+'.svg">'
 	}
 	var idx = task.Text.indexOf(" - ");
 	if (idx > 0) {
@@ -507,7 +507,9 @@ function loadTasks() {
 						$("#"+this.Section).append(htmlPTask(this));
 					});
 					// Calculate page statistic
-					afterUpdate();
+					calculateStatistic();
+					// Refresh events handlers
+					setEvents();
 					// Get ready to create a new task
 					$("#ib button").click();
  					break;
@@ -604,7 +606,12 @@ function onTaskEdit() {
 			break;
 	}
 	$("#task-status-select").val( $(this).attr("class") );
-	$("#task-icon-select").val( $(this).children("img").attr("class") );
+	var icon = $(this).children("img").attr("class");
+	if (icon) {
+		$("#task-icon-select").val( icon.replace("icon","").replace("created","").replace("done","").replace("canceled","").replace("moved","").trim() );
+	} else {
+		$("#task-icon-select").val("");
+	}
 	$("#task-section-select").val( $("p#"+id).parents("section").attr("id") );
 	$("#task-text-input").val( $(this).text() );
 	$("#task-id-input").val( id );
@@ -729,7 +736,9 @@ function submitTask(list) {
 					// Re-apply filter
 					applyFilter($("#filter-input").val());
 					// Calculate page statistic
-					afterUpdate();
+					calculateStatistic();
+					// Refresh events handlers
+					setEvents();
 					// Get ready to create a new task
 					$("#ib button").click();
 					break
@@ -865,7 +874,8 @@ function insertDelimiter() {
 	li = li + '<img class="delete-delimiter" src="/static/icons/delete.svg" title="'+hintDeleteDelimiter+'">';
 	li = li + '</li>';
 	$(this).parents("li").after(li);
-	afterUpdate();
+	// Refresh events handlers
+	setEvents();
 }
 
 // ===========================================================================
@@ -873,14 +883,15 @@ function insertDelimiter() {
 // ===========================================================================
 function deleteDelimiter() {
 	$(this).parents("li").remove();
-	afterUpdate();
+	// Refresh events handlers
+	setEvents();
 }
 
+
 // ===========================================================================
-// Initializing page objects after updating the task table from the server
+// 	Calculate statistics of tasks
 // ===========================================================================
-function afterUpdate() {
-	// Calculate statistics
+function calculateStatistic()
 	$("#total-tasks-count-label").text($("p").length+":");
 	if ( $("p").length == 0 )
 	{
@@ -902,7 +913,12 @@ function afterUpdate() {
 		cnt = $("p.created").length - cnt
 		$("#activity-tasks-count-label").text(cnt+" ("+Math.round(cnt*100/total)+"%)");
 	}
-	// Set events handlers
+}
+
+// ===========================================================================
+// Refresh events handlers after updating dynamics page objects
+// ===========================================================================
+function setEvents() {
 	$("p").unbind('click');
 	$("p").bind('click',onTaskEdit)
 	$("div.today-task").unbind('click');
