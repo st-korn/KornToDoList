@@ -462,7 +462,7 @@ function htmlLiTask(task) {
 		p = p + task.Text;
 	}
 	p = p + '</div>'
-	p = p + '<img class="insert-delimiter" src="/static/icons/delimiter.svg">'
+	p = p + '<img class="insert-delimiter" src="/static/icons/delimiter.svg" title="'+hintInsertDelimiter+'">'
 	p = p + '</li>';
 	return p;
 }
@@ -859,8 +859,21 @@ function saveToday() {
 // Insert delimiter line after selected task in today's task-list
 // ===========================================================================
 function insertDelimiter() {
-	console.log($(this).parents("li").length)
-	$(this).parents("li").after('<li class="delimiter"><img class="handle" src="/static/icons/updown.svg"><div class="delimiter"></div><img class="delete-delimiter" src="/static/icons/delete.svg"></li>')
+	var li = '<li class="delimiter">';
+	li = li + '<img class="handle" src="/static/icons/updown.svg">';
+	li = li + '<div class="delimiter"></div>';
+	li = li + '<img class="delete-delimiter" src="/static/icons/delete.svg" title="'+hintDeleteDelimiter+'">';
+	li = li + '</li>';
+	$(this).parents("li").after(li);
+	afterUpdate();
+}
+
+// ===========================================================================
+// Delete delimiter line
+// ===========================================================================
+function deleteDelimiter() {
+	$(this).parents("li").remove();
+	afterUpdate();
 }
 
 // ===========================================================================
@@ -896,5 +909,7 @@ function afterUpdate() {
 	$("div.today-task").bind('click', onTaskEdit);
 	$("img.insert-delimiter").unbind('click');
 	$("img.insert-delimiter").bind('click', insertDelimiter);
+	$("img.delete-delimiter").unbind('click');
+	$("img.delete-delimiter").bind('click', deleteDelimiter);
 }
 

@@ -136,5 +136,8 @@
 
 "resultListCreated" : "Список создан",
 "resultDateTooFar" : "Название списка должно содержать текущую дату. Проверьте часы и календарь на вашем на устройстве.",
-"resultCreateListFailed" : "Не удалось создать список"
+"resultCreateListFailed" : "Не удалось создать список",
+
+"hintInsertDelimiter" : "добавить разделитель",
+"hintDeleteDelimiter" : "удалить разделитель"
 }
