@@ -41,7 +41,8 @@ function init() {
 
 	// Initialize sortable today's task-list
 	$("#today-tasks-ul").sortable( {
-		placeholder: "ui-state-highlight"
+		placeholder: "ui-state-highlight",
+		handle: ".handle"
 	});
 
 	// Analyze the presence of a saved session
@@ -448,16 +449,20 @@ function htmlPTask(task) {
 // ===========================================================================
 function htmlLiTask(task) {
 	var tooltips = {'created': statusCreated, 'moved': statusMoved, 'canceled': statusCanceled, 'done': statusDone};
-	var p = '<li id="li-' + task.Id + '" class="' + task.Status + '" data-tooltip="' + tooltips[task.Status] + '" data-timestamp="'+task.Timestamp+'">'
+	var p = '<li>'
+	p = p + '<img class="handle" src="/static/icons/updown.svg">'
 	if (task.Icon != "") {
-		p = p + '<img class="'+task.Icon+'" src="/static/icons/'+task.Icon+'.svg">'
+		p = p + '<img class="icon '+task.Icon+' '+task.Status+'" src="/static/icons/'+task.Icon+'.svg">'
 	}
+	p = p + '<div class="today-task '+task.Status+'" id="div-' + task.Id + '" class="' + task.Status + '" data-tooltip="' + tooltips[task.Status] + '" data-timestamp="'+task.Timestamp+'">'
 	var idx = task.Text.indexOf(" - ");
 	if (idx > 0) {
 		p = p + '<span class="employee">' + task.Text.substr(0,idx) + '</span>' + task.Text.substring(idx,task.Text.length);
 	} else {
 		p = p + task.Text;
 	}
+	p = p + '</div>'
+	p = p + '<img class="insert-delimiter" src="/static/icons/delimiter.svg">'
 	p = p + '</li>';
 	return p;
 }
@@ -594,8 +599,8 @@ function onTaskEdit() {
 		case "P" :
 			id = $(this).attr("id")
 			break;
-		case "LI" :
-			id = $(this).attr("id").substr(3);
+		case "DIV" :
+			id = $(this).attr("id").substr(4);
 			break;
 	}
 	$("#task-status-select").val( $(this).attr("class") );
@@ -604,7 +609,7 @@ function onTaskEdit() {
 	$("#task-text-input").val( $(this).text() );
 	$("#task-id-input").val( id );
 	$("#task-timestamp-input").val( $(this).attr("data-timestamp") )
-	if ($("li#li-"+id).length > 0) {
+	if ($("div#div-"+id).length > 0) {
 		$("#checkbox-today-input").prop('checked', true);
 	} else {
 		$("#checkbox-today-input").prop('checked', false);
@@ -701,15 +706,15 @@ function submitTask(list) {
 						// Try to include task to the today's task-list
 						var task = response.Tasks.find(obj => { return obj.Id === $("#task-id-input").val() });
 						if (task != undefined) {
-							if ($("li#li-"+$("#task-id-input").val()).length == 0) {
+							if ($("div#div-"+$("#task-id-input").val()).length == 0) {
 								$("#today-tasks-ul").append(htmlLiTask(task));
 								saveToday();
 							}
 						}
 					} else {
 						// Try to exclude task from the today's task-list
-						if ($("li#li-"+$("#task-id-input").val()).length > 0) {
-							$("li#li-"+$("#task-id-input").val()).remove();
+						if ($("div#div-"+$("#task-id-input").val()).length > 0) {
+							$("div#div-"+$("#task-id-input").val()).parents("li").remove();
 							saveToday();
 						}
 					};
@@ -851,6 +856,14 @@ function saveToday() {
 }
 
 // ===========================================================================
+// Insert delimiter line after selected task in today's task-list
+// ===========================================================================
+function insertDelimiter() {
+	console.log($(this).parents("li").length)
+	$(this).parents("li").after('<li class="delimiter"><img class="handle" src="/static/icons/updown.svg"><div class="delimiter"></div><img class="delete-delimiter" src="/static/icons/delete.svg"></li>')
+}
+
+// ===========================================================================
 // Initializing page objects after updating the task table from the server
 // ===========================================================================
 function afterUpdate() {
@@ -877,7 +890,11 @@ function afterUpdate() {
 		$("#activity-tasks-count-label").text(cnt+" ("+Math.round(cnt*100/total)+"%)");
 	}
 	// Set events handlers
-	$("p").click(onTaskEdit)
-	$("li").click(onTaskEdit)
+	$("p").unbind('click');
+	$("p").bind('click',onTaskEdit)
+	$("div.today-task").unbind('click');
+	$("div.today-task").bind('click', onTaskEdit);
+	$("img.insert-delimiter").unbind('click');
+	$("img.insert-delimiter").bind('click', insertDelimiter);
 }
 
