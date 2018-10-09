@@ -445,26 +445,45 @@ function htmlPTask(task) {
 
 // ===========================================================================
 // Generate <li> HTML for the Task structure
-// IN: task struct {	ID : string, Text : string, Section : string, Status : string, Icon : string, Timestamp : string }
+// IN: taskId string
 // ===========================================================================
-function htmlLiTask(task) {
+function htmlLiTask(taskId) {
+	var taskIcon = $(this).children("img").attr("class");
+	if (taskIcon) {
+		taskIcon = taskIcon.replace("icon","").replace("created","").replace("done","").replace("canceled","").replace("moved","").trim();
+	};
+	var taskStatus = $("#"+taskId).attr("class");
+	var taskTimestamp = $("#"+taskId).attr("data-timestamp");
+	var taskText = $("#"+taskId).text();
 	var tooltips = {'created': statusCreated, 'moved': statusMoved, 'canceled': statusCanceled, 'done': statusDone};
-	var p = '<li>'
-	p = p + '<img class="handle" src="/static/icons/updown.svg">'
-	if (task.Icon != "") {
-		p = p + '<img class="icon '+task.Icon+' '+task.Status+'" src="/static/icons/'+task.Icon+'.svg">'
+	var li = '<li>'
+	li = li + '<img class="handle" src="/static/icons/updown.svg">'
+	if (taskIcon) {
+		li = li + '<img class="icon '+taskIcon+' '+taskStatus+'" src="/static/icons/'+taskIcon+'.svg">'
 	}
-	p = p + '<div class="today-task '+task.Status+'" id="div-' + task.Id + '" class="' + task.Status + '" data-tooltip="' + tooltips[task.Status] + '" data-timestamp="'+task.Timestamp+'">'
-	var idx = task.Text.indexOf(" - ");
+	li = li + '<div class="today-task '+taskStatus+'" id="div-' + taskId + '" class="' + taskStatus + '" data-tooltip="' + tooltips[taskStatus] + '" data-timestamp="'+taskTimestamp+'">'
+	var idx = taskText.indexOf(" - ");
 	if (idx > 0) {
-		p = p + '<span class="employee">' + task.Text.substr(0,idx) + '</span>' + task.Text.substring(idx,task.Text.length);
+		li = li + '<span class="employee">' + taskText.substr(0,idx) + '</span>' + taskText.substring(idx,taskText.length);
 	} else {
-		p = p + task.Text;
+		li = li + taskText;
 	}
-	p = p + '</div>'
-	p = p + '<img class="insert-delimiter" src="/static/icons/delimiter.svg" title="'+hintInsertDelimiter+'">'
-	p = p + '</li>';
-	return p;
+	li = li + '</div>'
+	li = li + '<img class="insert-delimiter" src="/static/icons/delimiter.svg" title="'+hintInsertDelimiter+'">'
+	li = li + '</li>';
+	return li;
+}
+
+// ===========================================================================
+// Generate <li> HTML for delimiter
+// ===========================================================================
+function htmlLiDelimiter() {
+	var li = '<li class="delimiter">';
+	li = li + '<img class="handle" src="/static/icons/updown.svg">';
+	li = li + '<div class="delimiter"></div>';
+	li = li + '<img class="delete-delimiter" src="/static/icons/delete.svg" title="'+hintDeleteDelimiter+'">';
+	li = li + '</li>';
+	return li;	
 }
 
 // ===========================================================================
@@ -708,20 +727,22 @@ function submitTask(list) {
 							}
 						};
 					});
-					// Include or exclude task to the today's task-list
+					// Include, update or exclude task to the today's task-list
 					if ($("#checkbox-today-input").prop('checked')) {
-						// Try to include task to the today's task-list
-						var task = response.Tasks.find(obj => { return obj.Id === $("#task-id-input").val() });
-						if (task != undefined) {
-							if ($("div#div-"+$("#task-id-input").val()).length == 0) {
-								$("#today-tasks-ul").append(htmlLiTask(task));
-								saveToday();
-							}
+						if ( $("div#div-"+$("#task-id-input").val()).length == 0 ) {
+							// Try to include task to the today's task-list
+							$("#today-tasks-ul").append(htmlLiTask($("#task-id-input").val()));
+							// Save today's tasks
+							saveToday();	
+						} else {
+							// Try to update task in the today's task-list
+							$("div#div-"+$("#task-id-input")).replaceWith(htmlLiTask($("#task-id-input").val()));
 						}
 					} else {
 						// Try to exclude task from the today's task-list
 						if ($("div#div-"+$("#task-id-input").val()).length > 0) {
 							$("div#div-"+$("#task-id-input").val()).parents("li").remove();
+							// Save today's tasks
 							saveToday();
 						}
 					};
@@ -861,19 +882,90 @@ function moveTaskToNewList() {
 // Send today's task list on server, to remember it in database
 // ===========================================================================
 function saveToday() {
-
+	// Collect array of today's tasks
+	var todayTasks = []
+	$("#today-tasks-ul li").each( function() {
+		if ($(this).attr("class") == "delimiter") {
+			todayTasks[todayTasks.length] = ""
+		} else {
+			todayTasks[todayTasks.length] = $(this).children("div.today-task").attr("id").substr(4)
+		}
+	});	
+	// Send Ajax POST request
+	$("#operation-status-label").text("");
+	showSpinner("#task-spinner-div");
+	$.ajax( {
+		url : "/SaveTodayTasks",
+		cache: false,
+		type : "post",
+		dataType: "json",
+		contentType: "application/json; charset=utf-8",
+		data : JSON.stringify( {
+			List: $("#task-lists-select").val(),
+			TodayTasks: todayTasks,
+			Timestamp: $("#today-tasks-ul").attr("data-timestamp")
+		} ),
+		// if success
+		success: function (response) {
+			hideSpinner("#task-spinner-div");
+			switch(response.Result) {
+  				case "SessionEmptyNotFoundOrExpired" :
+  					Cookies.remove('User-Session');
+  					location.reload();
+					break;
+				case "InvalidListName" :
+					$("#operation-status-label").html(resultInvalidListName);
+					break;
+				case "DateTooFar" :
+					$("#operation-status-label").html(resultDateTooFar);
+					break;
+				case "TodaysTaskListUpdateFailed" :
+					$("#operation-status-label").html(resultTodaysTaskListUpdateFailed);
+					break;
+				case "TodaysTaskListUpdated" :
+				case "TodaysTaskListJustUpdated" :
+					// Purge old today's tasks
+					$("#today-tasks-ul li").remove();
+					// Collect today's tasks
+					$.each(response.TodayTasks, function() {
+						if ( this.length > 0 ) {
+							// insert task
+							$("#today-tasks-ul").append(htmlLiTask(this));
+						} else {
+							// insert delimiter
+							$("#today-tasks-ul").append(htmlLiDelimiter());
+						}; 
+					} );
+					// Update Timestamp
+					$("#today-tasks-ul").attr("data-timestamp", response.Timestamp);
+					// Update status label
+					if (response.Result == "TodaysTaskListUpdated") {
+						$("#operation-status-label").html(resultTodaysTaskListUpdated);
+					} else if (response.Result == "TodaysTaskListJustUpdated") {
+						$("#operation-status-label").html(resultTodaysTaskListJustUpdated);
+					};
+					// Refresh events handlers
+					setEvents();
+					break;
+				default : $("#operation-status-label").html(resultUnknown);
+			}
+		},
+		// if error returns
+		error: function(jqXHR,exception) { 
+			hideSpinner("#task-spinner-div");
+			showAjaxError("#operation-status-label",jqXHR,exception);
+		}
+	} );
+	return false;
 }
 
 // ===========================================================================
 // Insert delimiter line after selected task in today's task-list
 // ===========================================================================
 function insertDelimiter() {
-	var li = '<li class="delimiter">';
-	li = li + '<img class="handle" src="/static/icons/updown.svg">';
-	li = li + '<div class="delimiter"></div>';
-	li = li + '<img class="delete-delimiter" src="/static/icons/delete.svg" title="'+hintDeleteDelimiter+'">';
-	li = li + '</li>';
-	$(this).parents("li").after(li);
+	$(this).parents("li").after(htmlLiDelimiter());
+	// Save today's tasks
+	saveToday();	
 	// Refresh events handlers
 	setEvents();
 }
@@ -883,6 +975,8 @@ function insertDelimiter() {
 // ===========================================================================
 function deleteDelimiter() {
 	$(this).parents("li").remove();
+	// Save today's tasks
+	saveToday();	
 	// Refresh events handlers
 	setEvents();
 }
@@ -891,7 +985,7 @@ function deleteDelimiter() {
 // ===========================================================================
 // 	Calculate statistics of tasks
 // ===========================================================================
-function calculateStatistic()
+function calculateStatistic() {
 	$("#total-tasks-count-label").text($("p").length+":");
 	if ( $("p").length == 0 )
 	{

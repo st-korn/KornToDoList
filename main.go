@@ -11,9 +11,10 @@ import (
 	"net/mail"        // to generate emails
 	"net/smtp"        // to send emails
 	"os"              // to get OS environment variables
+	"regexp"          // to validation todo-list names
 	"strings"         // to parse http-request headers
 	"text/template"   // for use HTML-page templates
-	"time"            // to define MongoDB time type for structure elements, for timers
+	"time"            // to define MongoDB time type for structure elements, for timers, to validation todo-list names
 
 	"golang.org/x/text/language"         // to detect user-perferred language
 	"golang.org/x/text/language/display" // to output national names of languages
@@ -167,6 +168,25 @@ func DetectLanguageAndLoadLabels(req *http.Request) (langTag language.Tag, langE
 }
 
 // ===========================================================================================================================
+// Task lists common routines
+// ===========================================================================================================================
+
+// Check if the string "list" matches the format "YYYY-MM-DD"
+// If it matches, returns true as result, and it's value in time.Time ad datetime
+// If don't matches, returns false as result
+func TestTaskListName(list string) (result bool, datetime time.Time) {
+	regexp, _ := regexp.Compile(`\d\d\d\d-\d\d-\d\d`)
+	if !regexp.MatchString(list) {
+		return false, datetime
+	}
+	datetime, err := time.Parse("2006-01-02", list)
+	if err != nil {
+		return false, datetime
+	}
+	return true, datetime
+}
+
+// ===========================================================================================================================
 // E-Mail sending
 // ===========================================================================================================================
 
@@ -233,7 +253,7 @@ func SendEmail(fromName string, fromAddress string, toAddress string, subject st
 // Debug function: output to STDOUT all HTTP-headers, received in the HTTP-request
 // IN: *http.Request
 // OUT: -
-func formatRequest(r *http.Request) string {
+func FormatRequest(r *http.Request) string {
 	// Create return string
 	var request []string
 	// Add the request string
@@ -319,6 +339,13 @@ type typeTask struct {
 	Section   string
 	Status    string
 	Icon      string
+	Timestamp time.Time
+}
+
+type typeTodaysTaks struct {
+	EMail     string
+	List      string
+	Tasks     []string
 	Timestamp time.Time
 }
 

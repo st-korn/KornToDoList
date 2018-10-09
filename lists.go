@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json" // to parse and generate JSON input and output parameters
 	"net/http"      // for HTTP-server
-	"regexp"        // to validation todo-list name
 	"sort"          // for sortings lists
 	"time"          // to validation todo-list name
 
@@ -85,14 +84,8 @@ func webCreateList(res http.ResponseWriter, req *http.Request) {
 	var response typeCreateListJSONResponse
 
 	// Check incoming parameters
-	regexp, _ := regexp.Compile(`\d\d\d\d-\d\d-\d\d`)
-	if !regexp.MatchString(request.List) {
-		response.Result = "InvalidListName"
-		ReturnJSON(res, response)
-		return
-	}
-	dateList, err := time.Parse("2006-01-02", request.List)
-	if err != nil {
+	passed, dateList := TestTaskListName(request.List)
+	if !passed {
 		response.Result = "InvalidListName"
 		ReturnJSON(res, response)
 		return

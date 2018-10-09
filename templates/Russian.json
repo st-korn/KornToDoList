@@ -139,5 +139,8 @@
 "resultCreateListFailed" : "Не удалось создать список",
 
 "hintInsertDelimiter" : "добавить разделитель",
-"hintDeleteDelimiter" : "удалить разделитель"
+"hintDeleteDelimiter" : "удалить разделитель",
+"resultTodaysTaskListUpdateFailed" : "Не удалось обновить список здадач на сегодня",
+"resultTodaysTaskListJustUpdated" : "Список задач на сегодня был обновлён ранее с другого устройства",
+"resultTodaysTaskListUpdated" : "Список задач на сегодня обновлён"
 }

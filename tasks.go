@@ -3,9 +3,8 @@ package main
 import (
 	"encoding/json" // to parse and generate JSON input and output parameters
 	"net/http"      // for HTTP-server
-	"regexp"        // to validation todo-list name
 	"strings"       // TrimSpace function
-	"time"          // to validation todo-list name, for timestamps
+	"time"          // for timestamps
 
 	"gopkg.in/mgo.v2/bson" // to use BSON queries format
 )
@@ -136,14 +135,8 @@ func webSendTask(res http.ResponseWriter, req *http.Request) {
 		ReturnJSON(res, response)
 		return
 	}
-	regexp, _ := regexp.Compile(`\d\d\d\d-\d\d-\d\d`)
-	if !regexp.MatchString(request.List) {
-		response.Result = "InvalidListName"
-		ReturnJSON(res, response)
-		return
-	}
-	_, err = time.Parse("2006-01-02", request.List)
-	if err != nil {
+	passed, _ := TestTaskListName(request.List)
+	if !passed {
 		response.Result = "InvalidListName"
 		ReturnJSON(res, response)
 		return

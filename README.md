@@ -217,8 +217,9 @@ Save today's task list in database.
     IN: JSON: { List string,
                 TodayTasks []string (_id task or "" for delimiter),
                 Timestamp : datetime (updated task timestamp, can't be null or "") }
-    OUT: JSON: { Result : string ["InvalidListName", "SessionEmptyNotFoundOrExpired", "TodaysTaskListJustUpdated", "TodaysTaskListUpdated",
-                 TodayTasks []string (_id task or "" for delimiter) }
+    OUT: JSON: { Result : string ["InvalidListName", "SessionEmptyNotFoundOrExpired", "TodaysTaskListUpdateFailed","TodaysTaskListJustUpdated", "TodaysTaskListUpdated",
+                 TodayTasks []string (_id task or "" for delimiter) 
+                 Timestamp : datetime }
 
 * Checks the current session for validity. If the session is not valid, it returns `"SessionEmptyNotFoundOrExpired"` as a result.
 * If today's task-list exist in database, and its timestamp is greater than timestamp of updated task-list, recieved from users-application, return `"TodaysTaskListJustUpdated"` error.

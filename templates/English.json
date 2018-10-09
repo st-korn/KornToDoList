@@ -139,5 +139,8 @@
 "resultCreateListFailed" : "Failed to create list",
 
 "hintInsertDelimiter" : "insert delimiter",
-"hintDeleteDelimiter" : "delete delimiter"
+"hintDeleteDelimiter" : "delete delimiter",
+"resultTodaysTaskListUpdateFailed" : "Failed to update the list of today's tasks",
+"resultTodaysTaskListJustUpdated" : "The today's tasks list has been updated earlier from another device",
+"resultTodaysTaskListUpdated" : "Today's tasks list updated"
 }

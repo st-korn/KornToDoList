@@ -2,9 +2,7 @@ package main
 
 import (
 	"net/http"      // for HTTP-server
-	"regexp"        // to validation todo-list name
 	"text/template" // for use HTML-page templates
-	"time"          // to validation todo-list name
 
 	"golang.org/x/text/language/display" // to output national names of languages
 	"gopkg.in/mgo.v2/bson"               // to use BSON queries format
@@ -39,13 +37,8 @@ func webFormShow(res http.ResponseWriter, req *http.Request) {
 	if req.URL.Path != "/" {
 		// Check incoming parameters
 		webFormData.ListToOpen = req.URL.Path[1:]
-		regexp, _ := regexp.Compile(`\d\d\d\d-\d\d-\d\d`)
-		if !regexp.MatchString(webFormData.ListToOpen) {
-			http.NotFound(res, req)
-			return
-		}
-		_, err := time.Parse("2006-01-02", webFormData.ListToOpen)
-		if err != nil {
+		passed, _ := TestTaskListName(webFormData.ListToOpen)
+		if !passed {
 			http.NotFound(res, req)
 			return
 		}
