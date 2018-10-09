@@ -450,10 +450,7 @@ function htmlPTask(task) {
 // IN: taskId string
 // ===========================================================================
 function htmlLiTask(taskId) {
-	var taskIcon = $(this).children("img").attr("class");
-	if (taskIcon) {
-		taskIcon = taskIcon.replace("icon","").replace("created","").replace("done","").replace("canceled","").replace("moved","").trim();
-	};
+	var taskIcon = extractIcon( $("#"+taskId).children("img").attr("class") );
 	var taskStatus = $("#"+taskId).attr("class");
 	var taskTimestamp = $("#"+taskId).attr("data-timestamp");
 	var taskText = $("#"+taskId).text();
@@ -639,17 +636,12 @@ function onTaskEdit() {
 			id = $(this).attr("id").substr(4);
 			break;
 	}
-	$("#task-status-select").val( $(this).attr("class") );
-	var icon = $(this).children("img").attr("class");
-	if (icon) {
-		$("#task-icon-select").val( icon.replace("icon","").replace("created","").replace("done","").replace("canceled","").replace("moved","").trim() );
-	} else {
-		$("#task-icon-select").val("");
-	}
+	$("#task-status-select").val( $("p#"+id).attr("class") );
+	$("#task-icon-select").val( extractIcon( $("p#"+id).children("img").attr("class") ) );
 	$("#task-section-select").val( $("p#"+id).parents("section").attr("id") );
-	$("#task-text-input").val( $(this).text() );
+	$("#task-text-input").val( $("p#"+id).text() );
 	$("#task-id-input").val( id );
-	$("#task-timestamp-input").val( $(this).attr("data-timestamp") )
+	$("#task-timestamp-input").val( $("p#"+id).attr("data-timestamp") )
 	if ($("div#div-"+id).length > 0) {
 		$("#checkbox-today-input").prop('checked', true);
 	} else {
@@ -751,7 +743,7 @@ function submitTask(list) {
 							saveToday();	
 						} else {
 							// Try to update task in the today's task-list
-							$("div#div-"+$("#task-id-input")).replaceWith(htmlLiTask($("#task-id-input").val()));
+							$("div#div-"+$("#task-id-input").val()).parents("li").replaceWith(htmlLiTask($("#task-id-input").val()));
 						}
 					} else {
 						// Try to exclude task from the today's task-list
