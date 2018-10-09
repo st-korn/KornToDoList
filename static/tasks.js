@@ -28,6 +28,8 @@ function init() {
 	$("#new-list-create-button").bind('click', newList);
 	$("#task-move-button").bind('click', moveTaskToNewList);
 	$("#register-user-button").bind('click', clickSignup);
+	$("#clear-done-button").bind('click', clearDoneTasksFromToday)
+	$("#clear-all-button").bind('click', clearAllTasksFromToday)
 
 	// Fill autocomplete with names of employees
 	$("#filter-input").autocomplete( {
@@ -494,6 +496,7 @@ function loadTasks() {
 	manageListsButtons();
 	// Purge current tasks
 	$("p").remove();
+	$("li").remove();
 	// If no ToDo-list found - then nothing to do
 	if ( !$("#task-lists-select").val() ) { return false };
 	// Check selected list: if it isn't first - change current URL
@@ -525,6 +528,18 @@ function loadTasks() {
 					$.each(response.Tasks, function() {
 						$("#"+this.Section).append(htmlPTask(this));
 					});
+					// Collect today's tasks
+					$.each(response.TodayTasks, function() {
+						if ( this.length > 0 ) {
+							// insert task
+							$("#today-tasks-ul").append(htmlLiTask(this));
+						} else {
+							// insert delimiter
+							$("#today-tasks-ul").append(htmlLiDelimiter());
+						}; 
+					} );
+					// Update Timestamp
+					$("#today-tasks-ul").attr("data-timestamp", response.TodayTasksTimestamp);
 					// Calculate page statistic
 					calculateStatistic();
 					// Refresh events handlers
@@ -903,7 +918,7 @@ function saveToday() {
 		data : JSON.stringify( {
 			List: $("#task-lists-select").val(),
 			TodayTasks: todayTasks,
-			Timestamp: $("#today-tasks-ul").attr("data-timestamp")
+			TodayTasksTimestamp: $("#today-tasks-ul").attr("data-timestamp")
 		} ),
 		// if success
 		success: function (response) {
@@ -937,7 +952,7 @@ function saveToday() {
 						}; 
 					} );
 					// Update Timestamp
-					$("#today-tasks-ul").attr("data-timestamp", response.Timestamp);
+					$("#today-tasks-ul").attr("data-timestamp", response.TodayTasksTimestamp);
 					// Update status label
 					if (response.Result == "TodaysTaskListUpdated") {
 						$("#operation-status-label").html(resultTodaysTaskListUpdated);
@@ -976,11 +991,27 @@ function insertDelimiter() {
 function deleteDelimiter() {
 	$(this).parents("li").remove();
 	// Save today's tasks
-	saveToday();	
+	saveToday();
 	// Refresh events handlers
 	setEvents();
 }
 
+// ===========================================================================
+// Remove all tasks not in "created" status from today's tasks list
+// ===========================================================================
+function clearDoneTasksFromToday() {
+	$("div.today-task.done").parents("li").remove();
+	$("div.today-task.canceled").parents("li").remove();
+	$("div.today-task.moved").parents("li").remove();
+	saveToday();
+}
+
+// ===========================================================================
+// Remove all tasks from today's tasks list
+// ===========================================================================
+function clearAllTasksFromToday() {
+	$("li").remove();
+}
 
 // ===========================================================================
 // 	Calculate statistics of tasks
@@ -1022,4 +1053,3 @@ function setEvents() {
 	$("img.delete-delimiter").unbind('click');
 	$("img.delete-delimiter").bind('click', deleteDelimiter);
 }
-

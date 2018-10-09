@@ -176,10 +176,13 @@ Get tasks of selected user lists.
                               Section : string ["iu","in","nu","nn","ib"], 
                               Status : string ["created", "done", "canceled", "moved"],
                               Icon : string ["wait","remind","call","force","mail","prepare","manage","meet","visit","make","journey","think"], 
-                              Timestamp : datetime } }
+                              Timestamp : datetime }
+                 TodayTasks []string (_id task or "" for delimiter),
+                 TodayTasksTimestamp : datetime }
 
 * Checks the current session for validity. If the session is not valid, it returns `"SessionEmptyNotFoundOrExpired"` as a result.
 * Returns an array of structures that identify tasks from a selected list of the current user.
+* Also return list of today's tasks from selected list of the current user.
 
 ### `POST /SendTask`
 
@@ -205,7 +208,7 @@ Update existing task from the list or append new task to the list.
                               Timestamp : datetime } }
 
 * Checks the current session for validity. If the session is not valid, it returns `"SessionEmptyNotFoundOrExpired"` as a result.
-* If updated task exist in database, and its timestamp is greater than timestamp of updated task, recieved from users-application, return `"TaskJustUpdated"` error.
+* If updated task exist in database, and its timestamp is greater than timestamp of updated task, recieved from users-application, return `"TaskJustUpdated"` error and array of a single element - original task from the database.
 * Update existing task or generate ID and append new task to the database.
 * Returns an array of a single element - an added or updated task with its ID.
 
@@ -216,13 +219,13 @@ Save today's task list in database.
     Cookies: User-Session : string (UUID)
     IN: JSON: { List string,
                 TodayTasks []string (_id task or "" for delimiter),
-                Timestamp : datetime (updated task timestamp, can't be null or "") }
+                TodayTasksTimestamp : datetime (updated task timestamp, can't be null or "") }
     OUT: JSON: { Result : string ["InvalidListName", "SessionEmptyNotFoundOrExpired", "TodaysTaskListUpdateFailed","TodaysTaskListJustUpdated", "TodaysTaskListUpdated",
-                 TodayTasks []string (_id task or "" for delimiter) 
-                 Timestamp : datetime }
+                TodayTasks []string (_id task or "" for delimiter),
+                TodayTasksTimestamp : datetime }
 
 * Checks the current session for validity. If the session is not valid, it returns `"SessionEmptyNotFoundOrExpired"` as a result.
-* If today's task-list exist in database, and its timestamp is greater than timestamp of updated task-list, recieved from users-application, return `"TodaysTaskListJustUpdated"` error.
+* If today's task-list exist in database, and its timestamp is greater than timestamp of updated task-list, recieved from users-application, return `"TodaysTaskListJustUpdated"` error and original today's task list from the database.
 * Update today's task-list of current list in the database.
 * Returns an array of updated today's task-list.
 

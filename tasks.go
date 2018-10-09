@@ -14,6 +14,7 @@ import (
 // POST /GetTasks
 // Checks the current session for validity. If the session is not valid, it returns "SessionEmptyNotFoundOrExpired" as a result.
 // Returns an array of structures that identify tasks from a selected list of the current user.
+// Also return list of today's tasks from selected list of the current user.
 // Cookies: User-Session : string (UUID)
 // IN: JSON: {List : string}
 // OUT: JSON: { Result : string ["OK", "SessionEmptyNotFoundOrExpired"],
@@ -24,7 +25,9 @@ import (
 //							 Section : string ["iu","in","nu","nn","ib"],
 //							 Status : string ["created", "done", "canceled", "moved"],
 //							 Icon : string ["wait","remind","call","force","mail","prepare","manage","meet","visit","make","journey","think"],
-//							 Timestamp : datetime } }
+//							 Timestamp : datetime },
+//				TodayTasks []string (_id task or "" for delimiter),
+//				TodayTasksTimestamp : datetime }
 // ===========================================================================================================================
 
 // Structure JSON-request for getting tasks
@@ -34,8 +37,10 @@ type typeGetTasksJSONRequest struct {
 
 // Structure JSON-response for getting tasks
 type typeGetTasksJSONResponse struct {
-	Result string
-	Tasks  []typeTask
+	Result              string
+	Tasks               []typeTask
+	TodayTasks          []string
+	TodayTasksTimestamp time.Time
 }
 
 func webGetTasks(res http.ResponseWriter, req *http.Request) {
@@ -61,6 +66,14 @@ func webGetTasks(res http.ResponseWriter, req *http.Request) {
 	// Select tasks of user list
 	c := session.DB(DB).C("Tasks")
 	c.Find(bson.M{"email": email, "list": request.List, "text": bson.M{"$ne": ""}}).All(&response.Tasks)
+
+	// Select today's tasks list
+	var todaysTasks typeTodaysTaks
+	c = session.DB(DB).C("TodaysTasks")
+	err = c.Find(bson.M{"email": email, "list": request.List}).One(&todaysTasks)
+	response.TodayTasks = todaysTasks.Tasks
+	response.TodayTasksTimestamp = todaysTasks.Timestamp
+
 	response.Result = "OK"
 
 	// Return JSON response
@@ -70,8 +83,9 @@ func webGetTasks(res http.ResponseWriter, req *http.Request) {
 // ===========================================================================================================================
 // API: Update existing task from the list or append new task to the list.
 // POST /SendTask
-// Checks the current session for validity. If the session is not valid, it returns "SessionEmptyNotFoundOrExpired" as a result.
-// Update existing task or generate ID and ppend new task to the database.
+// If updated task exist in database, and its timestamp is greater than timestamp of updated task, recieved from users-application,
+// return `"TaskJustUpdated"` error and array of a single element - original task from the database.
+// Update existing task or generate ID and append new task to the database.
 // Returns an array of a single element - an added or updated task with its ID.
 // Cookies: User-Session : string (UUID)
 // IN: JSON: { List : string,

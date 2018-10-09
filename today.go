@@ -14,30 +14,31 @@ import (
 // API: Save today's task list in database.
 // POST /SaveTodayTasks
 // Checks the current session for validity. If the session is not valid, it returns `"SessionEmptyNotFoundOrExpired"` as a result.
-// If today's task-list exist in database, and its timestamp is greater than timestamp of updated task-list, recieved from users-application, return `"TodaysTaskListJustUpdated"` error.
+// If today's task-list exist in database, and its timestamp is greater than timestamp of updated task-list, recieved from users-application,
+// return `"TodaysTaskListJustUpdated"` error and original today's task list from the database.
 // Update today's task-list of current list in the database.
 // Returns an array of updated today's task-list.
 // Cookies: User-Session : string (UUID)
 // IN: JSON: { List string,
 //			   TodayTasks []string (_id task or "" for delimiter),
-//			   Timestamp : datetime (updated task timestamp, can't be null or "") }
+//			   TodayTasksTimestamp : datetime (updated task timestamp, can't be null or "") }
 // OUT: JSON: { Result : string ["InvalidListName", "SessionEmptyNotFoundOrExpired", "TodaysTaskListUpdateFailed", "TodaysTaskListJustUpdated", "TodaysTaskListUpdated",
-//				TodayTasks []string (_id task or "" for delimiter)
-//				Timestamp : datetime }
+//				TodayTasks []string (_id task or "" for delimiter),
+//				TodayTasksTimestamp : datetime }
 // ===========================================================================================================================
 
 // Structure JSON-request for getting tasks
 type typeSaveTodayTasksJSONRequest struct {
-	List       string
-	TodayTasks []string
-	Timestamp  time.Time
+	List                string
+	TodayTasks          []string
+	TodayTasksTimestamp time.Time
 }
 
 // Structure JSON-response for getting tasks
 type typeSaveTodayTasksJSONResponse struct {
-	Result     string
-	TodayTasks []string
-	Timestamp  time.Time
+	Result              string
+	TodayTasks          []string
+	TodayTasksTimestamp time.Time
 }
 
 func webSaveTodayTasks(res http.ResponseWriter, req *http.Request) {
@@ -75,11 +76,11 @@ func webSaveTodayTasks(res http.ResponseWriter, req *http.Request) {
 	if err == nil {
 
 		// Compare timestamps
-		durationSeconds := todaysTasks.Timestamp.Sub(request.Timestamp).Seconds()
+		durationSeconds := todaysTasks.Timestamp.Sub(request.TodayTasksTimestamp).Seconds()
 		if durationSeconds > 0 {
 			response.Result = "TodaysTaskListJustUpdated"
 			response.TodayTasks = todaysTasks.Tasks
-			response.Timestamp = todaysTasks.Timestamp
+			response.TodayTasksTimestamp = todaysTasks.Timestamp
 			ReturnJSON(res, response)
 			return
 		}
@@ -130,7 +131,7 @@ func webSaveTodayTasks(res http.ResponseWriter, req *http.Request) {
 	}
 
 	response.TodayTasks = todaysTasks.Tasks
-	response.Timestamp = todaysTasks.Timestamp
+	response.TodayTasksTimestamp = todaysTasks.Timestamp
 
 	// Return JSON response
 	ReturnJSON(res, response)
