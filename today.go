@@ -15,15 +15,14 @@ import (
 // POST /SaveTodayTasks
 // Checks the current session for validity. If the session is not valid, it returns `"SessionEmptyNotFoundOrExpired"` as a result.
 // If today's task-list exist in database, and its timestamp is greater than timestamp of updated task-list, recieved from users-application,
-// return `"TodaysTaskListJustUpdated"` error and original today's task list from the database.
+// return `"TodaysTaskListJustUpdated"` error.
 // Update today's task-list of current list in the database.
-// Returns an array of updated today's task-list.
+// Returns timestamp of updated today's task-list.
 // Cookies: User-Session : string (UUID)
 // IN: JSON: { List string,
 //			   TodayTasks []string (_id task or "" for delimiter),
 //			   TodayTasksTimestamp : datetime (updated task timestamp, can't be null or "") }
 // OUT: JSON: { Result : string ["InvalidListName", "SessionEmptyNotFoundOrExpired", "TodaysTaskListUpdateFailed", "TodaysTaskListJustUpdated", "TodaysTaskListUpdated",
-//				TodayTasks []string (_id task or "" for delimiter),
 //				TodayTasksTimestamp : datetime }
 // ===========================================================================================================================
 
@@ -37,7 +36,6 @@ type typeSaveTodayTasksJSONRequest struct {
 // Structure JSON-response for getting tasks
 type typeSaveTodayTasksJSONResponse struct {
 	Result              string
-	TodayTasks          []string
 	TodayTasksTimestamp time.Time
 }
 
@@ -79,15 +77,15 @@ func webSaveTodayTasks(res http.ResponseWriter, req *http.Request) {
 		durationSeconds := todaysTasks.Timestamp.Sub(request.TodayTasksTimestamp).Seconds()
 		if durationSeconds > 0 {
 			response.Result = "TodaysTaskListJustUpdated"
-			response.TodayTasks = todaysTasks.Tasks
 			response.TodayTasksTimestamp = todaysTasks.Timestamp
 			ReturnJSON(res, response)
 			return
 		}
 
 		// Update existing today's tasks list
+		response.TodayTasksTimestamp = time.Now().UTC()
 		err = c.Update(bson.M{"email": email, "list": request.List},
-			bson.M{"$set": bson.M{"tasks": request.TodayTasks, "timestamp": time.Now().UTC()}})
+			bson.M{"$set": bson.M{"tasks": request.TodayTasks, "timestamp": response.TodayTasksTimestamp}})
 		if err != nil {
 			response.Result = "TodaysTaskListUpdateFailed"
 			ReturnJSON(res, response)
@@ -128,10 +126,8 @@ func webSaveTodayTasks(res http.ResponseWriter, req *http.Request) {
 		}
 
 		response.Result = "TodaysTaskListUpdated"
+		response.TodayTasksTimestamp = todaysTasks.Timestamp
 	}
-
-	response.TodayTasks = todaysTasks.Tasks
-	response.TodayTasksTimestamp = todaysTasks.Timestamp
 
 	// Return JSON response
 	ReturnJSON(res, response)

@@ -397,6 +397,7 @@ function getLists() {
 					// If no task-list is found, create a new task-list.
 					if ($("#task-lists-select option").length == 0) {
 						newList();
+						return false;
 					 };
 					// Select list from the form URL
 					if (openList) {
@@ -412,6 +413,8 @@ function getLists() {
 					};
 					// Load all tasks of current list
 					loadTasks();
+					// Get ready to create a new task
+					$("#ib button").click();
 					break;
 				default : $("#operation-status-label").html(resultUnknown);
 			}
@@ -535,14 +538,13 @@ function loadTasks() {
 							$("#today-tasks-ul").append(htmlLiDelimiter());
 						}; 
 					} );
-					// Update Timestamp
+					// Update Timestamps
 					$("#today-tasks-ul").attr("data-timestamp", response.TodayTasksTimestamp);
+					$("#tasks-main").attr("data-timestamp", response.LastModifiedTimestamp);
 					// Calculate page statistic
 					calculateStatistic();
 					// Refresh events handlers
 					setEvents();
-					// Get ready to create a new task
-					$("#ib button").click();
  					break;
 				default : $("#operation-status-label").html(resultUnknown);
 			}
@@ -679,6 +681,14 @@ function submitTask(list) {
 		$("#task-text-input").focus();
 		return false 
 	};
+	var task = {};
+	task.List = list;
+	task.Id = $("#task-id-input").val();
+	task.Text = $("#task-text-input").val();
+	task.Section = $("#task-section-select").val();
+	task.Status = $("#task-status-select").val();
+	task.Icon = $("#task-icon-select").val();
+	task.Timestamp = $("#task-timestamp-input").val();
 	// Send Ajax POST request
 	$("#operation-status-label").text("");
 	showSpinner("#task-spinner-div");
@@ -688,15 +698,7 @@ function submitTask(list) {
 		type : "post",
 		dataType: "json",
 		contentType: "application/json; charset=utf-8",
-		data : JSON.stringify( {
-			List: list,
-			Id: $("#task-id-input").val(),
-			Text: $("#task-text-input").val(),
-			Section: $("#task-section-select").val(),
-			Status: $("#task-status-select").val(),
-			Icon: $("#task-icon-select").val(),
-			Timestamp: $("#task-timestamp-input").val()
-		} ),
+		data : JSON.stringify( task ),
 		// if success
 		success: function (response) {
 			hideSpinner("#task-spinner-div");
@@ -720,46 +722,49 @@ function submitTask(list) {
 				case "InsertFailed" :
 					$("#operation-status-label").html(resultInsertFailed);
 					break;
+				case "TaskJustUpdated" :
+					$("#operation-status-label").html(resultTaskJustUpdated);
+					loadTasks();
+					break;
 				case "TaskUpdated" :
 				case "TaskInserted" :
-				case "TaskJustUpdated" :
-					// Collect tasks
-					$.each(response.Tasks, function() {
-						if ( $("#"+this.Id).length == 0 ) {
-							$("#"+this.Section).append(htmlPTask(this));
-						} else {
-							$("#"+this.Id).replaceWith(htmlPTask(this));
-							if (this.Section != $("#"+this.Id).parents("section").attr("id")) {
-								$("#"+this.Id).appendTo($("#"+this.Section));
-							}
+					// Update ID and timestamp
+					task.Id = response.Id;
+					task.Timestamp = response.Timestamp;
+					// Add or modify task
+					if (response.Result == "TaskUpdated") {
+						// Update status label
+						$("#operation-status-label").html(resultTaskUpdated);
+						// Modify existing task
+						$("#"+task.Id).replaceWith(htmlPTask(task));
+						if (task.Section != $("#"+task.Id).parents("section").attr("id")) {
+							$("#"+task.Id).appendTo($("#"+task.Section));
 						};
-					});
+					} else if (response.Result == "TaskInserted") {
+						// Update status label
+						$("#operation-status-label").html(resultTaskInserted);
+						// Add new task to section
+						$("#"+task.Section).append(htmlPTask(task));
+					};
+					// Update id and timestamp from returned values
 					// Include, update or exclude task to the today's task-list
 					if ($("#checkbox-today-input").prop('checked')) {
-						if ( $("div#div-"+$("#task-id-input").val()).length == 0 ) {
+						if ( $("div#div-"+task.Id).length == 0 ) {
 							// Try to include task to the today's task-list
-							$("#today-tasks-ul").append(htmlLiTask($("#task-id-input").val()));
+							$("#today-tasks-ul").append(htmlLiTask(task.Id));
 							// Save today's tasks
 							saveToday();	
 						} else {
 							// Try to update task in the today's task-list
-							$("div#div-"+$("#task-id-input").val()).parents("li").replaceWith(htmlLiTask($("#task-id-input").val()));
+							$("div#div-"+task.Id).parents("li").replaceWith(htmlLiTask(task.Id));
 						}
 					} else {
 						// Try to exclude task from the today's task-list
-						if ($("div#div-"+$("#task-id-input").val()).length > 0) {
-							$("div#div-"+$("#task-id-input").val()).parents("li").remove();
+						if ($("div#div-"+task.Id).length > 0) {
+							$("div#div-"+task.Id).parents("li").remove();
 							// Save today's tasks
 							saveToday();
 						}
-					};
-					// Update status label
-					if (response.Result == "TaskUpdated") {
-						$("#operation-status-label").html(resultTaskUpdated);
-					} else if (response.Result == "TaskInserted") {
-						$("#operation-status-label").html(resultTaskInserted);
-					} else if (response.Result == "TaskJustUpdated") {
-						$("#operation-status-label").html(resultTaskJustUpdated);
 					};
 					// Re-apply filter
 					applyFilter($("#filter-input").val());
@@ -929,8 +934,12 @@ function saveToday() {
 				case "TodaysTaskListUpdateFailed" :
 					$("#operation-status-label").html(resultTodaysTaskListUpdateFailed);
 					break;
-				case "TodaysTaskListUpdated" :
 				case "TodaysTaskListJustUpdated" :
+					$("#operation-status-label").html(resultTodaysTaskListJustUpdated);
+					loadTasks();
+					break;
+				case "TodaysTaskListUpdated" :
+				// -=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=--=-=-=-
 					// Purge old today's tasks
 					$("#today-tasks-ul li").remove();
 					// Collect today's tasks
