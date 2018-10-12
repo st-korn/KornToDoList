@@ -44,7 +44,8 @@ function init() {
 	// Initialize sortable today's task-list
 	$("#today-tasks-ul").sortable( {
 		placeholder: "ui-state-highlight",
-		handle: ".handle"
+		handle: ".handle",
+		update: function (e, ui) { saveToday(); }
 	});
 
 	// Analyze the presence of a saved session
@@ -939,29 +940,9 @@ function saveToday() {
 					loadTasks();
 					break;
 				case "TodaysTaskListUpdated" :
-				// -=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=--=-=-=-
-					// Purge old today's tasks
-					$("#today-tasks-ul li").remove();
-					// Collect today's tasks
-					$.each(response.TodayTasks, function() {
-						if ( this.length > 0 ) {
-							// insert task
-							$("#today-tasks-ul").append(htmlLiTask(this));
-						} else {
-							// insert delimiter
-							$("#today-tasks-ul").append(htmlLiDelimiter());
-						}; 
-					} );
+					$("#operation-status-label").html(resultTodaysTaskListUpdated);
 					// Update Timestamp
 					$("#today-tasks-ul").attr("data-timestamp", response.TodayTasksTimestamp);
-					// Update status label
-					if (response.Result == "TodaysTaskListUpdated") {
-						$("#operation-status-label").html(resultTodaysTaskListUpdated);
-					} else if (response.Result == "TodaysTaskListJustUpdated") {
-						$("#operation-status-label").html(resultTodaysTaskListJustUpdated);
-					};
-					// Refresh events handlers
-					setEvents();
 					break;
 				default : $("#operation-status-label").html(resultUnknown);
 			}

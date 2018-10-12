@@ -91,16 +91,8 @@ func webSaveTodayTasks(res http.ResponseWriter, req *http.Request) {
 			ReturnJSON(res, response)
 			return
 		}
-
-		// Obtain an updated today's tasks list
-		err = c.Find(bson.M{"email": email, "list": request.List}).One(&todaysTasks)
-		if err != nil {
-			response.Result = "TodaysTaskListUpdateFailed"
-			ReturnJSON(res, response)
-			return
-		}
-
 		response.Result = "TodaysTaskListUpdated"
+
 	} else {
 
 		// Create new today's tasks list
@@ -117,16 +109,8 @@ func webSaveTodayTasks(res http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		// Obtain an inserted today's tasks list
-		err = c.Find(bson.M{"email": email, "list": request.List}).One(&todaysTasks)
-		if err != nil {
-			response.Result = "TodaysTaskListUpdateFailed"
-			ReturnJSON(res, response)
-			return
-		}
-
-		response.Result = "TodaysTaskListUpdated"
 		response.TodayTasksTimestamp = todaysTasks.Timestamp
+		response.Result = "TodaysTaskListUpdated"
 	}
 
 	// Return JSON response
