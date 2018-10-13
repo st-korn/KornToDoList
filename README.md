@@ -168,7 +168,7 @@ Get tasks of selected user lists.
 
     Cookies: User-Session : string (UUID)
     IN: JSON: {List : string}
-    OUT: JSON: { Result : string ["OK", "SessionEmptyNotFoundOrExpired"], 
+    OUT: JSON: { Result : string ["OK", "InvalidListName", "SessionEmptyNotFoundOrExpired"], 
                  Tasks : [] { Id : string, 
                               EMail : string, 
                               List : string,
@@ -202,7 +202,7 @@ Update existing task from the list or append new task to the list.
     OUT: JSON: { Result : string ["TaskEmpty", "InvalidListName", "SessionEmptyNotFoundOrExpired", "UpdatedTaskNotFound", 
                                   "UpdateFailed", "TaskJustUpdated", "TaskUpdated", "InsertFailed", "TaskInserted"],
                  Id : string,
-                 Timestamp : datetime } }
+                 Timestamp : datetime }
 
 * Checks the current session for validity. If the session is not valid, it returns `"SessionEmptyNotFoundOrExpired"` as a result.
 * If updated task exist in database, and its timestamp is greater than timestamp of updated task, recieved from users-application, return `"TaskJustUpdated"` error.
@@ -217,13 +217,28 @@ Save today's task list in database.
     IN: JSON: { List string,
                 TodayTasks []string (_id task or "" for delimiter),
                 TodayTasksTimestamp : datetime (updated task timestamp, can't be null or "") }
-    OUT: JSON: { Result : string ["InvalidListName", "SessionEmptyNotFoundOrExpired", "TodaysTaskListUpdateFailed","TodaysTaskListJustUpdated", "TodaysTaskListUpdated",
+    OUT: JSON: { Result : string ["InvalidListName", "SessionEmptyNotFoundOrExpired", "TodaysTaskListUpdateFailed","TodaysTaskListJustUpdated", "TodaysTaskListUpdated"],
                 TodayTasksTimestamp : datetime }
 
 * Checks the current session for validity. If the session is not valid, it returns `"SessionEmptyNotFoundOrExpired"` as a result.
 * If today's task-list exist in database, and its timestamp is greater than timestamp of updated task-list, recieved from users-application, return `"TodaysTaskListJustUpdated"` error.
 * Update today's task-list of current list in the database.
 * Returns timestamp of updated today's task-list.
+
+### `POST /NeedUpdate`
+
+Checks need to update the task list.
+
+    Cookies: User-Session : string (UUID)
+    IN: JSON: { List string,
+                LastModifiedTimestamp : datetime,
+                Result : string ["InvalidListName", "SessionEmptyNotFoundOrExpired", "TodaysTaskListUpdateFailed","TodaysTaskListJustUpdated", "TodaysTaskListUpdated"] }
+    OUT: JSON: { Result : string ["InvalidListName", "SessionEmptyNotFoundOrExpired", "AllActual", "NeedUpdate"] }
+
+* Checks the current session for validity. If the session is not valid, it returns `"SessionEmptyNotFoundOrExpired"` as a result.
+* Compare LastModifiedTimestamp with max timestamp of list's tasks. If any of tasks timestamps is greater - return "NeedUpdate".
+* Compare TodayTasksTimestamp with timestamp of today's task list. If today's taks list's timestamp is greater - return "NeedUpdate".
+* Otherwise return "AllActual".
 
 ## Database structure
 

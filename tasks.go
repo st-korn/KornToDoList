@@ -18,7 +18,7 @@ import (
 // Also return list of today's tasks from selected list of the current user.
 // Cookies: User-Session : string (UUID)
 // IN: JSON: {List : string}
-// OUT: JSON: { Result : string ["OK", "SessionEmptyNotFoundOrExpired"],
+// OUT: JSON: { Result : string ["OK", "InvalidListName", "SessionEmptyNotFoundOrExpired"],
 //				Tasks : [] { Id : string,
 //							 EMail : string,
 //							 List : string,
@@ -58,6 +58,14 @@ func webGetTasks(res http.ResponseWriter, req *http.Request) {
 	// Preparing to response
 	var response typeGetTasksJSONResponse
 
+	// Check incoming parameters
+	passed, _ := TestTaskListName(request.List)
+	if !passed {
+		response.Result = "InvalidListName"
+		ReturnJSON(res, response)
+		return
+	}
+
 	// Check if the current user session is valid
 	email, session := TestSession(req)
 	if email == "" {
@@ -78,7 +86,7 @@ func webGetTasks(res http.ResponseWriter, req *http.Request) {
 	// Select today's tasks list
 	var todaysTasks typeTodaysTaks
 	c = session.DB(DB).C("TodaysTasks")
-	err = c.Find(bson.M{"email": email, "list": request.List}).One(&todaysTasks)
+	c.Find(bson.M{"email": email, "list": request.List}).One(&todaysTasks)
 	response.TodayTasks = todaysTasks.Tasks
 	response.TodayTasksTimestamp = todaysTasks.Timestamp
 
@@ -106,7 +114,7 @@ func webGetTasks(res http.ResponseWriter, req *http.Request) {
 // OUT: JSON: { Result : string ["TaskEmpty", "InvalidListName", "SessionEmptyNotFoundOrExpired", "UpdatedTaskNotFound",
 //								 "UpdateFailed", "TaskJustUpdated", "TaskUpdated", "InsertFailed", "TaskInserted"],
 //				Id : string,
-//				Timestamp : datetime } }
+//				Timestamp : datetime }
 // ===========================================================================================================================
 
 // Structure JSON-request for getting tasks
@@ -232,5 +240,90 @@ func webSendTask(res http.ResponseWriter, req *http.Request) {
 	}
 
 	// Return JSON response
+	ReturnJSON(res, response)
+}
+
+// ===========================================================================================================================
+// API: Checks need to update the task list.
+// POST /NeedUpdate
+// Checks the current session for validity. If the session is not valid, it returns `"SessionEmptyNotFoundOrExpired"` as a result.
+// Compare LastModifiedTimestamp with max timestamp of list's tasks. If any of tasks timestamps is greater - return "NeedUpdate".
+// Compare TodayTasksTimestamp with timestamp of today's task list. If today's taks list's timestamp is greater - return "NeedUpdate".
+// Otherwise return "AllActual".
+// Cookies: User-Session : string (UUID)
+// IN: JSON: { List string,
+//			   LastModifiedTimestamp : datetime,
+//			   TodayTasksTimestamp : datetime }
+// OUT: JSON: { Result : string ["InvalidListName", "SessionEmptyNotFoundOrExpired", "AllActual", "NeedUpdate"] }
+// ===========================================================================================================================
+
+// Structure JSON-request for getting tasks
+type typeNeedUpdateJSONRequest struct {
+	List                  string
+	LastModifiedTimestamp time.Time
+	TodayTasksTimestamp   time.Time
+}
+
+// Structure JSON-response for getting tasks
+type typeNeedUpdateJSONResponse struct {
+	Result string
+}
+
+func webNeedUpdate(res http.ResponseWriter, req *http.Request) {
+
+	// Parse request to struct
+	var request typeNeedUpdateJSONRequest
+	err := json.NewDecoder(req.Body).Decode(&request)
+	if err != nil {
+		panic(err)
+	}
+
+	// Preparing to response
+	var response typeNeedUpdateJSONResponse
+
+	// Check incoming parameters
+	passed, _ := TestTaskListName(request.List)
+	if !passed {
+		response.Result = "InvalidListName"
+		ReturnJSON(res, response)
+		return
+	}
+
+	// Check if the current user session is valid
+	email, session := TestSession(req)
+	if email == "" {
+		response.Result = "SessionEmptyNotFoundOrExpired"
+		ReturnJSON(res, response)
+		return
+	}
+
+	// Select max timestamp
+	var lastTask typeTask
+	c := session.DB(DB).C("Tasks")
+	c.Find(bson.M{"email": email, "list": request.List, "text": bson.M{"$ne": ""}}).Sort("-timestamp").One(&lastTask)
+
+	// Compare timestamps
+	durationSeconds := lastTask.Timestamp.Sub(request.LastModifiedTimestamp).Seconds()
+	if durationSeconds > 0 {
+		response.Result = "NeedUpdate"
+		ReturnJSON(res, response)
+		return
+	}
+
+	// Select today's tasks list
+	var todaysTasks typeTodaysTaks
+	c = session.DB(DB).C("TodaysTasks")
+	c.Find(bson.M{"email": email, "list": request.List}).One(&todaysTasks)
+
+	// Compare timestamps
+	durationSeconds = todaysTasks.Timestamp.Sub(request.TodayTasksTimestamp).Seconds()
+	if durationSeconds > 0 {
+		response.Result = "NeedUpdate"
+		ReturnJSON(res, response)
+		return
+	}
+
+	// Return JSON response
+	response.Result = "AllActual"
 	ReturnJSON(res, response)
 }

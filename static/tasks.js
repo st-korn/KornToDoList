@@ -1,4 +1,5 @@
 // Initialze
+var timerIdle;
 $( init );
 
 // ===========================================================================
@@ -30,6 +31,15 @@ function init() {
 	$("#register-user-button").bind('click', clickSignup);
 	$("#clear-done-button").bind('click', clearDoneTasksFromToday)
 	$("#clear-all-button").bind('click', clearAllTasksFromToday)
+
+	// Bind handlers for idle timer
+    window.onload = resetTimer;
+    window.onmousemove = resetTimer;
+    window.onmousedown = resetTimer;  // catches touchscreen presses as well      
+    window.ontouchstart = resetTimer; // catches touchscreen swipes as well 
+    window.onclick = resetTimer;      // catches touchpad clicks as well
+    window.onkeypress = resetTimer;   
+    window.addEventListener('scroll', resetTimer, true); // improved; see comments
 
 	// Fill autocomplete with names of employees
 	$("#filter-input").autocomplete( {
@@ -74,8 +84,6 @@ function init() {
 		getUserInfo();
 		// Load list of todo-lists for current user
 		getLists();
-		// Start working with page
-		$("#ib button").click();
 	}
 }
 
@@ -414,8 +422,6 @@ function getLists() {
 					};
 					// Load all tasks of current list
 					loadTasks();
-					// Get ready to create a new task
-					$("#ib button").click();
 					break;
 				default : $("#operation-status-label").html(resultUnknown);
 			}
@@ -507,7 +513,7 @@ function loadTasks() {
 		window.history.replaceState("", "", '/'+$("#task-lists-select").val());
 	}
 	// Send Ajax POST request
-	$("#operation-status-label").text("");
+	//$("#operation-status-label").text(""); // don't clear status label: for exception's of updating task or tody's-list
 	showSpinner("#task-spinner-div");
 	$.ajax( {
 		url : "/GetTasks",
@@ -523,7 +529,10 @@ function loadTasks() {
   				case "SessionEmptyNotFoundOrExpired" :
   					Cookies.remove('User-Session');
   					location.reload();
-  					break;
+					break;
+				case "InvalidListName" :
+					$("#operation-status-label").html(resultInvalidListName);
+					break;
 				case "OK" :
 					// Collect tasks
 					$.each(response.Tasks, function() {
@@ -542,10 +551,14 @@ function loadTasks() {
 					// Update Timestamps
 					$("#today-tasks-ul").attr("data-timestamp", response.TodayTasksTimestamp);
 					$("#tasks-main").attr("data-timestamp", response.LastModifiedTimestamp);
+					// Clear status label
+					$("#operation-status-label").text("");
 					// Calculate page statistic
 					calculateStatistic();
 					// Refresh events handlers
 					setEvents();
+					// Get ready to create a new task
+					$("#ib button").click();
  					break;
 				default : $("#operation-status-label").html(resultUnknown);
 			}
@@ -650,6 +663,7 @@ function onTaskEdit() {
 	} else {
 		$("#checkbox-today-input").prop('checked', false);
 	};
+	$("#task-checksum-input").val( calculateTaskChecksum() );
 	$("#task-submit-button").html(buttonSaveTask);
 	manageListsButtons();
 	$("#task-text-input").focus();
@@ -667,25 +681,74 @@ function newTask() {
 	var now = new Date();
 	$("#task-timestamp-input").val(now.toJSON());
 	$("#checkbox-today-input").prop('checked', false);
+	$("#task-checksum-input").val( calculateTaskChecksum() );
 	$("#task-submit-button").html(buttonAddTask);
 	manageListsButtons();
 	$("#task-text-input").focus();
 }
 
 // ===========================================================================
+// Calculate checksum of current task in task-form
+// ===========================================================================
+function calculateTaskChecksum() {
+	return md5(
+		$("#task-text-input").val()+
+		$("#task-section-select").val()+
+		$("#task-icon-select").val()+
+		$("#task-status-select").val()
+	);
+}
+
+// ===========================================================================
+// Update today's todo-list from the current task in task-form
+// ===========================================================================
+function updateTodaysTasksList(id) {
+	if ($("#checkbox-today-input").prop('checked')) {
+		if ( $("div#div-"+id).length == 0 ) {
+			// Try to include task to the today's task-list
+			$("#today-tasks-ul").append(htmlLiTask(id));
+			// Save today's tasks
+			saveToday();	
+		} else {
+			// Try to update task in the today's task-list
+			$("div#div-"+id).parents("li").replaceWith(htmlLiTask(id));
+		}
+	} else {
+		// Try to exclude task from the today's task-list
+		if ($("div#div-"+id).length > 0) {
+			$("div#div-"+id).parents("li").remove();
+			// Save today's tasks
+			saveToday();
+		}
+	};
+}
+
+// ===========================================================================
 // Send current edited task (existing or new) to server and database in the specified list
 // ===========================================================================
 function submitTask(list) {
-	// if no task text - then nothing to do
+	// If no task text - then nothing to do
 	if ( !$("#task-text-input").val() ) { 
 		$("#operation-status-label").html(resultTaskEmpty); 
 		$("#task-text-input").focus();
-		return false 
+		return false
 	};
+	// Is any field of the task-form modified?
+	if ( ( calculateTaskChecksum() == $("#task-checksum-input").val() ) && ( list == $("#task-lists-select").val() ) ) {
+		// Nothing changed
+		// Update today's todo-list from the current task
+		updateTodaysTasksList($("#task-id-input").val());
+		// Refresh events handlers
+		setEvents();
+		// Get ready to create a new task
+		$("#ib button").click();
+		return false
+	}
+	// Prepare task struct
 	var task = {};
 	task.List = list;
 	task.Id = $("#task-id-input").val();
-	task.Text = $("#task-text-input").val();
+	task.Text = $("#task-text-input").val().trim();
 	task.Section = $("#task-section-select").val();
 	task.Status = $("#task-status-select").val();
 	task.Icon = $("#task-icon-select").val();
@@ -729,52 +792,37 @@ function submitTask(list) {
 					break;
 				case "TaskUpdated" :
 				case "TaskInserted" :
-					// Update ID and timestamp
-					task.Id = response.Id;
-					task.Timestamp = response.Timestamp;
-					// Add or modify task
-					if (response.Result == "TaskUpdated") {
-						// Update status label
-						$("#operation-status-label").html(resultTaskUpdated);
-						// Modify existing task
-						$("#"+task.Id).replaceWith(htmlPTask(task));
-						if (task.Section != $("#"+task.Id).parents("section").attr("id")) {
-							$("#"+task.Id).appendTo($("#"+task.Section));
+					if (list == $("#task-lists-select").val()) {
+						// Update ID and timestamp
+						task.Id = response.Id;
+						task.Timestamp = response.Timestamp;
+						$("#tasks-main").attr("data-timestamp", response.Timestamp);
+						// Add or modify task
+						if (response.Result == "TaskUpdated") {
+							// Update status label
+							$("#operation-status-label").html(resultTaskUpdated);
+							// Modify existing task
+							$("#"+task.Id).replaceWith(htmlPTask(task));
+							if (task.Section != $("#"+task.Id).parents("section").attr("id")) {
+								$("#"+task.Id).appendTo($("#"+task.Section));
+							};
+						} else if (response.Result == "TaskInserted") {
+							// Update status label
+							$("#operation-status-label").html(resultTaskInserted);
+							// Add new task to section
+							$("#"+task.Section).append(htmlPTask(task));
 						};
-					} else if (response.Result == "TaskInserted") {
-						// Update status label
-						$("#operation-status-label").html(resultTaskInserted);
-						// Add new task to section
-						$("#"+task.Section).append(htmlPTask(task));
-					};
-					// Update id and timestamp from returned values
-					// Include, update or exclude task to the today's task-list
-					if ($("#checkbox-today-input").prop('checked')) {
-						if ( $("div#div-"+task.Id).length == 0 ) {
-							// Try to include task to the today's task-list
-							$("#today-tasks-ul").append(htmlLiTask(task.Id));
-							// Save today's tasks
-							saveToday();	
-						} else {
-							// Try to update task in the today's task-list
-							$("div#div-"+task.Id).parents("li").replaceWith(htmlLiTask(task.Id));
-						}
-					} else {
-						// Try to exclude task from the today's task-list
-						if ($("div#div-"+task.Id).length > 0) {
-							$("div#div-"+task.Id).parents("li").remove();
-							// Save today's tasks
-							saveToday();
-						}
-					};
-					// Re-apply filter
-					applyFilter($("#filter-input").val());
-					// Calculate page statistic
-					calculateStatistic();
-					// Refresh events handlers
-					setEvents();
-					// Get ready to create a new task
-					$("#ib button").click();
+						// Update today's todo-list from the current task
+						updateTodaysTasksList(task.Id);
+						// Re-apply filter
+						applyFilter($("#filter-input").val());
+						// Calculate page statistic
+						calculateStatistic();
+						// Refresh events handlers
+						setEvents();
+						// Get ready to create a new task
+						$("#ib button").click();
+					}
 					break
 				default : $("#operation-status-label").html(resultUnknown);
 			}
@@ -856,13 +904,14 @@ function newList() {
 					$("#operation-status-label").html(resultCreateListFailed);
 					break;
 				case "ListCreated" :
+					$("#operation-status-label").html(resultListCreated);
 					// Collect lists names
 					$("#task-lists-select option").remove();
 					$.each(response.Lists, function() {
 						$("#task-lists-select").append($("<option />").val(this).text(this));
 					});
 					// Select first list
-					$("#task-lists-select").prop("selectedIndex",0)
+					$("#task-lists-select").prop("selectedIndex",0);
 					// Load all tasks of current list
 					loadTasks();
 					break;
@@ -994,6 +1043,59 @@ function clearDoneTasksFromToday() {
 function clearAllTasksFromToday() {
 	$("li").remove();
 	saveToday();
+}
+
+// ===========================================================================
+// Restarts the timer, used to check for an update.
+// ===========================================================================
+function resetTimer() {
+	clearTimeout(timerIdle);
+	timerIdle = setTimeout(checkNeedUpdate, 5*60*1000);  // time is in milliseconds
+}
+
+// ===========================================================================
+// Checks if an update tasks or today's tasks list is needed.
+// ===========================================================================
+function checkNeedUpdate() {
+	// Send Ajax POST request
+	$.ajax( {
+		url : "/NeedUpdate",
+		cache: false,
+		type : "post",
+		dataType: "json",
+		contentType: "application/json; charset=utf-8",
+		data : JSON.stringify( {
+			List: $("#task-lists-select").val(),
+			LastModifiedTimestamp: $("#tasks-main").attr("data-timestamp"),
+			TodayTasksTimestamp: $("#today-tasks-ul").attr("data-timestamp")
+		} ),
+		// if success
+		success: function (response) {
+			switch(response.Result) {
+  				case "SessionEmptyNotFoundOrExpired" :
+  					Cookies.remove('User-Session');
+  					location.reload();
+					break;
+				case "InvalidListName" :
+					$("#operation-status-label").html(resultInvalidListName);
+					break;
+				case "AllActual" :
+					resetTimer();
+					break;
+				case "NeedUpdate" :
+					loadTasks();
+					resetTimer();
+					break;
+				default : $("#operation-status-label").html(resultUnknown);
+			}
+		},
+		// if error returns
+		error: function(jqXHR,exception) { 
+			hideSpinner("#task-spinner-div");
+			showAjaxError("#operation-status-label",jqXHR,exception);
+		}
+	} );
+	return false;
 }
 
 // ===========================================================================

@@ -378,6 +378,7 @@ func main() {
 	http.HandleFunc("/SendTask", webSendTask)
 	http.HandleFunc("/CreateList", webCreateList)
 	http.HandleFunc("/SaveTodayTasks", webSaveTodayTasks)
+	http.HandleFunc("/NeedUpdate", webNeedUpdate)
 	http.HandleFunc("/", webFormShow)
 
 	// Register a HTTP file server for delivery static files from the static directory

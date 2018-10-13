@@ -22,7 +22,7 @@ import (
 // IN: JSON: { List string,
 //			   TodayTasks []string (_id task or "" for delimiter),
 //			   TodayTasksTimestamp : datetime (updated task timestamp, can't be null or "") }
-// OUT: JSON: { Result : string ["InvalidListName", "SessionEmptyNotFoundOrExpired", "TodaysTaskListUpdateFailed", "TodaysTaskListJustUpdated", "TodaysTaskListUpdated",
+// OUT: JSON: { Result : string ["InvalidListName", "SessionEmptyNotFoundOrExpired", "TodaysTaskListUpdateFailed", "TodaysTaskListJustUpdated", "TodaysTaskListUpdated"],
 //				TodayTasksTimestamp : datetime }
 // ===========================================================================================================================
 
