@@ -244,6 +244,175 @@ func webSendTask(res http.ResponseWriter, req *http.Request) {
 }
 
 // ===========================================================================================================================
+// API: Move existing task from one list to another.
+// POST /MoveTask
+// Checks the current session for validity. If the session is not valid, it returns `"SessionEmptyNotFoundOrExpired"` as a result.
+// If updated task exist in database, and its timestamp is greater than timestamp of updated task, recieved from users-application, return `"TaskJustUpdated"` error.
+// Generate ID and append new task to destination task-list in the database.
+// Update existing task in source task-list: set status = "moved".
+// If Today flag is true, then add created task to today's taks list of destination task-list.
+// Returns Timestamp of modified task from source task-list.
+// Cookies: User-Session : string (UUID)
+// IN: JSON: { Id : string (don't may be null or ""),
+//			   ToList : string,
+//			   Text : string,
+//			   Section : string ["iu","in","nu","nn","ib"],
+//			   Status : string ["created", "done", "canceled", "moved"],
+//			   Icon : string ["wait","remind","call","force","mail","prepare","manage","meet","visit","make","journey","think"],
+//			   Timestamp : datetime (updated task timestamp, can't be null or ""),
+//			   Today : bool }
+// OUT: JSON: { Result : string ["TaskEmpty", "InvalidListName", "SessionEmptyNotFoundOrExpired", "UpdatedTaskNotFound",
+//								 "InsertFailed", "UpdateFailed", "TodaysTaskListUpdateFailed", "TaskJustUpdated", "TaskMoved"],
+//				Timestamp : datetime }
+// ===========================================================================================================================
+
+// Structure JSON-request for getting tasks
+type typeMoveTaskJSONRequest struct {
+	Id        string
+	ToList    string
+	Text      string
+	Section   string
+	Icon      string
+	Status    string
+	Timestamp time.Time
+	Today     bool
+}
+
+// Structure JSON-response for getting tasks
+type typeMoveTaskJSONResponse struct {
+	Result    string
+	Id        string
+	Timestamp time.Time
+}
+
+func webMoveTask(res http.ResponseWriter, req *http.Request) {
+
+	// Parse request to struct
+	var request typeMoveTaskJSONRequest
+	err := json.NewDecoder(req.Body).Decode(&request)
+	if err != nil {
+		panic(err)
+	}
+
+	// Preparing to response
+	var response typeMoveTaskJSONResponse
+
+	// Check incoming parameters
+	request.Text = strings.TrimSpace(request.Text)
+	if request.Section == "" {
+		request.Section = "ib"
+	}
+	if request.Status == "" {
+		request.Section = "created"
+	}
+	if (request.Text == "") || (request.Id == "") {
+		response.Result = "TaskEmpty"
+		ReturnJSON(res, response)
+		return
+	}
+	passed, _ := TestTaskListName(request.ToList)
+	if !passed {
+		response.Result = "InvalidListName"
+		ReturnJSON(res, response)
+		return
+	}
+
+	// Check if the current user session is valid
+	email, session := TestSession(req)
+	if email == "" {
+		response.Result = "SessionEmptyNotFoundOrExpired"
+		ReturnJSON(res, response)
+		return
+	}
+
+	// Looking for an updated task
+	var task typeTask
+	c := session.DB(DB).C("Tasks")
+	err = c.Find(bson.M{"email": email, "_id": bson.ObjectIdHex(request.Id)}).One(&task)
+	if err != nil {
+		response.Result = "UpdatedTaskNotFound"
+		ReturnJSON(res, response)
+		return
+	}
+
+	// Compare timestamps
+	durationSeconds := task.Timestamp.Sub(request.Timestamp).Seconds()
+	if durationSeconds > 0 {
+		response.Result = "TaskJustUpdated"
+		response.Timestamp = task.Timestamp
+		ReturnJSON(res, response)
+		return
+	}
+
+	// Create new task
+	// Generate new task _id
+	task.Id = bson.NewObjectId()
+	task.EMail = email
+	task.List = request.ToList
+	task.Text = request.Text
+	task.Section = request.Section
+	task.Icon = request.Icon
+	task.Status = request.Status
+	task.Timestamp = time.Now().UTC()
+
+	// Insert new task
+	err = c.Insert(&task)
+	if err != nil {
+		response.Result = "InsertFailed"
+		ReturnJSON(res, response)
+		return
+	}
+
+	// Update existing task
+	response.Timestamp = time.Now().UTC()
+	err = c.Update(bson.M{"email": email, "_id": bson.ObjectIdHex(request.Id)},
+		bson.M{"$set": bson.M{"status": "moved", "timestamp": response.Timestamp}})
+	if err != nil {
+		response.Result = "UpdateFailed"
+		ReturnJSON(res, response)
+		return
+	}
+
+	// Add the task to today's task list if needed
+	if request.Today {
+		// Looking for exists today's tasks list
+		var todaysTasks typeTodaysTaks
+		c := session.DB(DB).C("TodaysTasks")
+		err = c.Find(bson.M{"email": email, "list": request.ToList}).One(&todaysTasks)
+		if err == nil {
+			// Update existing today's tasks list
+			todaysTasks.Tasks = append(todaysTasks.Tasks, task.Id.Hex())
+			todaysTasks.Timestamp = time.Now().UTC()
+			err = c.Update(bson.M{"email": email, "list": request.ToList},
+				bson.M{"$set": bson.M{"tasks": todaysTasks.Tasks, "timestamp": todaysTasks.Timestamp}})
+			if err != nil {
+				response.Result = "TodaysTaskListUpdateFailed"
+				ReturnJSON(res, response)
+				return
+			}
+			response.Result = "TodaysTaskListUpdated"
+		} else {
+			// Create new today's tasks list
+			todaysTasks.EMail = email
+			todaysTasks.List = request.ToList
+			todaysTasks.Tasks = append(todaysTasks.Tasks, task.Id.Hex())
+			todaysTasks.Timestamp = time.Now().UTC()
+			// Insert new today's tasks list
+			err = c.Insert(&todaysTasks)
+			if err != nil {
+				response.Result = "TodaysTaskListUpdateFailed"
+				ReturnJSON(res, response)
+				return
+			}
+		}
+	}
+
+	// Return JSON response
+	response.Result = "TaskMoved"
+	ReturnJSON(res, response)
+}
+
+// ===========================================================================================================================
 // API: Checks need to update the task list.
 // POST /NeedUpdate
 // Checks the current session for validity. If the session is not valid, it returns `"SessionEmptyNotFoundOrExpired"` as a result.

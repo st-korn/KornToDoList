@@ -133,6 +133,7 @@
 "resultTaskUpdated" : "Задача обновлена",
 "resultInsertFailed" : "Не удалось добавить задачу",
 "resultTaskInserted" : "Задача добавлена",
+"resultTaskMoved" : "Задача перенесена",
 
 "resultListCreated" : "Список создан",
 "resultDateTooFar" : "Название списка должно содержать текущую дату. Проверьте часы и календарь на вашем на устройстве.",

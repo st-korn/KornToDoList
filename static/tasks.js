@@ -125,6 +125,7 @@ function onTaskEdit() {
 	};
 	$("#task-checksum-input").val( calculateTaskChecksum() );
 	$("#task-submit-button").html(buttonSaveTask);
+	$("#operation-status-label").text("");
 	manageListsButtons();
 	$("#task-text-input").focus();
 }
@@ -143,6 +144,7 @@ function newTask() {
 	$("#checkbox-today-input").prop('checked', false);
 	$("#task-checksum-input").val( calculateTaskChecksum() );
 	$("#task-submit-button").html(buttonAddTask);
+	//$("#operation-status-label").text(""); // not necessary
 	manageListsButtons();
 	$("#task-text-input").focus();
 }
@@ -160,9 +162,9 @@ function calculateTaskChecksum() {
 }
 
 // ===========================================================================
-// Send current edited task (existing or new) to server and database in the specified list
+// Send current edited task (existing or new) to server and database in current list
 // ===========================================================================
-function submitTask(list) {
+function submitTaskOnCurrentList() {
 	// If no task text - then nothing to do
 	if ( !$("#task-text-input").val() ) { 
 		$("#operation-status-label").html(resultTaskEmpty); 
@@ -170,7 +172,7 @@ function submitTask(list) {
 		return false
 	};
 	// Is any field of the task-form modified?
-	if ( ( calculateTaskChecksum() == $("#task-checksum-input").val() ) && ( list == $("#task-lists-select").val() ) ) {
+	if ( calculateTaskChecksum() == $("#task-checksum-input").val() ) {
 		// Nothing changed
 		// Update today's todo-list from the current task
 		updateTodaysTasksList($("#task-id-input").val());
@@ -182,7 +184,7 @@ function submitTask(list) {
 	}
 	// Prepare task struct
 	var task = {};
-	task.List = list;
+	task.List = $("#task-lists-select").val();
 	task.Id = $("#task-id-input").val();
 	task.Text = $("#task-text-input").val().trim();
 	task.Section = $("#task-section-select").val();
@@ -228,37 +230,36 @@ function submitTask(list) {
 					break;
 				case "TaskUpdated" :
 				case "TaskInserted" :
-					if (list == $("#task-lists-select").val()) {
-						// Update ID and timestamp
-						task.Id = response.Id;
-						task.Timestamp = response.Timestamp;
-						$("#tasks-main").attr("data-timestamp", response.Timestamp);
-						// Add or modify task
-						if (response.Result == "TaskUpdated") {
-							// Update status label
-							$("#operation-status-label").html(resultTaskUpdated);
-							// Modify existing task
-							$("#"+task.Id).replaceWith(htmlPTask(task));
-							if (task.Section != $("#"+task.Id).parents("section").attr("id")) {
-								$("#"+task.Id).appendTo($("#"+task.Section));
-							};
-						} else if (response.Result == "TaskInserted") {
-							// Update status label
-							$("#operation-status-label").html(resultTaskInserted);
-							// Add new task to section
-							$("#"+task.Section).append(htmlPTask(task));
+					// Update ID and timestamp
+					task.Id = response.Id;
+					task.Timestamp = response.Timestamp;
+					$("#tasks-main").attr("data-timestamp", response.Timestamp);
+					// Add or modify task
+					if (response.Result == "TaskUpdated") {
+						// Update status label
+						$("#operation-status-label").html(resultTaskUpdated);
+						// Modify existing task
+						$("#"+task.Id).replaceWith(htmlPTask(task));
+						if (task.Section != $("#"+task.Id).parents("section").attr("id")) {
+							// Move task <p> to another section
+							$("#"+task.Id).appendTo($("#"+task.Section));
 						};
-						// Update today's todo-list from the current task
-						updateTodaysTasksList(task.Id);
-						// Re-apply filter
-						applyFilter($("#filter-input").val());
-						// Calculate page statistic
-						calculateStatistic();
-						// Refresh events handlers
-						setEvents();
-						// Get ready to create a new task
-						$("#ib button").click();
-					}
+					} else if (response.Result == "TaskInserted") {
+						// Update status label
+						$("#operation-status-label").html(resultTaskInserted);
+						// Add new task to section
+						$("#"+task.Section).append(htmlPTask(task));
+					};
+					// Update today's todo-list from the current task
+					updateTodaysTasksList(task.Id);
+					// Re-apply filter
+					applyFilter($("#filter-input").val());
+					// Calculate page statistic
+					calculateStatistic();
+					// Refresh events handlers
+					setEvents();
+					// Get ready to create a new task
+					$("#ib button").click();
 					break
 				default : $("#operation-status-label").html(resultUnknown);
 			}
@@ -273,23 +274,97 @@ function submitTask(list) {
 }
 
 // ===========================================================================
-// Send current edited task (existing or new) to server and database in current list
-// ===========================================================================
-function submitTaskOnCurrentList() {
-	submitTask($("#task-lists-select").val());
-	return false;
-}
-
-// ===========================================================================
 // Move selected task to the most recent todo-list
 // ===========================================================================
 function moveTaskToNewList() {
-	var oldID = $("#task-id-input").val();
-	$("#task-id-input").val("");
-	submitTask($("#task-lists-select").find("option:first-child").val())
-	$("#"+oldID).click();
-	$("#task-status-select").val("moved");
-	submitTask($("#task-lists-select").val());
+	// If no task text - then nothing to do
+	if ( !$("#task-text-input").val() ) { 
+		$("#operation-status-label").html(resultTaskEmpty); 
+		$("#task-text-input").focus();
+		return false
+	};
+	// Prepare task struct
+	var task = {};
+	task.Id = $("#task-id-input").val();
+	task.ToList = $("#task-lists-select").find("option:first-child").val();
+	task.Text = $("#task-text-input").val().trim();
+	task.Section = $("#task-section-select").val();
+	task.Status = $("#task-status-select").val();
+	task.Icon = $("#task-icon-select").val();
+	task.Timestamp = $("#task-timestamp-input").val();
+	task.Today = $("#checkbox-today-input").prop('checked');
+	// Send Ajax POST request
+	$("#operation-status-label").text("");
+	showSpinner("#task-spinner-div");
+	$.ajax( {
+		url : "/MoveTask",
+		cache: false,
+		type : "post",
+		dataType: "json",
+		contentType: "application/json; charset=utf-8",
+		data : JSON.stringify( task ),
+		// if success
+		success: function (response) {
+			hideSpinner("#task-spinner-div");
+			switch(response.Result) {
+  				case "SessionEmptyNotFoundOrExpired" :
+  					Cookies.remove('User-Session');
+  					location.reload();
+					break;
+				case "TaskEmpty" :
+					$("#operation-status-label").html(resultTaskEmpty);
+					break;
+				case "InvalidListName" :
+					$("#operation-status-label").html(resultInvalidListName);
+					break;
+				case "UpdatedTaskNotFound" :
+					$("#operation-status-label").html(resultUpdatedTaskNotFound);
+					break;
+				case "UpdateFailed" :
+					$("#operation-status-label").html(resultUpdateFailed);
+					break;
+				case "InsertFailed" :
+					$("#operation-status-label").html(resultInsertFailed);
+					break;
+				case "TodaysTaskListUpdateFailed" :
+					$("#operation-status-label").html(resultTodaysTaskListUpdateFailed);
+					break;
+				case "TaskJustUpdated" :
+					$("#operation-status-label").html(resultTaskJustUpdated);
+					loadTasks();
+					break;
+				case "TaskMoved" :
+					// Update timestamp
+					task.Timestamp = response.Timestamp;
+					$("#tasks-main").attr("data-timestamp", response.Timestamp);
+					// Update status label
+					$("#operation-status-label").html(resultTaskMoved);
+					// Modify existing task
+					$("#"+task.Id).attr("class","moved") ;
+					$("#"+task.Id).attr("data-tooltip", statusMoved) ;
+					$("#"+task.Id).attr("data-timestamp", response.Timestamp) ;
+					// Update today's todo-list from the current task
+					if ( $("div#div-"+task.Id).length > 0 ) {
+						$("div#div-"+task.Id).parents("li").replaceWith(htmlLiTask(task.Id));
+					}
+					// Re-apply filter
+					applyFilter($("#filter-input").val());
+					// Calculate page statistic
+					calculateStatistic();
+					// Refresh events handlers
+					setEvents();
+					// Get ready to create a new task
+					$("#ib button").click();
+					break
+				default : $("#operation-status-label").html(resultUnknown);
+			}
+		},
+		// if error returns
+		error: function(jqXHR,exception) { 
+			hideSpinner("#task-spinner-div");
+			showAjaxError("#operation-status-label",jqXHR,exception);
+		}
+	} );
 	return false;
 }
 

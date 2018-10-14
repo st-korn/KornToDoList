@@ -133,6 +133,7 @@
 "resultTaskUpdated" : "Task updated",
 "resultInsertFailed" : "Failed to add task",
 "resultTaskInserted" : "Task added",
+"resultTaskMoved" : "Task moved",
 
 "resultListCreated" : "List created",
 "resultDateTooFar" : "The list name must contain the current date. Check the clock and calendar on your device.",
