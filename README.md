@@ -12,10 +12,26 @@ Experimental web-app ToDo-list by Stanislav Kornienko's conception. You can try 
 * `lists.go` - implements JSON-api of lists-routines (such as GetLists, CreateList) for javascript and mobile applications.
 * `tasks.go` - implements JSON-api of tasks-routines (such as GetTasks, SendTask) for javascript and mobile applications.
 * `today.go` - implements JSON-api of today's task list routines (such as SaveTodayTasks) for javascript and mobile applications.
+
+* `static/global.css` - common CSS, used on all web-pages
+* `static/changepassword.css` - CSS for change password web-page
+* `static/tasks.css` - CSS for main tasks web-page
+
+* `static/global.js` - common JavaScript, used on all web-pages
+* `static/changepassword.js` - JavaScript, used on change password web-page
+* `static/tasks.js` - JavaScript-routines for task management on main web-page
+* `static/headers.js` - JavaScript-routines for user management (SignIn, LogIn, LogOut, etc..) on main web-page
+* `static/lists.js` - JavaScript-routines for list management on main web-page
+* `static/filter.js` - JavaScript-routines for tasks filtering on main web-page
+* `static/today.js` - JavaScript-routines for today's tasks list management on main web-page
+
+* `static/icons/` - icons, used in application: only .SVG vector format
+* `static/libs/` - standard JavaScript libraries, such as jQuery, etc..
 * `templates/` - here are HTML-templates and JSON language packages. A file from this folder is used by the main server application, but not transmitted to clients directly via HTTP requests.
-* `static/` - here are the static files that clients should receive via http requests: javascripts, CSSs, icons, etc.
 * `.graphics/` - in this folder the original images and the results of their processing are saved. All images received from third-party sites and services must necessarily contain a license, which allows their public commercial use.
 * `.vscode/` - here the Visual Studio Code settings are saved.
+
+- here are the static files that clients should receive via http requests: javascripts, CSSs, icons, etc.
 
 ## Environment variables
 
@@ -40,6 +56,8 @@ To run .go server-application you need to set these environment variables:
 * If the request from the browser came over the HTTP-protocol, the system returns the `301 (Moved Permanently)` redirection to the corresponding HTTPS page.
 
 * The application allows the receipt of requests directly without a cloud proxy (for example, for debugging). The application processes such requests only via the **HTTP**-protocol, and they are not redirected to HTTPS.
+
+* If the application determines that the hostname begins with the `www.`, then redirect the user to the hostname with a truncated `www.` prefix.
 
 ## WEB-server API
 
@@ -233,7 +251,6 @@ Move existing task from one list to another.
 * If Today flag is true, then add created task to today's taks list of destination task-list.
 * Returns Timestamp of modified task from source task-list.
 
-
 ### `POST /SaveTodayTasks`
 
 Save today's task list in database.
@@ -323,6 +340,19 @@ Collection, that contains todays task-lists.
         "tasks" : []string //_id task or "" for delimiter
         "timestamp" : datetime // server date and time last modification of today's task-list
     }
+
+## Timestamps
+
+There are two timestamp fields in database:
+* `timestamp` in `Tasks` collection - timestamp of creation or latest modify of a task;
+* `timestamp` in `TodaysTasks` collection - timestamp of creation or latest modify of a today's tasks list.
+
+There are three timestamps in JSON-api:
+* `Timestamp` - timestamp of a specific task;
+* `TodayTasksTimestamp` - timestamp of today's tasks list;
+* `LastModifiedTimestamp` - most recent timestamp of current list's tasks.
+
+All timestamps stored in MongoDB with UTC datetime format. JSON implemented timestamps as strings, in format `2018-10-13T17:03:35.254Z` or `2018-10-14T20:53:56.893+03:00`. All timestamp comparisons are made in the **UTC format**.
 
 ## Identifiers naming
 
