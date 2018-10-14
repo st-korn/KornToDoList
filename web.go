@@ -25,8 +25,8 @@ type typeWebFormData struct {
 
 func webFormShow(res http.ResponseWriter, req *http.Request) {
 
-	// If necessary, we redirect requests received via the unprotected HTTP protocol to HTTPS
-	if RedirectIncomingHTTPtoHTTPS(res, req) {
+	// If necessary, we redirect requests received via the unprotected HTTP protocol to HTTPS and redirect to hostname without "www.""
+	if RedirectIncomingHTTPandWWW(res, req) {
 		return
 	}
 
@@ -83,8 +83,8 @@ type typeChangePasswordFormData struct {
 
 func webChangePasswordFormShow(res http.ResponseWriter, req *http.Request) {
 
-	// If necessary, we redirect requests received via the unprotected HTTP protocol to HTTPS
-	if RedirectIncomingHTTPtoHTTPS(res, req) {
+	// If necessary, we redirect requests received via the unprotected HTTP protocol to HTTPS and redirect to hostname without "www."
+	if RedirectIncomingHTTPandWWW(res, req) {
 		return
 	}
 

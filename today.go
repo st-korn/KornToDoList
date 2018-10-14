@@ -1,13 +1,11 @@
 package main
 
 import (
-	"encoding/json"
-	"net/http" // for HTTP-server
-	"time"
+	"encoding/json" // to parse and generate JSON input and output parameters
+	"net/http"      // for HTTP-server
+	"time"          // for timestamps
 
-	"gopkg.in/mgo.v2/bson"
-	// to validation todo-list name, for timestamps
-	// to use BSON queries format
+	"gopkg.in/mgo.v2/bson" // to use BSON queries format
 )
 
 // ===========================================================================================================================

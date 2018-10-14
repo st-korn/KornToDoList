@@ -281,9 +281,14 @@ func FormatRequest(r *http.Request) string {
 // If found incoming HTTP-request through cloud HTTPS-proxy - then redirect user's browser from http to https
 // IN: http.ResponseWriter, *http.Request
 // OUT: bool [true - redirect required, false - you can continue to serve the request]
-func RedirectIncomingHTTPtoHTTPS(res http.ResponseWriter, req *http.Request) bool {
-	if strings.ToLower(req.Header.Get("X-Forwarded-Proto")) == "http" {
-		target := "https://" + req.Host + req.URL.Path
+func RedirectIncomingHTTPandWWW(res http.ResponseWriter, req *http.Request) bool {
+	hostOriginal := strings.ToLower(req.Host)
+	hostWithoutWWW := hostOriginal
+	if hostOriginal[0:4] == "www." {
+		hostWithoutWWW = hostOriginal[4:]
+	}
+	if (strings.ToLower(req.Header.Get("X-Forwarded-Proto")) == "http") || (hostOriginal != hostWithoutWWW) {
+		target := "https://" + hostWithoutWWW + req.URL.Path
 		if len(req.URL.RawQuery) > 0 {
 			target += "?" + req.URL.RawQuery
 		}
