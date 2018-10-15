@@ -80,6 +80,8 @@ function loadTasks() {
 					$("#tasks-main").attr("data-timestamp", response.LastModifiedTimestamp);
 					// Clear status label
 					$("#operation-status-label").text("");
+					// Re-apply filter
+					applyFilter($("#filter-input").val());
 					// Calculate page statistic
 					calculateStatistic();
 					// Refresh events handlers
