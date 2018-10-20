@@ -17,9 +17,9 @@
 	<script src="/static/global.js?4"></script>
 	<script src="/static/headers.js?2"></script>
 	<script src="/static/lists.js?2"></script>
-	<script src="/static/filter.js?2"></script>
+	<script src="/static/filter.js?3"></script>
 	<script src="/static/today.js?2"></script>
-	<script src="/static/tasks.js?7"></script>
+	<script src="/static/tasks.js?8"></script>
 	<script>
 		{{- range $key, $value := .Labels}}
 		{{- if or (or (or ( or (eq (printf "%.4s" $key) "ajax") (eq (printf "%.6s" $key) "result") ) (eq (printf "%.6s" $key) "status") ) (eq (printf "%.6s" $key) "button") ) (eq (printf "%.4s" $key) "hint") }}
