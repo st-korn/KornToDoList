@@ -133,6 +133,7 @@ nav {
 }
 #user-form {
   flex-grow: 1;
+  text-align: right;
 }
 #languages-and-help-form {
   flex-grow: 1;

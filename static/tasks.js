@@ -8,7 +8,7 @@ var timerIdle;
 function htmlPTask(task) {
 	var tooltips = {'created': statusCreated, 'moved': statusMoved, 'canceled': statusCanceled, 'done': statusDone};
 	var p = '<p id="' + task.Id + '" class="' + task.Status + '" data-tooltip="' + tooltips[task.Status] + '" data-timestamp="'+task.Timestamp+'">'
-	if (task.Icon != "") {
+	if (task.Icon) {
 		p = p + '<img class="icon '+task.Status+'" src="/static/icons/'+task.Icon+'.svg" alt="'+task.Icon+'">'
 	}
 	var idx = task.Text.indexOf(" - ");
