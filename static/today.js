@@ -156,6 +156,8 @@ function clearDoneTasksFromToday() {
 	$("div.today-task.canceled").parents("li").remove();
 	$("div.today-task.moved").parents("li").remove();
 	saveToday();
+	// Calculate page statistic
+	calculateStatistic();
 }
 
 // ===========================================================================
@@ -164,4 +166,6 @@ function clearDoneTasksFromToday() {
 function clearAllTasksFromToday() {
 	$("li").remove();
 	saveToday();
+	// Calculate page statistic
+	calculateStatistic();
 }
