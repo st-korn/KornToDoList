@@ -342,9 +342,10 @@ function moveTaskToNewList() {
 					// Update status label
 					$("#operation-status-label").html(resultTaskMoved);
 					// Modify existing task
-					$("#"+task.Id).attr("class","moved") ;
-					$("#"+task.Id).attr("data-tooltip", statusMoved) ;
+					$("#"+task.Id).attr("class","moved");
+					$("#"+task.Id).attr("data-tooltip", statusMoved);
 					$("#"+task.Id).attr("data-timestamp", response.Timestamp) ;
+					$("#"+task.Id+" img").removeClass("created").removeClass("done").removeClass("canceled").addClass("moved");
 					// Update today's todo-list from the current task
 					if ( $("div#div-"+task.Id).length > 0 ) {
 						$("div#div-"+task.Id).parents("li").replaceWith(htmlLiTask(task.Id));
