@@ -6,23 +6,34 @@ function applyFilter(filter) {
 	switch($("#filter-select").val()) {
 		case "all" :
 			$("p").show();
+			$("li").show();
 			break;
 		case "created-only" :
 			$("p.created").show();
 			$("p.done").hide();
 			$("p.canceled").hide();
 			$("p.moved").hide();
+			$("div.today-task.created").closest("li").show();
+			$("div.today-task.done").closest("li").hide();
+			$("div.today-task.canceled").closest("li").hide();
+			$("div.today-task.moved").closest("li").hide();
 			break;
 		case "created-not-wait-not-remind" :
+			$("p.created").show();
 			$("p.done").hide();
 			$("p.canceled").hide();
 			$("p.moved").hide();
-			$("p.created").show();
 			$("img.wait, img.remind").closest("p.created").hide();
+			$("div.today-task.created").closest("li").show();
+			$("div.today-task.done").closest("li").hide();
+			$("div.today-task.canceled").closest("li").hide();
+			$("div.today-task.moved").closest("li").hide();
+			$("img.wait, img.remind").closest("li").hide();
 			break;
 	}
 	if ( filter != "" ) {
-		$("p:not(:Contains("+ filter.trim() +"))").hide(); 
+		$("p:not(:Contains("+ filter.trim() +"))").hide();
+		$("div.today-task:not(:Contains("+ filter.trim() +"))").closest("li").hide();
 	}
 }
 
