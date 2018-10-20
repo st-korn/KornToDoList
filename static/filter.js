@@ -22,7 +22,7 @@ function applyFilter(filter) {
 			break;
 	}
 	if ( filter != "" ) {
-		$("p:not(:Contains("+ filter +"))").hide(); 
+		$("p:not(:Contains("+ filter.trim() +"))").hide(); 
 	}
 }
 
@@ -42,7 +42,7 @@ function clickClearFilter() {
 function onEnterFilterInput(event) {
 	if (event.keyCode == 13) {
 		event.preventDefault();
-		applyFilter();
+		applyFilter($("#filter-input").val());
 		$("#filter-clear-button").focus();
 	}
 }
