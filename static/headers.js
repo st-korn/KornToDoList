@@ -1,9 +1,11 @@
+// Page initialization
+$( init );
+
 // ===========================================================================
 // Page initialization
 // ===========================================================================
 function init() {
 	// Bind event handling
-	$("#language-select").change(onLanguageChange);
 	$("#welcome-register-user-button").bind('click', clickSignup);
 	$("#welcome-login-user-button").bind('click', showLoginForm);
 	$("#welcome-start-anonymously-button").bind('click', startAnonymously);
@@ -287,14 +289,6 @@ function hideHelp() {
 	$("#help-header").animate({height: "hide"}, 100);
 	$("#help-label").show();
 	return false;
-}
-
-// ===========================================================================
-// When the user selects a language from the list
-// ===========================================================================
-function onLanguageChange() {
-	Cookies.set('User-Language', $("#language-select").val(), { expires: DefaultCookieLifetimeDays });
-	location.reload();
 }
 
 // ===========================================================================

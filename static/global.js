@@ -1,6 +1,9 @@
 // Default cookies lifetime interval (days)
 const DefaultCookieLifetimeDays = 365
 
+// Bind event handling
+$( function() {$("#language-select").change(onLanguageChange);} );
+
 // ===========================================================================
 // Universal function to parse Ajax errors
 // ===========================================================================
@@ -74,4 +77,12 @@ function extractIcon(classes) {
 	} else {
 		return "";
 	}
+}
+
+// ===========================================================================
+// When the user selects a language from the list
+// ===========================================================================
+function onLanguageChange() {
+	Cookies.set('User-Language', $("#language-select").val(), { expires: DefaultCookieLifetimeDays });
+	location.reload();
 }

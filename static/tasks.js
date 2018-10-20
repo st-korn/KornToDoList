@@ -1,6 +1,5 @@
-// Initialze
+// Timer initialization
 var timerIdle;
-$( init );
 
 // ===========================================================================
 // Generate <p> HTML for the Task structure
