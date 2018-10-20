@@ -2,7 +2,7 @@
 
 Experimental web-app ToDo-list by Stanislav Kornienko's conception. You can try it in the cloud <https://todo.works>
 
-<img src="https://github.com/st-korn/KornToDoList/raw/master/static/favicon.png" width="64">
+<img src="https://github.com/st-korn/KornToDoList/raw/master/static/favicon.png" width="64" alt="logo">
 
 ## Project Files
 

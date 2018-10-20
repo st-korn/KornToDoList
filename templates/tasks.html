@@ -33,11 +33,11 @@
 	<header id="help-header">
 		<h1>{{.Labels.helpH1}}</h1>
 		<h2>{{.Labels.helpH2}}</h2>
-		<article class="tip"><img src="/static/icons/smartphone.svg"><div>{{.Labels.helpSmartphone}}</div></article>
-		<article class="tip"><img src="/static/icons/evening.svg"><div>{{.Labels.helpEvening}}</div></article>
-		<article class="tip"><img src="/static/icons/meeting.svg"><div>{{.Labels.helpMeeting}}</div></article>
-		<article class="tip"><img src="/static/icons/filter.svg"><div>{{.Labels.helpFilter}}</div></article>
-		<article class="tip"><img src="/static/icons/checklist.svg"><div>{{.Labels.helpChecklist}}</div></article>
+		<article class="tip"><img src="/static/icons/smartphone.svg" alt="quickly add a task"><div>{{.Labels.helpSmartphone}}</div></article>
+		<article class="tip"><img src="/static/icons/evening.svg" alt="sort incoming tasks"><div>{{.Labels.helpEvening}}</div></article>
+		<article class="tip"><img src="/static/icons/meeting.svg" alt="delegate tasks"><div>{{.Labels.helpMeeting}}</div></article>
+		<article class="tip"><img src="/static/icons/filter.svg" alt="filter tasks"><div>{{.Labels.helpFilter}}</div></article>
+		<article class="tip"><img src="/static/icons/checklist.svg" alt="easy start from scratch"><div>{{.Labels.helpChecklist}}</div></article>
 		<div id="help-close-div"><button id="help-close-button">{{.Labels.buttonHelpClose}}</button></div>
 	</header>
 	<header id="welcome-header">
@@ -78,8 +78,8 @@
 	</header>
 	<nav id="user-help-lists-nav">
 		<form id="user-form">
-			<img id="user-img" src="/static/icons/user.svg">
-			<img id="anon-img" src="/static/icons/anon.svg">
+			<img id="user-img" src="/static/icons/user.svg" alt="registered user">
+			<img id="anon-img" src="/static/icons/anon.svg" alt="anonymous user">
 			<label id="user-label"></label>
 			<button id="register-user-button">{{.Labels.buttonRegister}}</button>
 			<button id="logout-user-button">{{.Labels.buttonLogout}}</button>
@@ -112,7 +112,7 @@
 	</nav>
 	<nav id="task-filter-nav">
 		<form id="filter-form">
-			<img src="/static/icons/search.svg">
+			<img src="/static/icons/search.svg" alt="search">
 			<input type="text" id="filter-input" name="filter" size="20" placeholder="{{.Labels.placeholderSearchInput}}">
 			<button id="filter-clear-button">x</button>
 			<select title="{{.Labels.hintFilterSelector}}" name="filter" id="filter-select">

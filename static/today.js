@@ -3,15 +3,15 @@
 // IN: taskId string
 // ===========================================================================
 function htmlLiTask(taskId) {
-	var taskIcon = extractIcon( $("#"+taskId).children("img").attr("class") );
+	var taskIcon = $("#"+taskId).children("img").attr("alt");
 	var taskStatus = $("#"+taskId).attr("class");
 	var taskTimestamp = $("#"+taskId).attr("data-timestamp");
 	var taskText = $("#"+taskId).text();
 	var tooltips = {'created': statusCreated, 'moved': statusMoved, 'canceled': statusCanceled, 'done': statusDone};
 	var li = '<li>'
-	li = li + '<img class="handle" src="/static/icons/updown.svg">'
+	li = li + '<img class="handle" src="/static/icons/updown.svg" alt="move task">'
 	if (taskIcon) {
-		li = li + '<img class="icon '+taskIcon+' '+taskStatus+'" src="/static/icons/'+taskIcon+'.svg">'
+		li = li + '<img class="icon '+taskStatus+'" src="/static/icons/'+taskIcon+'.svg" alt="'+taskIcon+'">'
 	}
 	li = li + '<div class="today-task '+taskStatus+'" id="div-' + taskId + '" class="' + taskStatus + '" data-tooltip="' + tooltips[taskStatus] + '" data-timestamp="'+taskTimestamp+'">'
 	var idx = taskText.indexOf(" - ");
@@ -21,7 +21,7 @@ function htmlLiTask(taskId) {
 		li = li + taskText;
 	}
 	li = li + '</div>'
-	li = li + '<img class="insert-delimiter" src="/static/icons/delimiter.svg" title="'+hintInsertDelimiter+'">'
+	li = li + '<img class="insert-delimiter" src="/static/icons/delimiter.svg" title="'+hintInsertDelimiter+'" alt="insert delimiter">'
 	li = li + '</li>';
 	return li;
 }
@@ -31,9 +31,9 @@ function htmlLiTask(taskId) {
 // ===========================================================================
 function htmlLiDelimiter() {
 	var li = '<li class="delimiter">';
-	li = li + '<img class="handle" src="/static/icons/updown.svg">';
+	li = li + '<img class="handle" src="/static/icons/updown.svg" alt="move delimiter">';
 	li = li + '<div class="delimiter"></div>';
-	li = li + '<img class="delete-delimiter" src="/static/icons/delete.svg" title="'+hintDeleteDelimiter+'">';
+	li = li + '<img class="delete-delimiter" src="/static/icons/delete.svg" title="'+hintDeleteDelimiter+'" alt="remove delimiter">';
 	li = li + '</li>';
 	return li;	
 }

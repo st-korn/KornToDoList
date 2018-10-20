@@ -9,7 +9,7 @@ function htmlPTask(task) {
 	var tooltips = {'created': statusCreated, 'moved': statusMoved, 'canceled': statusCanceled, 'done': statusDone};
 	var p = '<p id="' + task.Id + '" class="' + task.Status + '" data-tooltip="' + tooltips[task.Status] + '" data-timestamp="'+task.Timestamp+'">'
 	if (task.Icon != "") {
-		p = p + '<img class="icon '+task.Icon+' '+task.Status+'" src="/static/icons/'+task.Icon+'.svg">'
+		p = p + '<img class="icon '+task.Status+'" src="/static/icons/'+task.Icon+'.svg" alt="'+task.Icon+'">'
 	}
 	var idx = task.Text.indexOf(" - ");
 	if (idx > 0) {
@@ -114,7 +114,7 @@ function onTaskEdit() {
 			break;
 	}
 	$("#task-status-select").val( $("p#"+id).attr("class") );
-	$("#task-icon-select").val( extractIcon( $("p#"+id).children("img").attr("class") ) );
+	$("#task-icon-select").val( $("p#"+id).children("img").attr("alt") );
 	$("#task-section-select").val( $("p#"+id).parents("section").attr("id") );
 	$("#task-text-input").val( $("p#"+id).text() );
 	$("#task-id-input").val( id );

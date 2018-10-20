@@ -69,17 +69,6 @@ function getCurrentDate() {
 }
 
 // ===========================================================================
-// Extract icon class name from several class names of <img> tag
-// ===========================================================================
-function extractIcon(classes) {
-	if (classes) {
-		return classes.replace("icon","").replace("created","").replace("done","").replace("canceled","").replace("moved","").trim();
-	} else {
-		return "";
-	}
-}
-
-// ===========================================================================
 // When the user selects a language from the list
 // ===========================================================================
 function onLanguageChange() {
