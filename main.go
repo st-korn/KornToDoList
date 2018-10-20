@@ -125,20 +125,20 @@ type typeLabels map[string]string
 // IN:
 //		req *http.Request // http-request
 // OUT:
-//		langTag language.Tag // detected language
+//		langTagString string // tag of detected language
 //		langEnglishName string // english name of detected language
 //		labels typeLabels // labels of these language
-func DetectLanguageAndLoadLabels(req *http.Request) (langTag language.Tag, langEnglishName string, labels typeLabels) {
+func DetectLanguageAndLoadLabels(req *http.Request) (langTagString string, langEnglishName string, labels typeLabels) {
 
 	// Start detect user-language from cookie
 	var langCookieEnglishName string
-	var langTagCode string
 	langCookie, err := req.Cookie("User-Language")
 	if err == nil {
 		langCookieEnglishName = langCookie.Value
 	}
 
 	// Finduser-language from supported languages list
+	var langTagCode string
 	for _, tag := range SupportedLangs {
 		if display.English.Tags().Name(tag) == langCookieEnglishName {
 			langTagCode = tag.String()
@@ -146,10 +146,12 @@ func DetectLanguageAndLoadLabels(req *http.Request) (langTag language.Tag, langE
 	}
 
 	// Finish detect user-language
+	var langTag language.Tag
 	accept := req.Header.Get("Accept-Language")
 	matcher := language.NewMatcher(SupportedLangs)
 	langTag, _ = language.MatchStrings(matcher, langTagCode, accept)
 
+	langTagString = langTag.String()
 	langEnglishName = display.English.Tags().Name(langTag)
 
 	// Load strings-table for user-language
@@ -164,7 +166,7 @@ func DetectLanguageAndLoadLabels(req *http.Request) (langTag language.Tag, langE
 	}
 	json.Unmarshal(jsonText, &labels)
 
-	return langTag, langEnglishName, labels
+	return langTagString, langEnglishName, labels
 }
 
 // ===========================================================================================================================

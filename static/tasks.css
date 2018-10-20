@@ -51,28 +51,34 @@ article.tip {
     align-items: flex-start;
   }
 }
-article > img {
+article div {
+  display: block;
+  text-align: justify;
+}
+article.tip img {
   display: block;
   height: 32px;
   margin: 3px 10px 0 0;
 }
-article > div {
-  display: block;
-  text-align: justify;
+article.tip h4 {
+  display: inline;
 }
-article > button {
+article.welcome button {
   font-size: 14px;
   white-space:nowrap;
 }
 @media (max-width: 899px) { 
-  article > button {
+  article.welcome h4 {
     margin : 0 5px 0 0;
+    width: 100%;
+  }
+  article.welcome button {
     width: 100%;
   }
 }
 @media (min-width: 900px) { 
-  article > button {
-    margin : -2px 5px 0 0;
+  article.welcome h4 {
+    margin : -3px 5px 0 0;
   }
 }
 code {

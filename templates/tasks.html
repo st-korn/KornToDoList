@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="{{.UserLangTag}}">
 <head>
 	<title>{{.Labels.titleWebPage}}</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
-	<link rel="stylesheet" type="text/css" href="/static/global.css?10">
-	<link rel="stylesheet" type="text/css" href="/static/tasks.css?15">
+	<link rel="stylesheet" type="text/css" href="/static/global.css?12">
+	<link rel="stylesheet" type="text/css" href="/static/tasks.css?18">
 	<link rel="stylesheet" type="text/css" href="/static/libs/jquery-ui.min.css">
 	<link rel="icon" type="image/png" href="/static/favicon.png">
 	<link rel="apple-touch-icon" type="image/png" href="/static/faviphone.png">
@@ -14,13 +14,13 @@
 	<script src="/static/libs/jquery.ui.touch-punch.min.js"></script>
 	<script src="/static/libs/js.cookie.js"></script>
 	<script src="/static/libs/md5.min.js"></script>
-	<script src="/static/global.js?3"></script>
-	<script src="/static/headers.js?1"></script>
-	<script src="/static/lists.js?1"></script>
-	<script src="/static/filter.js?1"></script>
-	<script src="/static/today.js?1"></script>
-	<script src="/static/tasks.js?6"></script>
-	<script type="text/javascript">
+	<script src="/static/global.js?4"></script>
+	<script src="/static/headers.js?2"></script>
+	<script src="/static/lists.js?2"></script>
+	<script src="/static/filter.js?2"></script>
+	<script src="/static/today.js?2"></script>
+	<script src="/static/tasks.js?7"></script>
+	<script>
 		{{- range $key, $value := .Labels}}
 		{{- if or (or (or ( or (eq (printf "%.4s" $key) "ajax") (eq (printf "%.6s" $key) "result") ) (eq (printf "%.6s" $key) "status") ) (eq (printf "%.6s" $key) "button") ) (eq (printf "%.4s" $key) "hint") }}
 		var {{$key}} = "{{$value}}";
@@ -41,9 +41,9 @@
 		<div id="help-close-div"><button id="help-close-button">{{.Labels.buttonHelpClose}}</button></div>
 	</header>
 	<header id="welcome-header">
-		<article class="welcome"><button id="welcome-register-user-button">{{.Labels.buttonWelcomeRegister}}</button><div>{{.Labels.labelWelcomeRegister}}</div></article>
-		<article class="welcome"><button id="welcome-login-user-button">{{.Labels.buttonWelcomeLogin}}</button><div>{{.Labels.labelWelcomeLogin}}</div></article>
-		<article class="welcome"><button id="welcome-start-anonymously-button">{{.Labels.buttonWelcomeStartAnonymously}}</button><div>{{.Labels.labelWelcomeStartAnonymously}}</div></article>
+		<article class="welcome"><h4><button id="welcome-register-user-button">{{.Labels.buttonWelcomeRegister}}</button></h4><div>{{.Labels.labelWelcomeRegister}}</div></article>
+		<article class="welcome"><h4><button id="welcome-login-user-button">{{.Labels.buttonWelcomeLogin}}</button></h4><div>{{.Labels.labelWelcomeLogin}}</div></article>
+		<article class="welcome"><h4><button id="welcome-start-anonymously-button">{{.Labels.buttonWelcomeStartAnonymously}}</button></h4><div>{{.Labels.labelWelcomeStartAnonymously}}</div></article>
 	</header>
 	<header id="signup-header">
 		<form id="signup-form" class="left-side">
@@ -135,7 +135,7 @@
 			 	<option value="ib">{{.Labels.sectionIB}}</option>
 			</select>
 			<select title="{{.Labels.hintTaskIconSelector}}" name="icon" id="task-icon-select">
-				<option value=""></option>
+				<option value="" disabled selected>{{.Labels.iconDefault}}</option>
 				<option value="wait">{{.Labels.iconWait}}</option>
 				<option value="remind">{{.Labels.iconRemind}}</option>
 				<option value="call">{{.Labels.iconCall}}</option>

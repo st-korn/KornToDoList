@@ -17,10 +17,11 @@ import (
 
 // Structure to fill HTML-template of main web-page
 type typeWebFormData struct {
-	UserLang   string     // english_name of current language, on which to display the page
-	Langs      []typeLang // global list of supported languages
-	Labels     typeLabels // strings-table of current language for HTML
-	ListToOpen string     // selected list name (by URL path)
+	UserLang    string     // english_name of current language, on which to display the page
+	UserLangTag string     // tag of current language, on which to display the page
+	Langs       []typeLang // global list of supported languages
+	Labels      typeLabels // strings-table of current language for HTML
+	ListToOpen  string     // selected list name (by URL path)
 }
 
 func webFormShow(res http.ResponseWriter, req *http.Request) {
@@ -52,7 +53,7 @@ func webFormShow(res http.ResponseWriter, req *http.Request) {
 	}
 
 	// Detect user-language and load it labels
-	_, webFormData.UserLang, webFormData.Labels = DetectLanguageAndLoadLabels(req)
+	webFormData.UserLangTag, webFormData.UserLang, webFormData.Labels = DetectLanguageAndLoadLabels(req)
 
 	// Apply HTML-template
 	res.Header().Set("Content-type", "text/html")
@@ -76,11 +77,12 @@ func webFormShow(res http.ResponseWriter, req *http.Request) {
 
 // Structure to fill HTML-template of main web-page
 type typeChangePasswordFormData struct {
-	UUID     string     // UUID set-password-link
-	UserLang string     // english_name of current language, on which to display the page
-	Langs    []typeLang // global list of supported languages
-	Labels   typeLabels // strings-table of current language for HTML
-	Result   string     // A string that passes a precomputed and predefined result to a form, for example "Link is expired or account is not found"
+	UUID        string     // UUID set-password-link
+	UserLang    string     // english_name of current language, on which to display the page
+	UserLangTag string     // tag of current language, on which to display the page
+	Langs       []typeLang // global list of supported languages
+	Labels      typeLabels // strings-table of current language for HTML
+	Result      string     // A string that passes a precomputed and predefined result to a form, for example "Link is expired or account is not found"
 }
 
 func webChangePasswordFormShow(res http.ResponseWriter, req *http.Request) {
@@ -105,7 +107,7 @@ func webChangePasswordFormShow(res http.ResponseWriter, req *http.Request) {
 	}
 
 	// Detect user-language and load it labels
-	_, changePasswordFormData.UserLang, changePasswordFormData.Labels = DetectLanguageAndLoadLabels(req)
+	changePasswordFormData.UserLangTag, changePasswordFormData.UserLang, changePasswordFormData.Labels = DetectLanguageAndLoadLabels(req)
 
 	// Connect to database
 	session := GetMongoDBSession()

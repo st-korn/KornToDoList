@@ -1,39 +1,61 @@
 /* ===============================================================
    Global styles of web-application
    =============================================================== */
+
+/* Web-pages */
 html {
   -webkit-text-size-adjust: 100%; /* Prevent font scaling in landscape while allowing user zoom */
-	font: 12px Arial, Helvetica, sans-serif;
+	font: normal 12px Arial, Helvetica, sans-serif;
 }
+
+/* Web-pages background */
 body {
 	background: linear-gradient( rgba(187,187,187,0.3), transparent 1px), linear-gradient( 90deg, rgba(187,187,187,0.3), transparent 1px);
 	background-size: 12px 12px;
 	background-position: center center;
 }
+
+/* Page headers */
 h1 {
   margin: 5px 0 10px 0;
   font: 400 18px Geneva,Tahoma,Verdana,sans-serif;
   text-align: center;
 }
+
+/* Page sub-headers */
 h2 {
   margin: 5px 0 5px 0;
   font: 800 16px Geneva,Tahoma,Verdana,sans-serif;
 }
+
+/* Section headers */
 h3 {
   margin: 0;
   padding: 0;
   font: bold 12px "Arial Black", Gadget, sans-serif;
   color: rgb(105,105,105);
 }
-form {
-  font: 12px Arial, Helvetica, sans-serif;
+
+/* Article headers */
+h4 {
+  font: bold 12px Arial, Helvetica, sans-serif;
+  margin: 0;
 }
+
+/* All forms */
+form {
+  font: normal 12px Arial, Helvetica, sans-serif;
+}
+
+/* All form's elements */
 input, 
 select, 
 button {
-  font: 12px Arial, Helvetica, sans-serif;
+  font: normal 12px Arial, Helvetica, sans-serif;
   margin: 1px 3px 2px 3px;
 }
+
+/* Ajax result's labels */
 label.result {
   font-style: italic;
   line-height: 21px;
