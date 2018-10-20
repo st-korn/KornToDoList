@@ -178,6 +178,23 @@ Create new todo-list for current user.
 
 * Checks the current session for validity. If the session is not valid, it returns `"SessionEmptyNotFoundOrExpired"` as a result.
 * Verifies that the desired list name does not differ by more than 24 hours from the current server date.
+* Add new task with empty Text field, assigned to created list name. 
+* Such tasks with empty Text field are sevice tasks is not returned by the GetTasks API.
+* Returns array of strings with names of saved users todo-lists.
+
+### `POST /RemoveEmptyList`
+
+Remove empty todo-list for current user.
+
+    Cookies: User-Session : string (UUID)
+    IN: JSON: {List : string "YYYY-MM-DD"}
+    OUT: JSON: { Result : string ["ListRemoved", "InvalidListName", "SessionEmptyNotFoundOrExpired"], 
+                 Lists : []string }
+
+* Checks the current session for validity. If the session is not valid, it returns `"SessionEmptyNotFoundOrExpired"` as a result.
+* Remove all service tasks with empty Text field.
+* If there are no other tasks with the filled Text field in the list, it will automatically cease to exist, 
+* since there will be no tasks that belong to it.
 * Returns array of strings with names of saved users todo-lists.
 
 ### `POST /GetTasks`

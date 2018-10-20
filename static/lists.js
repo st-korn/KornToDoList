@@ -10,6 +10,12 @@ function manageListsButtons() {
 	} else {
 		$("#new-list-create-button").hide();
 	};
+	// Determines the ability to remove empty task list
+	if ($("p").length > 0) {
+		$("#empty-list-remove-button").hide();
+	} else {
+		$("#empty-list-remove-button").show();
+	}
 	// Determines the ability to move a task to another task list
 	if ($("#task-lists-select").prop("selectedIndex") == 0) {
 		$("#task-move-button").hide();
@@ -126,6 +132,55 @@ function newList() {
 					break;
 				case "ListCreated" :
 					$("#operation-status-label").html(resultListCreated);
+					// Collect lists names
+					$("#task-lists-select option").remove();
+					$.each(response.Lists, function() {
+						$("#task-lists-select").append($("<option />").val(this).text(this));
+					});
+					// Select first list
+					$("#task-lists-select").prop("selectedIndex",0);
+					// Load all tasks of current list
+					loadTasks();
+					break;
+				default : $("#operation-status-label").html(resultUnknown);
+			}
+		},
+		// if error returns
+		error: function(jqXHR,exception) { 
+			hideSpinner("#task-spinner-div");
+			showAjaxError("#operation-status-label",jqXHR,exception);
+		}
+	} );
+	return false;
+}
+
+// ===========================================================================
+// Remove current empty todo-list
+// ===========================================================================
+function removeList() {
+	// Send Ajax POST request
+	$("#operation-status-label").text("");
+	showSpinner("#task-spinner-div");
+	$.ajax( {
+		url : "/RemoveEmptyList",
+		cache: false,
+		type : "post",
+		dataType: "json",
+		contentType: "application/json; charset=utf-8",
+		data : JSON.stringify( { List: $("#task-lists-select").val() } ),
+		// if success
+		success: function (response) {
+			hideSpinner("#task-spinner-div");
+			switch(response.Result) {
+  				case "SessionEmptyNotFoundOrExpired" :
+  					Cookies.remove('User-Session');
+  					location.reload();
+					break;
+				case "InvalidListName" :
+					$("#operation-status-label").html(resultInvalidListName);
+					break;
+				case "ListRemoved" :
+					$("#operation-status-label").html(resultListRemoved);
 					// Collect lists names
 					$("#task-lists-select option").remove();
 					$.each(response.Lists, function() {

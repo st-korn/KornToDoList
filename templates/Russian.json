@@ -4,6 +4,7 @@
 "labelTaskLists" : "Список задач: ",
 "hintTaskListsSelector" : "Выберите список задач, с которым будете работать",
 "buttonNewListCreate" : "Создать новый список",
+"buttonEmptyListRemove" : "Удалить пустой список",
 
 "buttonLogin" : "Войти",
 "buttonRegister" : "Регистрация",
@@ -138,6 +139,7 @@
 "resultListCreated" : "Список создан",
 "resultDateTooFar" : "Название списка должно содержать текущую дату. Проверьте часы и календарь на вашем на устройстве.",
 "resultCreateListFailed" : "Не удалось создать список",
+"resultListRemoved" : "Список удалён",
 
 "hintInsertDelimiter" : "добавить разделитель",
 "hintDeleteDelimiter" : "удалить разделитель",

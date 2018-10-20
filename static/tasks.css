@@ -13,6 +13,7 @@ header,
 #login-spinner-div,
 #task-spinner-div
 #new-list-create-button,
+#empty-list-remove-button,
 #task-move-button
 {
   display: none;

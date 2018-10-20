@@ -26,8 +26,6 @@ function htmlPTask(task) {
 // Load from server all tasks of current selected list
 // ===========================================================================
 function loadTasks() {
-	// Manage visibility and availability of list buttons
-	manageListsButtons();
 	// Purge current tasks
 	$("p").remove();
 	$("li").remove();
@@ -86,6 +84,8 @@ function loadTasks() {
 					calculateStatistic();
 					// Refresh events handlers
 					setEvents();
+					// Manage visibility and availability of list buttons
+					manageListsButtons();
 					// Get ready to create a new task
 					$("#ib button").click();
  					break;

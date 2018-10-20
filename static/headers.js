@@ -23,6 +23,7 @@ function init() {
 	$("#task-submit-button").bind('click', submitTaskOnCurrentList);
 	$("button.add").bind('click', newTask);
 	$("#new-list-create-button").bind('click', newList);
+	$("#empty-list-remove-button").bind('click', removeList);
 	$("#task-move-button").bind('click', moveTaskToNewList);
 	$("#register-user-button").bind('click', clickSignup);
 	$("#clear-done-button").bind('click', clearDoneTasksFromToday)

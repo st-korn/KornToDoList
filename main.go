@@ -383,6 +383,7 @@ func main() {
 	http.HandleFunc("/SendTask", webSendTask)
 	http.HandleFunc("/MoveTask", webMoveTask)
 	http.HandleFunc("/CreateList", webCreateList)
+	http.HandleFunc("/RemoveEmptyList", webRemoveEmptyList)
 	http.HandleFunc("/SaveTodayTasks", webSaveTodayTasks)
 	http.HandleFunc("/NeedUpdate", webNeedUpdate)
 	http.HandleFunc("/", webFormShow)
