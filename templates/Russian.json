@@ -38,7 +38,7 @@
 "iconThink" : "придумать",
 
 "hintTaskStatusSelector" : "Текущий статус задачи",
-"statusCreated" : "создана",
+"statusCreated" : "в работе",
 "statusMoved" : "перенесена",
 "statusCanceled" : "отменена",
 "statusDone" : "завершена",

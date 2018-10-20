@@ -38,7 +38,7 @@
 "iconThink" : "think",
 
 "hintTaskStatusSelector" : "Current task status",
-"statusCreated" : "created",
+"statusCreated" : "on the go",
 "statusMoved" : "moved",
 "statusCanceled" : "canceled",
 "statusDone" : "done",
