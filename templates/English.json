@@ -66,6 +66,7 @@
 "labelStatisticCanceled" : "canceled",
 "labelStatisticActivity" : "need activity",
 "labelStatisticWaitRemind" : "need control",
+"labelStatisticToday" : "today",
 
 "buttonWelcomeRegister" : "Sign up",
 "labelWelcomeRegister" : "Need e-mail, registration takes 30 seconds.",

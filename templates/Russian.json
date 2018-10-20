@@ -66,6 +66,7 @@
 "labelStatisticCanceled" : "отменено",
 "labelStatisticActivity" : "требуют активности",
 "labelStatisticWaitRemind" : "требуют контроля",
+"labelStatisticToday" : "сегодня",
 
 "buttonWelcomeRegister" : "Зарегистрируйтесь",
 "labelWelcomeRegister" : "Понадобится e-mail, регистрация занимает 30 секунд.",

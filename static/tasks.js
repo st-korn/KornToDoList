@@ -390,10 +390,12 @@ function calculateStatistic() {
 		$("#done-tasks-count-label").text(cnt+" ("+Math.round(cnt*100/total)+"%),");
 		cnt = $("p.canceled").length
 		$("#canceled-tasks-count-label").text(cnt+" ("+Math.round(cnt*100/total)+"%),");
-		cnt = $("img.wait, img.remind").closest("p.created").length
+		cnt = $("img[alt='wait'], img[alt='remind']").closest("p.created").length
 		$("#wait-remind-tasks-count-label").text(cnt+" ("+Math.round(cnt*100/total)+"%),");
 		cnt = $("p.created").length - cnt
-		$("#activity-tasks-count-label").text(cnt+" ("+Math.round(cnt*100/total)+"%)");
+		$("#activity-tasks-count-label").text(cnt+" ("+Math.round(cnt*100/total)+"%),");
+		cnt = $("div.today-task").length
+		$("#today-tasks-count-label").text(cnt+" ("+Math.round(cnt*100/total)+"%)");
 	}
 }
 

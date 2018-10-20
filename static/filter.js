@@ -23,12 +23,12 @@ function applyFilter(filter) {
 			$("p.done").hide();
 			$("p.canceled").hide();
 			$("p.moved").hide();
-			$("img.wait, img.remind").closest("p.created").hide();
+			$("img[alt='wait'], img[alt='remind']").closest("p.created").hide();
 			$("div.today-task.created").closest("li").show();
 			$("div.today-task.done").closest("li").hide();
 			$("div.today-task.canceled").closest("li").hide();
 			$("div.today-task.moved").closest("li").hide();
-			$("img.wait, img.remind").closest("li").hide();
+			$("img[alt='wait'], img[alt='remind']").closest("li").hide();
 			break;
 	}
 	if ( filter != "" ) {
