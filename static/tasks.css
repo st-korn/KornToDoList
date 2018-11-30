@@ -301,7 +301,7 @@ li {
 }
 li img {
 	display: inline-block;
-  flex-grow: 1;
+  flex-grow: 0;
 }
 img.handle {
   height: 16px;
