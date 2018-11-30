@@ -35,6 +35,7 @@ function applyFilter(filter) {
 		$("p:not(:Contains("+ filter.trim() +"))").hide();
 		$("div.today-task:not(:Contains("+ filter.trim() +"))").closest("li").hide();
 	}
+	Cookies.set('User-Filter', $("#filter-select").val(), { expires: DefaultCookieLifetimeDays });
 }
 
 // ===========================================================================

@@ -299,6 +299,12 @@ Checks need to update the task list.
 * Compare TodayTasksTimestamp with timestamp of today's task list. If today's taks list's timestamp is greater - return "NeedUpdate".
 * Otherwise return "AllActual".
 
+## Used cookies
+
+    User-Language  : string // User-selected language english name
+    User-Session : string // UUID of stored session
+    User-Filter : string // Selected filter mode ["all", "created-only", "created-not-wait-not-remind"]
+
 ## Database structure
 
 ### `Tasks`

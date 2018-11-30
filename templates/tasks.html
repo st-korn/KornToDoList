@@ -118,9 +118,9 @@
 			<input type="text" id="filter-input" name="filter" size="20" placeholder="{{.Labels.placeholderSearchInput}}">
 			<button id="filter-clear-button">x</button>
 			<select title="{{.Labels.hintFilterSelector}}" name="filter" id="filter-select">
-			 	<option value="all">{{.Labels.filterAll}}</option>
-			 	<option value="created-only">{{.Labels.filterCreatedOnly}}</option>
-			 	<option value="created-not-wait-not-remind">{{.Labels.statusCreatedNotWaitNotRemind}}</option>
+			 	<option value="all"{{if eq .UserFilter "all"}} selected="selected"{{end}}>{{.Labels.filterAll}}</option>
+			 	<option value="created-only"{{if eq .UserFilter "created-only"}} selected="selected"{{end}}>{{.Labels.filterCreatedOnly}}</option>
+			 	<option value="created-not-wait-not-remind"{{if eq .UserFilter "created-not-wait-not-remind"}} selected="selected"{{end}}>{{.Labels.statusCreatedNotWaitNotRemind}}</option>
 			</select>
 		</form>
 		<form id="edit-task-form">

@@ -13,6 +13,7 @@ import (
 // GET /
 // GET /YYYY-MM-DD
 // Cookies: User-Language  : string
+// Cookies: User-Filter : string ["all", "created-only", "created-not-wait-not-remind"]
 // ===========================================================================================================================
 
 // Structure to fill HTML-template of main web-page
@@ -22,6 +23,7 @@ type typeWebFormData struct {
 	Langs       []typeLang // global list of supported languages
 	Labels      typeLabels // strings-table of current language for HTML
 	ListToOpen  string     // selected list name (by URL path)
+	UserFilter  string     // user-selected filter
 }
 
 func webFormShow(res http.ResponseWriter, req *http.Request) {
@@ -55,10 +57,18 @@ func webFormShow(res http.ResponseWriter, req *http.Request) {
 	// Detect user-language and load it labels
 	webFormData.UserLangTag, webFormData.UserLang, webFormData.Labels = DetectLanguageAndLoadLabels(req)
 
+	// Detect user-selected filter from cookie
+	filterCookie, err := req.Cookie("User-Filter")
+	if err == nil {
+		webFormData.UserFilter = filterCookie.Value
+	} else {
+		webFormData.UserFilter = "all"
+	}
+
 	// Apply HTML-template
 	res.Header().Set("Content-type", "text/html")
 	t := template.New("tasks.html")
-	t, err := t.ParseFiles("templates/tasks.html")
+	t, err = t.ParseFiles("templates/tasks.html")
 	if err != nil {
 		panic(err)
 	}
