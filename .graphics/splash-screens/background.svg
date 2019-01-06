@@ -1,0 +1,93 @@
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0,0,1024,1024">
+	<desc>cloud_done icon - Licensed under Apache License v2.0 (http://www.apache.org/licenses/LICENSE-2.0) - Created with Iconfu.com - Derivative work of Material icons (Copyright Google Inc.)</desc>
+	<defs>
+		<linearGradient x1="0" y1="807.6" x2="1024" y2="216.4" gradientUnits="userSpaceOnUse" id="color-LzeoGjpC">
+			<stop offset="0.42" stop-color="#b200b0" stop-opacity="0.04"/>
+			<stop offset="0.48" stop-color="#b200b0" stop-opacity="0.04"/>
+			<stop offset="0.48" stop-color="#bb0ab9" stop-opacity="0.09"/>
+			<stop offset="0.55" stop-color="#bb0ab9" stop-opacity="0.09"/>
+			<stop offset="0.55" stop-color="#c513c3" stop-opacity="0.14"/>
+			<stop offset="0.61" stop-color="#c513c3" stop-opacity="0.14"/>
+			<stop offset="0.61" stop-color="#ce1bcc" stop-opacity="0.19"/>
+			<stop offset="0.68" stop-color="#ce1bcc" stop-opacity="0.19"/>
+			<stop offset="0.68" stop-color="#d721d5" stop-opacity="0.24"/>
+			<stop offset="0.74" stop-color="#d721d5" stop-opacity="0.24"/>
+			<stop offset="0.74" stop-color="#e128df" stop-opacity="0.28"/>
+			<stop offset="0.81" stop-color="#e128df" stop-opacity="0.28"/>
+			<stop offset="0.81" stop-color="#eb2ee9" stop-opacity="0.33"/>
+			<stop offset="0.87" stop-color="#eb2ee9" stop-opacity="0.33"/>
+			<stop offset="0.87" stop-color="#f433f2" stop-opacity="0.38"/>
+			<stop offset="0.94" stop-color="#f433f2" stop-opacity="0.38"/>
+			<stop offset="0.94" stop-color="#fe39fc" stop-opacity="0.43"/>
+			<stop offset="1" stop-color="#fe39fc" stop-opacity="0.43"/>
+		</linearGradient>
+		<linearGradient x1="1024" y1="216.4" x2="0" y2="807.6" gradientUnits="userSpaceOnUse" id="color-njlRJgkU">
+			<stop offset="0.23" stop-color="#b500b3" stop-opacity="0"/>
+			<stop offset="0.29" stop-color="#b500b3" stop-opacity="0"/>
+			<stop offset="0.29" stop-color="#bb07b9" stop-opacity="0.05"/>
+			<stop offset="0.36" stop-color="#bb07b9" stop-opacity="0.05"/>
+			<stop offset="0.36" stop-color="#c20fc0" stop-opacity="0.11"/>
+			<stop offset="0.42" stop-color="#c20fc0" stop-opacity="0.11"/>
+			<stop offset="0.42" stop-color="#c915c6" stop-opacity="0.16"/>
+			<stop offset="0.49" stop-color="#c915c6" stop-opacity="0.16"/>
+			<stop offset="0.49" stop-color="#cf1acd" stop-opacity="0.21"/>
+			<stop offset="0.55" stop-color="#cf1acd" stop-opacity="0.21"/>
+			<stop offset="0.55" stop-color="#d61fd4" stop-opacity="0.26"/>
+			<stop offset="0.62" stop-color="#d61fd4" stop-opacity="0.26"/>
+			<stop offset="0.62" stop-color="#dc24da" stop-opacity="0.32"/>
+			<stop offset="0.68" stop-color="#dc24da" stop-opacity="0.32"/>
+			<stop offset="0.68" stop-color="#e328e1" stop-opacity="0.37"/>
+			<stop offset="0.74" stop-color="#e328e1" stop-opacity="0.37"/>
+			<stop offset="0.74" stop-color="#ea2de8" stop-opacity="0.42"/>
+			<stop offset="0.81" stop-color="#ea2de8" stop-opacity="0.42"/>
+			<stop offset="0.81" stop-color="#f031ee" stop-opacity="0.47"/>
+			<stop offset="0.87" stop-color="#f031ee" stop-opacity="0.47"/>
+			<stop offset="0.87" stop-color="#f735f5" stop-opacity="0.53"/>
+			<stop offset="0.94" stop-color="#f735f5" stop-opacity="0.53"/>
+			<stop offset="0.94" stop-color="#fe39fc" stop-opacity="0.58"/>
+			<stop offset="1" stop-color="#fe39fc" stop-opacity="0.58"/>
+		</linearGradient>
+		<linearGradient x1="807.6" y1="1024" x2="216.4" y2="0" gradientUnits="userSpaceOnUse" id="color-oGdb1Njo">
+			<stop offset="0.5" stop-color="#ffd201"/>
+			<stop offset="0.56" stop-color="#ffd201"/>
+			<stop offset="0.56" stop-color="#ffc34b"/>
+			<stop offset="0.61" stop-color="#ffc34b"/>
+			<stop offset="0.61" stop-color="#ffb46f"/>
+			<stop offset="0.67" stop-color="#ffb46f"/>
+			<stop offset="0.67" stop-color="#ffa38e"/>
+			<stop offset="0.72" stop-color="#ffa38e"/>
+			<stop offset="0.72" stop-color="#ff90aa"/>
+			<stop offset="0.78" stop-color="#ff90aa"/>
+			<stop offset="0.78" stop-color="#fe7bc6"/>
+			<stop offset="0.83" stop-color="#fe7bc6"/>
+			<stop offset="0.83" stop-color="#fe61e1"/>
+			<stop offset="0.89" stop-color="#fe61e1"/>
+			<stop offset="0.89" stop-color="#fe39fc"/>
+			<stop offset="0.94" stop-color="#fe39fc"/>
+		</linearGradient>
+		<linearGradient x1="807.6" y1="1024" x2="216.4" y2="0" gradientUnits="userSpaceOnUse" id="color-QIC6aOEn">
+			<stop offset="0" stop-color="#e51fe3" stop-opacity="0"/>
+			<stop offset="0.09" stop-color="#e51fe3" stop-opacity="0"/>
+			<stop offset="0.09" stop-color="#e058db" stop-opacity="0.1"/>
+			<stop offset="0.18" stop-color="#e058db" stop-opacity="0.1"/>
+			<stop offset="0.18" stop-color="#d87bd3" stop-opacity="0.19"/>
+			<stop offset="0.27" stop-color="#d87bd3" stop-opacity="0.19"/>
+			<stop offset="0.27" stop-color="#cc98cb" stop-opacity="0.29"/>
+			<stop offset="0.36" stop-color="#cc98cb" stop-opacity="0.29"/>
+			<stop offset="0.36" stop-color="#bbb2c2" stop-opacity="0.39"/>
+			<stop offset="0.45" stop-color="#bbb2c2" stop-opacity="0.39"/>
+			<stop offset="0.45" stop-color="#a2ccb8" stop-opacity="0.49"/>
+			<stop offset="0.54" stop-color="#a2ccb8" stop-opacity="0.49"/>
+			<stop offset="0.54" stop-color="#7be4ae" stop-opacity="0.58"/>
+			<stop offset="0.63" stop-color="#7be4ae" stop-opacity="0.58"/>
+			<stop offset="0.63" stop-color="#07fca3" stop-opacity="0.68"/>
+			<stop offset="0.72" stop-color="#07fca3" stop-opacity="0.68"/>
+		</linearGradient>
+	</defs>
+	<g fill="none" fill-rule="nonzero" style="mix-blend-mode: normal">
+		<path d="M1024,1024h-1024v-1024h1024z" fill="url(#color-oGdb1Njo)"/>
+		<path d="M1024,1024h-1024v-1024h1024z" fill="url(#color-QIC6aOEn)"/>
+		<path d="M1024,1024h-1024v-1024h1024z" fill="url(#color-njlRJgkU)"/>
+		<path d="M1024,1024h-1024v-1024h1024z" fill="url(#color-LzeoGjpC)"/>
+	</g>
+</svg>

@@ -11,5 +11,5 @@
 9. Change content size = 75%
 10. For web-icon (favicon.png) leave on "Background 1" tab Corner Rounding = 30%
 11. For iphone-icon (faviphone.png) set on "Background 1" tab Corner Rounding = 0% (without rounding)
-12. Export both icons in PNG 256x256 format
+12. Export both icons in PNG 512x512 format
 13. You can export botha icon also in SVG format for the future.

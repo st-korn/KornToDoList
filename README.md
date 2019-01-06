@@ -215,7 +215,7 @@ Get tasks of selected user lists.
                  LastModifiedTimestamp : datetime,
                  TodayTasks []string (_id task or "" for delimiter),
                  TodayTasksTimestamp : datetime,
-                  }
+               }
 
 * Checks the current session for validity. If the session is not valid, it returns `"SessionEmptyNotFoundOrExpired"` as a result.
 * Returns an array of structures that identify tasks from a selected list of the current user.
@@ -291,7 +291,7 @@ Checks need to update the task list.
     Cookies: User-Session : string (UUID)
     IN: JSON: { List string,
                 LastModifiedTimestamp : datetime,
-                Result : string ["InvalidListName", "SessionEmptyNotFoundOrExpired", "TodaysTaskListUpdateFailed","TodaysTaskListJustUpdated", "TodaysTaskListUpdated"] }
+                TodayTasksTimestamp : datetime }
     OUT: JSON: { Result : string ["InvalidListName", "SessionEmptyNotFoundOrExpired", "AllActual", "NeedUpdate"] }
 
 * Checks the current session for validity. If the session is not valid, it returns `"SessionEmptyNotFoundOrExpired"` as a result.

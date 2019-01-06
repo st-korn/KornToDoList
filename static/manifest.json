@@ -1,0 +1,14 @@
+{
+    "name": "Todo.works",
+    "short_name": "Todo.works",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color" : "#f19842",
+    "description": "Task list for easy work with a large number of tasks (100+), which makes it easy to start regularly from scratch",
+    "icons": [{
+      "src": "/static/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }]
+  }
